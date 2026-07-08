@@ -1,0 +1,29 @@
+---
+layout: default
+title: "归档 Archive"
+permalink: /archive/
+---
+<section class="archive wrap">
+  <header class="page-header">
+    <h1 class="page-title" data-en="Archive" data-zh="归档">归档</h1>
+    <p class="page-subtitle" data-en="All posts, newest first" data-zh="全部文章，按时间倒序">全部文章，按时间倒序</p>
+  </header>
+
+  {% assign postsByYear = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
+  {% for year in postsByYear %}
+  <div class="archive-year">
+    <h2 class="archive-year-title">{{ year.name }}</h2>
+    <ul class="archive-list">
+      {% for post in year.items %}
+      <li class="archive-item" data-lang="{{ post.lang | default: site.lang }}">
+        <a href="{{ post.url | relative_url }}">
+          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m-%d" }}</time>
+          <span class="archive-title">{{ post.title }}</span>
+          <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</section>

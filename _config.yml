@@ -1,0 +1,53 @@
+# --- Site settings ---
+title: "Liang Shi"
+tagline: "设计 · 技术 · 生活随笔"
+description: "Liang Shi 的个人博客 — 记录设计、技术与生活。Personal blog of Liang Shi on design, technology and life."
+author: "Liang Shi"
+email: "shil630@newschool.edu"
+lang: "zh"
+timezone: "America/New_York"
+
+# baseurl "" 因为这是 user page (shil630.github.io)，站点位于域名根目录
+baseurl: ""
+url: "https://shil630.github.io"
+
+# --- Social links (留空即不显示) ---
+social:
+  github: "shil630"
+  instagram: "shiliangbj12"
+  twitter: "shiliangbj12"
+
+# --- Build settings ---
+markdown: kramdown
+highlighter: rouge
+permalink: /posts/:year/:month/:day/:title/
+paginate: 8
+paginate_path: "/page/:num/"
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-paginate
+
+# 把 _pages 里的页面纳入构建
+include:
+  - _pages
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      lang: "zh"
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - LICENSE
+  - vendor

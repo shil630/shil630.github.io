@@ -1,0 +1,10 @@
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="social">
+      {% if site.social.github %}<a href="https://github.com/{{ site.social.github }}" target="_blank" rel="noopener">GitHub</a>{% endif %}
+      {% if site.social.instagram %}<a href="https://www.instagram.com/{{ site.social.instagram }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
+      {% if site.social.twitter %}<a href="https://twitter.com/{{ site.social.twitter }}" target="_blank" rel="noopener">Twitter</a>{% endif %}
+    </div>
+    <p class="copyright">© {{ site.time | date: '%Y' }} {{ site.author }} · Built with Jekyll &amp; GitHub Pages</p>
+  </div>
+</footer>

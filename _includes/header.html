@@ -1,0 +1,18 @@
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+
+    <nav class="site-nav">
+      <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>
+        <span data-en="Home" data-zh="首页">首页</span>
+      </a>
+      <a href="{{ '/archive/' | relative_url }}"{% if page.url contains 'archive' %} class="active"{% endif %}>
+        <span data-en="Archive" data-zh="归档">归档</span>
+      </a>
+      <a href="{{ '/about/' | relative_url }}"{% if page.url contains 'about' %} class="active"{% endif %}>
+        <span data-en="About" data-zh="关于">关于</span>
+      </a>
+      <button id="lang-toggle" class="lang-toggle" type="button" aria-label="切换语言 / Switch language">中 / EN</button>
+    </nav>
+  </div>
+</header>
