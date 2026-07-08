@@ -3,7 +3,17 @@ layout: default
 title: "草稿箱 Drafts"
 permalink: /drafts/
 robots: noindex, nofollow
+sitemap: false
 ---
+{% if jekyll.environment == "production" %}
+<section class="drafts wrap">
+  <header class="page-header">
+    <h1 class="page-title">404</h1>
+    <p class="page-subtitle" data-en="This page is a local-only tool." data-zh="此页面仅供本地使用。">此页面仅供本地使用。</p>
+    <p><a href="{{ '/' | relative_url }}"><span data-en="Back to home" data-zh="返回首页">返回首页</span></a></p>
+  </header>
+</section>
+{% else %}
 <section class="drafts wrap">
   <header class="page-header">
     <h1 class="page-title" data-en="Drafts" data-zh="草稿箱">草稿箱</h1>
@@ -45,3 +55,4 @@ robots: noindex, nofollow
   <p class="drafts-empty" data-en="No drafts visible. Start the server with <code>--draft</code> to see them here." data-zh="当前看不到草稿。请用 <code>--draft</code> 参数启动本地服务器。">当前看不到草稿。请用 <code>--draft</code> 参数启动本地服务器。</p>
   {% endif %}
 </section>
+{% endif %}
