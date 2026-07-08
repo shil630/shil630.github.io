@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# 本地预览博客。保存 Markdown 后刷新浏览器即可看到改动。
+set -euo pipefail
+cd "$(dirname "$0")"
+
+DRAFT_FLAG=()
+if [[ "${1:-}" == "--draft" ]] || [[ "${1:-}" == "-d" ]]; then
+  DRAFT_FLAG=(--draft)
+  shift
+fi
+
+echo "→ http://localhost:4000"
+[[ ${#DRAFT_FLAG[@]} -gt 0 ]] && echo "→ 草稿模式已开启（含 _drafts/）"
+echo "→ 改完文章保存，等终端出现 regenerate 后刷新页面"
+echo ""
+
+exec bundle exec jekyll serve --livereload ${DRAFT_FLAG[@]+"${DRAFT_FLAG[@]}"} "$@"

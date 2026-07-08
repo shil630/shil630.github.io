@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# 快速检查能否成功构建（不启动服务器）
+set -euo pipefail
+cd "$(dirname "$0")"
+
+DRAFT_FLAG=()
+if [[ "${1:-}" == "--draft" ]] || [[ "${1:-}" == "-d" ]]; then
+  DRAFT_FLAG=(--draft)
+fi
+
+bundle exec jekyll build ${DRAFT_FLAG[@]+"${DRAFT_FLAG[@]}"}
+echo "✓ 构建成功"

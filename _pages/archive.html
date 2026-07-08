@@ -9,7 +9,8 @@ permalink: /archive/
     <p class="page-subtitle" data-en="All posts, newest first" data-zh="全部文章，按时间倒序">全部文章，按时间倒序</p>
   </header>
 
-  {% assign postsByYear = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
+  {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
+  {% assign postsByYear = published_posts | group_by_exp: "post", "post.date | date: '%Y'" %}
   {% for year in postsByYear %}
   <div class="archive-year">
     <h2 class="archive-year-title">{{ year.name }}</h2>

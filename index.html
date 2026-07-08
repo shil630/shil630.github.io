@@ -15,7 +15,8 @@ layout: default
   </div>
 
   <ul class="post-list">
-    {% for post in site.posts %}
+    {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
+    {% for post in published_posts %}
     <li class="post-item" data-lang="{{ post.lang | default: site.lang }}">
       <a class="post-card" href="{{ post.url | relative_url }}">
         <div class="post-card-meta">

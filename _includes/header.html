@@ -9,6 +9,9 @@
       <a href="{{ '/archive/' | relative_url }}"{% if page.url contains 'archive' %} class="active"{% endif %}>
         <span data-en="Archive" data-zh="归档">归档</span>
       </a>
+      <a href="{{ '/drafts/' | relative_url }}"{% if page.url contains 'drafts' %} class="active"{% endif %}>
+        <span data-en="Drafts" data-zh="草稿箱">草稿箱</span>
+      </a>
       <a href="{{ '/about/' | relative_url }}"{% if page.url contains 'about' %} class="active"{% endif %}>
         <span data-en="About" data-zh="关于">关于</span>
       </a>

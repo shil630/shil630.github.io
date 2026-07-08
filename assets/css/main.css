@@ -232,6 +232,15 @@ img { max-width: 100%; height: auto; }
 .archive-item time { font-size: 13px; color: var(--fg-faint); font-variant-numeric: tabular-nums; flex-shrink: 0; width: 44px; }
 .archive-title { flex: 1; font-size: 16px; }
 
+/* ---------- Drafts ---------- */
+.drafts-help { margin-bottom: 32px; padding: 16px 20px; background: var(--bg-soft); border-radius: 10px; border: 1px solid var(--border); }
+.drafts-help p { margin: 0 0 10px; font-size: 15px; color: var(--fg-muted); }
+.drafts-help p:last-child { margin-bottom: 0; }
+.drafts-help pre { margin: 8px 0 12px; padding: 10px 14px; background: var(--bg); border-radius: 6px; overflow-x: auto; }
+.drafts-help code { font-size: 13px; }
+.drafts-empty { color: var(--fg-faint); font-size: 15px; }
+.draft-badge { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 2px 7px; border-radius: 4px; }
+
 /* ---------- Portfolio (about) ---------- */
 .portfolio-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 20px 0 12px; }
 .portfolio-item { position: relative; display: block; border-radius: 10px; overflow: hidden; background: var(--bg-soft); aspect-ratio: 4 / 3; }
