@@ -6,3 +6,8 @@ Gemfile.lock
 vendor/
 .bundle/
 .DS_Store
+
+# Editor / IDE
+.cursor/
+.vscode/
+.idea/
