@@ -1,9 +1,9 @@
 # --- Site settings ---
 title: "Liang Shi"
-tagline: "设计 · 技术 · 生活随笔"
-description: "Liang Shi 的个人博客 — 记录设计、技术与生活。Personal blog of Liang Shi on design, technology and life."
+tagline: "设计 · 投资 · 德州扑克"
+description: "Liang Shi 的个人博客 — 记录设计、投资与德州扑克。Personal blog of Liang Shi on design, investing and poker."
 author: "Liang Shi"
-email: "shil630@newschool.edu"
+email: "shiliangbj12@gmail.com"
 lang: "zh"
 timezone: "America/New_York"
 
@@ -16,6 +16,7 @@ social:
   github: "shil630"
   instagram: "shiliangbj12"
   twitter: "shiliangbj12"
+  linkedin: "https://www.linkedin.com/in/liang-shi-105172128/"
 
 # --- Build settings ---
 markdown: kramdown

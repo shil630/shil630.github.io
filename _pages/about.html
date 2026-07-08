@@ -77,6 +77,7 @@ permalink: /about/
 <h2><span data-en="Contact" data-zh="联系方式">联系方式</span></h2>
 <ul class="contact-list">
   <li>Email — <a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+  {% if site.social.linkedin %}<li>LinkedIn — <a href="{{ site.social.linkedin }}" target="_blank" rel="noopener">linkedin.com/in/liang-shi</a></li>{% endif %}
   {% if site.social.github %}<li>GitHub — <a href="https://github.com/{{ site.social.github }}" target="_blank" rel="noopener">@{{ site.social.github }}</a></li>{% endif %}
   {% if site.social.instagram %}<li>Instagram — <a href="https://www.instagram.com/{{ site.social.instagram }}" target="_blank" rel="noopener">@{{ site.social.instagram }}</a></li>{% endif %}
 </ul>
