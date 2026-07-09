@@ -18,6 +18,20 @@ social:
   twitter: "shiliangbj12"
   linkedin: "https://www.linkedin.com/in/liang-shi-105172128/"
 
+# --- Analytics & 邮件订阅 (填好 ID 后自动生效，留空则不渲染) ---
+# GA4 衡量 ID，形如 G-XXXXXXXXXX (analytics.google.com 注册后获取)
+google_analytics: ""
+# Buttondown 用户名 (buttondown.com 注册后获取)
+buttondown_username: ""
+
+# --- SEO / 社交分享卡片 ---
+twitter:
+  username: "shiliangbj12"
+  card: "summary"
+logo: "/assets/images/photo.jpg"
+# 站点级默认分享图，可换成自己设计的 og 卡片 (建议 1200x630)
+og_image: "/assets/images/photo.jpg"
+
 # --- Build settings ---
 markdown: kramdown
 highlighter: rouge
@@ -45,6 +59,7 @@ defaults:
     values:
       layout: "post"
       lang: "zh"
+      image: "/assets/images/photo.jpg"
 
 exclude:
   - Gemfile

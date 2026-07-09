@@ -20,6 +20,8 @@ layout: default
     {{ content }}
   </div>
 
+  {% include subscribe.html %}
+
   <nav class="post-nav">
     {% if page.previous %}
     <a class="prev" href="{{ page.previous.url | relative_url }}">

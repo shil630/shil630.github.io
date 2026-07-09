@@ -11,3 +11,7 @@ vendor/
 .cursor/
 .vscode/
 .idea/
+
+# Private notes / plans (never publish)
+AI 博客写作与运营解决方案 商业计划.md
+_private/
