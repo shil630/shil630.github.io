@@ -74,4 +74,18 @@
     });
     applyFilter(localStorage.getItem(FILTER_KEY) || "all");
   }
+
+  /* ---------- Analytics: newsletter signup ---------- */
+  // Fire a GA4 event when the subscribe form is submitted.
+  // Guarded so it silently no-ops when gtag isn't present (local/dev).
+  document.querySelectorAll(".subscribe-form").forEach(function (form) {
+    form.addEventListener("submit", function () {
+      if (typeof window.gtag === "function") {
+        window.gtag("event", "newsletter_signup", {
+          method: "buttondown",
+          page_location: window.location.pathname
+        });
+      }
+    });
+  });
 })();
