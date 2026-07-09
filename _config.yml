@@ -20,9 +20,9 @@ social:
 
 # --- Analytics & 邮件订阅 (填好 ID 后自动生效，留空则不渲染) ---
 # GA4 衡量 ID，形如 G-XXXXXXXXXX (analytics.google.com 注册后获取)
-google_analytics: ""
+google_analytics: "G-MQH963M94G"
 # Buttondown 用户名 (buttondown.com 注册后获取)
-buttondown_username: ""
+buttondown_username: "shiliangbj12"
 
 # --- SEO / 社交分享卡片 ---
 twitter:
