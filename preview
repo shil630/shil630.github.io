@@ -3,11 +3,28 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+if command -v rbenv >/dev/null 2>&1; then
+  eval "$(rbenv init - bash 2>/dev/null || rbenv init - zsh)"
+fi
+export LANG="${LANG:-en_US.UTF-8}"
+export LC_ALL="${LC_ALL:-en_US.UTF-8}"
+
+ensure_deps() {
+  if bundle exec jekyll --version >/dev/null 2>&1; then
+    return 0
+  fi
+  echo "依赖不可用（常见于换电脑或 iCloud 同步后），正在运行 ./setup …"
+  echo ""
+  ./setup
+}
+
 DRAFT_FLAG=()
 if [[ "${1:-}" == "--draft" ]] || [[ "${1:-}" == "-d" ]]; then
   DRAFT_FLAG=(--draft)
   shift
 fi
+
+ensure_deps
 
 echo "→ http://localhost:4000"
 [[ ${#DRAFT_FLAG[@]} -gt 0 ]] && echo "→ 草稿模式已开启（含 _drafts/）"

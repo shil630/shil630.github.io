@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# 每台电脑首次使用、或切换电脑后运行一次。
+# gem 装在 iCloud 外的本机目录，避免两台 Mac 互相覆盖编译产物。
+set -euo pipefail
+cd "$(dirname "$0")"
+
+if command -v rbenv >/dev/null 2>&1; then
+  eval "$(rbenv init - bash 2>/dev/null || rbenv init - zsh)"
+fi
+export LANG="${LANG:-en_US.UTF-8}"
+export LC_ALL="${LC_ALL:-en_US.UTF-8}"
+
+BUNDLE_DIR="${BUNDLE_DIR:-$HOME/.cache/shil630.github.io/bundle}"
+mkdir -p "$BUNDLE_DIR"
+
+echo "Ruby:  $(ruby -v)"
+echo "Bundle: $(bundle -v)"
+echo "Gems → $BUNDLE_DIR"
+echo ""
+
+bundle config set --local path "$BUNDLE_DIR"
+bundle config set --local deployment 'false'
+
+# 旧版留在 iCloud 里的 vendor/bundle 会导致路径冲突，清掉
+if [[ -d vendor/bundle ]]; then
+  echo "移除项目内的 vendor/bundle（已改到本机目录）…"
+  rm -rf vendor/bundle
+  rmdir vendor 2>/dev/null || true
+fi
+
+bundle install
+echo ""
+echo "✓ 环境就绪。运行 ./preview 开始预览。"

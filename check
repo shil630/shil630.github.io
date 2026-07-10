@@ -3,6 +3,17 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+if command -v rbenv >/dev/null 2>&1; then
+  eval "$(rbenv init - bash 2>/dev/null || rbenv init - zsh)"
+fi
+export LANG="${LANG:-en_US.UTF-8}"
+export LC_ALL="${LC_ALL:-en_US.UTF-8}"
+
+if ! bundle exec jekyll --version >/dev/null 2>&1; then
+  echo "依赖不可用，先运行 ./setup"
+  exit 1
+fi
+
 DRAFT_FLAG=()
 if [[ "${1:-}" == "--draft" ]] || [[ "${1:-}" == "-d" ]]; then
   DRAFT_FLAG=(--draft)

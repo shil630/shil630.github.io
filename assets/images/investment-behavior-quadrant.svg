@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120" role="img" aria-labelledby="title desc">
+  <title id="title">投资行为四象限</title>
+  <desc id="desc">横轴是买入后主动管理或被动反应，纵轴是机会准入严格或宽松。四格依次为紧凶、紧弱、松凶、松弱。砖红虚线箭头只代表作者从松弱练习走向更严格、主动的个人路径。</desc>
+  <rect width="1600" height="1120" fill="#F5F1EA"/>
+  <style>
+    .title { font-family: 'Songti SC', STSong, serif; font-size: 58px; font-weight: 600; fill: #1E1D1B; }
+    .subtitle { font-family: 'PingFang SC', 'Noto Sans CJK SC', sans-serif; font-size: 26px; fill: #5F5A54; }
+    .axis { font-family: 'PingFang SC', 'Noto Sans CJK SC', sans-serif; font-size: 28px; font-weight: 600; fill: #1E1D1B; }
+    .axis-en { font-family: Georgia, serif; font-size: 20px; fill: #8D8881; letter-spacing: 1px; }
+    .cell-title { font-family: 'Songti SC', STSong, serif; font-size: 42px; font-weight: 600; fill: #1E1D1B; }
+    .cell-copy { font-family: 'PingFang SC', 'Noto Sans CJK SC', sans-serif; font-size: 27px; fill: #4B4742; }
+    .cell-note { font-family: 'PingFang SC', 'Noto Sans CJK SC', sans-serif; font-size: 23px; fill: #6E6861; }
+    .tag { font-family: Georgia, serif; font-size: 18px; fill: #8D8881; letter-spacing: 1px; }
+    .path-label { font-family: 'PingFang SC', 'Noto Sans CJK SC', sans-serif; font-size: 23px; font-weight: 600; fill: #B64B3B; }
+    .footer { font-family: 'PingFang SC', 'Noto Sans CJK SC', sans-serif; font-size: 23px; fill: #6E6861; }
+  </style>
+
+  <text x="120" y="122" class="title">投资行为四象限</text>
+  <text x="120" y="170" class="subtitle">先看你让什么机会进来，再看买入以后怎样行动</text>
+  <text x="1480" y="122" text-anchor="end" class="subtitle">正EV实验 · 投资</text>
+
+  <line x1="300" y1="300" x2="300" y2="915" stroke="#1E1D1B" stroke-width="3"/>
+  <line x1="300" y1="915" x2="1420" y2="915" stroke="#1E1D1B" stroke-width="3"/>
+  <line x1="860" y1="300" x2="860" y2="915" stroke="#8D8881" stroke-width="2"/>
+  <line x1="300" y1="607" x2="1420" y2="607" stroke="#8D8881" stroke-width="2"/>
+
+  <text x="580" y="270" text-anchor="middle" class="axis">主动管理</text>
+  <text x="580" y="298" text-anchor="middle" class="axis-en">ACTIVE</text>
+  <text x="1140" y="270" text-anchor="middle" class="axis">被动反应</text>
+  <text x="1140" y="298" text-anchor="middle" class="axis-en">PASSIVE</text>
+
+  <text x="264" y="468" text-anchor="end" class="axis">严格准入</text>
+  <text x="264" y="496" text-anchor="end" class="axis-en">TIGHT</text>
+  <text x="264" y="774" text-anchor="end" class="axis">宽松准入</text>
+  <text x="264" y="802" text-anchor="end" class="axis-en">LOOSE</text>
+
+  <rect x="328" y="328" width="504" height="250" rx="18" fill="#F0E8DD"/>
+  <rect x="888" y="328" width="504" height="250" rx="18" fill="#EEE9E2"/>
+  <rect x="328" y="636" width="504" height="250" rx="18" fill="#EEE9E2"/>
+  <rect x="888" y="636" width="504" height="250" rx="18" fill="#F0E8DD"/>
+
+  <text x="372" y="395" class="cell-title">紧凶：挑得严，也愿意管</text>
+  <text x="372" y="435" class="tag">TIGHT · AGGRESSIVE</text>
+  <text x="372" y="486" class="cell-copy">角色、上限、复核、退出</text>
+  <text x="372" y="528" class="cell-note">不是猛干，是提前把判断做成动作</text>
+
+  <text x="932" y="395" class="cell-title">紧弱：严选，但容易不动作</text>
+  <text x="932" y="435" class="tag">TIGHT · PASSIVE</text>
+  <text x="932" y="486" class="cell-copy">看得细、拿着等、少复核</text>
+  <text x="932" y="528" class="cell-note">长期持有也可以是主动设计的结果</text>
+
+  <text x="372" y="703" class="cell-title">松凶：高波动的机会猎手</text>
+  <text x="372" y="743" class="tag">LOOSE · AGGRESSIVE</text>
+  <text x="372" y="794" class="cell-copy">看得多、出手多、主动调整</text>
+  <text x="372" y="836" class="cell-note">代价是更多判断、换手与波动</text>
+
+  <text x="932" y="703" class="cell-title">松弱：参与感驱动的跟随者</text>
+  <text x="932" y="743" class="tag">LOOSE · PASSIVE</text>
+  <text x="932" y="794" class="cell-copy">热点都想碰、买完等答案</text>
+  <text x="932" y="836" class="cell-note">机会很多，但没有一个仓位被真正管理</text>
+
+  <path d="M 1258 842 C 1198 798, 1042 692, 882 574 C 774 494, 692 450, 621 424" fill="none" stroke="#B64B3B" stroke-width="5" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <path d="M 622 424 L 652 430 L 638 453" fill="none" stroke="#B64B3B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="1258" cy="842" r="8" fill="#B64B3B"/>
+  <text x="1080" y="893" class="path-label">我在练习：从松弱 → 更严格、主动</text>
+
+  <line x1="120" y1="994" x2="1480" y2="994" stroke="#D9CFC3" stroke-width="2"/>
+  <text x="120" y="1047" class="footer">不是人格测试；行情、亏损与 FOMO 都可能让人换格。</text>
+  <text x="1480" y="1047" text-anchor="end" class="footer">观察的是动作，不是给人打分。</text>
+</svg>

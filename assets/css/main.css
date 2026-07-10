@@ -255,7 +255,8 @@ img { max-width: 100%; height: auto; }
 .prose p { margin: 0 0 20px; }
 .prose ul, .prose ol { margin: 0 0 20px; padding-left: 1.4em; }
 .prose li { margin: 4px 0; }
-.prose img { border-radius: 8px; margin: 20px 0; }
+.prose img { border-radius: 8px; margin: 20px 0; max-width: 100%; height: auto; }
+.prose img[src$=".svg"] { background: #F5F1EA; }
 .prose blockquote {
   margin: 24px 0;
   padding: 4px 20px;
