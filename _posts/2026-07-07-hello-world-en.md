@@ -4,6 +4,7 @@ title: "Hello, World"
 subtitle: "A new blog begins"
 date: 2026-07-07 10:00:00 -0400
 lang: en
+home: false
 tags: [meta, notes]
 ---
 

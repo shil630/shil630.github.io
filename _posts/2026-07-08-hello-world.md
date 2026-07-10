@@ -4,6 +4,7 @@ title: "你好，世界"
 subtitle: "新博客上线了"
 date: 2026-07-08 06:00:00 -0400
 lang: zh
+home: false
 tags: [随笔, 建站]
 ---
 

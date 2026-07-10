@@ -1,8 +1,8 @@
 # --- Site settings ---
-title: "Liang Shi"
-tagline: "设计 · 投资 · 德州扑克"
-description: "Liang Shi 的个人博客 — 记录设计、投资与德州扑克。Personal blog of Liang Shi on design, investing and poker."
-author: "Liang Shi"
+title: "石亮正EV"
+tagline: "在不确定中，持续做更好的决策"
+description: "石亮正EV：一个 UX 设计师关于设计、投资、德州与不确定性决策的长期实验，记录期望值、投入尺度、退出纪律和真实复盘。"
+author: "石亮 / Liang Shi"
 email: "shiliangbj12@gmail.com"
 lang: "zh"
 timezone: "America/New_York"
@@ -28,9 +28,9 @@ buttondown_username: "shiliangbj12"
 twitter:
   username: "shiliangbj12"
   card: "summary"
-logo: "/assets/images/photo.jpg"
+logo: "/assets/images/avatar-blog-512.png"
 # 站点级默认分享图，可换成自己设计的 og 卡片 (建议 1200x630)
-og_image: "/assets/images/photo.jpg"
+og_image: "/assets/images/blog-home-og.png"
 
 # --- Build settings ---
 markdown: kramdown
@@ -59,7 +59,7 @@ defaults:
     values:
       layout: "post"
       lang: "zh"
-      image: "/assets/images/photo.jpg"
+      image: "/assets/images/blog-home-og.png"
 
 exclude:
   - Gemfile

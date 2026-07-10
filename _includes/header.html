@@ -1,6 +1,6 @@
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+    <a class="site-title" href="{{ '/' | relative_url }}">石亮正EV</a>
 
     <nav class="site-nav">
       <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>
@@ -9,11 +9,6 @@
       <a href="{{ '/archive/' | relative_url }}"{% if page.url contains 'archive' %} class="active"{% endif %}>
         <span data-en="Archive" data-zh="归档">归档</span>
       </a>
-      {% if jekyll.environment != "production" %}
-      <a href="{{ '/drafts/' | relative_url }}"{% if page.url contains 'drafts' %} class="active"{% endif %}>
-        <span data-en="Drafts" data-zh="草稿箱">草稿箱</span>
-      </a>
-      {% endif %}
       <a href="{{ '/about/' | relative_url }}"{% if page.url contains 'about' %} class="active"{% endif %}>
         <span data-en="About" data-zh="关于">关于</span>
       </a>

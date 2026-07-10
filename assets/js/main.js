@@ -88,4 +88,17 @@
       }
     });
   });
+
+  // Track which free tool readers explicitly join the waitlist for.
+  document.querySelectorAll(".tool-waitlist-form").forEach(function (form) {
+    form.addEventListener("submit", function () {
+      var selected = form.querySelector('input[name="tag"]:checked');
+      if (selected && typeof window.gtag === "function") {
+        window.gtag("event", "tool_waitlist_vote", {
+          tool: selected.value,
+          page_location: window.location.pathname
+        });
+      }
+    });
+  });
 })();

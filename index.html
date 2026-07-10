@@ -1,22 +1,28 @@
 ---
 layout: default
+image: "/assets/images/blog-home-og.png"
 ---
 <section class="hero wrap">
-  <h1 class="hero-title">{{ site.title }}</h1>
-  <p class="hero-tagline" data-en="Design · Investing · Poker" data-zh="设计 · 投资 · 德州扑克">设计 · 投资 · 德州扑克</p>
+  <h1 class="hero-title" data-en="Keep making better decisions under uncertainty" data-zh="在不确定中，持续做更好的决策">在不确定中，持续做更好的决策</h1>
+  <p class="hero-pillars" data-en="Design · Investing · Poker" data-zh="设计 · 投资 · 德州">设计 · 投资 · 德州</p>
 </section>
 
-<section class="posts wrap">
+<section class="posts wrap" id="articles">
+  {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
+  {% assign home_posts = published_posts | where_exp: "post", "post.home != false" %}
+  {% assign home_posts_zh = home_posts | where: "lang", "zh" %}
+  {% assign home_posts_en = home_posts | where: "lang", "en" %}
+  {% if home_posts_zh.size > 0 and home_posts_en.size > 0 %}
   <div class="filter-bar">
     <span class="filter-label" data-en="Filter" data-zh="筛选">筛选</span>
     <button class="filter-chip active" data-filter="all">All / 全部</button>
     <button class="filter-chip" data-filter="zh">中文</button>
     <button class="filter-chip" data-filter="en">English</button>
   </div>
+  {% endif %}
 
   <ul class="post-list">
-    {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
-    {% for post in published_posts %}
+    {% for post in home_posts %}
     <li class="post-item" data-lang="{{ post.lang | default: site.lang }}">
       <a class="post-card" href="{{ post.url | relative_url }}">
         <div class="post-card-meta">

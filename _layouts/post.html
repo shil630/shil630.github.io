@@ -22,18 +22,24 @@ layout: default
 
   {% include subscribe.html %}
 
+  {% assign show_previous = false %}
+  {% assign show_next = false %}
+  {% if page.previous and page.previous.home != false %}{% assign show_previous = true %}{% endif %}
+  {% if page.next and page.next.home != false %}{% assign show_next = true %}{% endif %}
+  {% if show_previous or show_next %}
   <nav class="post-nav">
-    {% if page.previous %}
+    {% if show_previous %}
     <a class="prev" href="{{ page.previous.url | relative_url }}">
       <span class="dir">← <span data-en="Previous" data-zh="上一篇">上一篇</span></span>
       <span class="ttl">{{ page.previous.title }}</span>
     </a>
     {% endif %}
-    {% if page.next %}
+    {% if show_next %}
     <a class="next" href="{{ page.next.url | relative_url }}">
       <span class="dir"><span data-en="Next" data-zh="下一篇">下一篇</span> →</span>
       <span class="ttl">{{ page.next.title }}</span>
     </a>
     {% endif %}
   </nav>
+  {% endif %}
 </article>

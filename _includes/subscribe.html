@@ -1,14 +1,14 @@
 {% if site.buttondown_username != "" and site.buttondown_username %}
-<section class="subscribe wrap">
+<section class="subscribe wrap" id="subscribe">
   <div class="subscribe-box">
-    <h3 class="subscribe-title" data-en="Subscribe" data-zh="订阅更新">订阅更新</h3>
-    <p class="subscribe-desc" data-en="Get new posts by email. No spam, unsubscribe anytime." data-zh="新文章发布时通过邮件通知你。无垃圾邮件，随时可退订。">新文章发布时通过邮件通知你。无垃圾邮件，随时可退订。</p>
+    <h3 class="subscribe-title" data-en="Subscribe to the Positive EV Lab" data-zh="订阅正EV实验">订阅正EV实验</h3>
+    <p class="subscribe-desc" data-en="Occasional essays on design, investing, poker, and decision-making. No signals. No noise." data-zh="不定期更新关于设计、投资、德州与决策的文章。无喊单，无噪音。">不定期更新关于设计、投资、德州与决策的文章。无喊单，无噪音。</p>
     <form class="subscribe-form"
           action="https://buttondown.com/api/emails/embed-subscribe/{{ site.buttondown_username }}"
           method="post" target="_blank">
       <input type="email" name="email" placeholder="you@example.com" required
              aria-label="Email address">
-      <button type="submit" data-en="Subscribe" data-zh="订阅">订阅</button>
+      <button type="submit" data-en="Join the experiment" data-zh="加入实验">加入实验</button>
     </form>
   </div>
 </section>

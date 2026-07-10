@@ -1,7 +1,7 @@
 # shil630.github.io
 
-Liang Shi 的个人博客,基于 [Jekyll](https://jekyllrb.com/) + GitHub Pages。
-Personal blog of Liang Shi, built with Jekyll & GitHub Pages.
+「石亮正EV」Blog，基于 [Jekyll](https://jekyllrb.com/) + GitHub Pages。
+Liang Shi · Positive EV, built with Jekyll & GitHub Pages.
 
 在线地址 / Live: <https://shil630.github.io>
 
@@ -28,7 +28,8 @@ Personal blog of Liang Shi, built with Jekyll & GitHub Pages.
 
 ```
 _config.yml          站点配置(标题、社交链接等)
-index.html           首页(文章列表 + 语言筛选)
+index.html           品牌首页(定位 + 文章列表)
+_pages/              关于、归档等独立页面
 _pages/about.html    关于我(作品集 + 经历)
 _pages/archive.html  归档
 _posts/              所有文章
