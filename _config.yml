@@ -47,6 +47,7 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
   - jekyll-paginate
+  - jekyll-sitemap
 
 # 把 _pages 里的页面纳入构建
 include:
