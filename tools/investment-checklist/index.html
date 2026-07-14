@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>正EV · 投资决策检查清单</title>
+  <style>
+    :root {
+      --paper:#F5F1EA; --ink:#1E1D1B; --red:#B64B3B; --muted:#8D8881;
+      --sand:#D9CFC3; --card:#EEE6DC; --white:#FFFDF9; --soft:#FAF7F1;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; }
+    .page { width:min(100%, 1080px); margin:0 auto; padding:34px 28px 64px; }
+    .masthead { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--sand); padding-bottom:24px; }
+    .brand { display:flex; gap:11px; align-items:flex-start; }
+    .dots { display:flex; gap:5px; padding-top:7px; }
+    .dot { display:block; width:9px; height:9px; border-radius:50%; background:var(--ink); }
+    .dot.red { background:var(--red); }
+    .dot.outline { background:transparent; border:1px solid var(--red); }
+    h1 { margin:0; font-family:"Songti SC","STSong",serif; font-size:31px; line-height:1.25; }
+    .kicker { margin:6px 0 0; color:var(--muted); font-size:12px; letter-spacing:.08em; }
+    .edition { color:var(--muted); font:13px Georgia,serif; letter-spacing:.06em; }
+    .intro { max-width:760px; margin:38px 0 28px; }
+    .intro h2 { margin:0 0 12px; font-family:"Songti SC","STSong",serif; font-size:27px; line-height:1.45; }
+    .intro p { margin:0; color:#5d5750; font-size:15px; line-height:1.85; }
+    .mode-toggle { display:inline-flex; padding:3px; border:1px solid var(--sand); border-radius:7px; background:rgba(255,255,255,.42); }
+    .mode-button { min-width:94px; border:0; border-radius:4px; padding:8px 11px; color:var(--muted); background:transparent; font-size:13px; }
+    .mode-button small { display:block; margin-top:2px; font-size:10px; font-weight:400; }
+    .mode-button[aria-pressed="true"] { color:var(--ink); background:#f0e2d8; box-shadow:0 1px 2px rgba(30,29,27,.08); }
+    .mode-hint { margin:12px 0 0; color:var(--muted); font-size:12px; line-height:1.7; }
+    .notice { margin:24px 0; padding:14px 16px; border-left:3px solid var(--red); background:var(--card); color:#59534d; font-size:13px; line-height:1.75; }
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:26px 0 14px; }
+    .step { padding:13px 15px; border:1px solid var(--sand); border-radius:5px; color:var(--muted); background:rgba(255,255,255,.26); font-size:13px; }
+    .step strong { display:block; margin-bottom:3px; color:var(--ink); font-family:Georgia,serif; font-size:15px; }
+    .step.active { border-color:var(--red); background:#f0e2d8; }
+    .coverage { display:flex; justify-content:space-between; gap:16px; align-items:center; margin:0 0 24px; padding:12px 15px; border:1px solid var(--sand); border-radius:5px; background:rgba(255,255,255,.34); color:#665f58; font-size:12px; line-height:1.6; }
+    .coverage strong { color:var(--red); font-weight:600; }
+    #simpleChecklist { display:none; }
+    body[data-mode="simple"] #simpleChecklist { display:grid; gap:16px; }
+    body[data-mode="simple"] #fullChecklist { display:none; }
+    .simple-upgrade { margin:0; padding:14px 16px; border:1px dashed var(--sand); border-radius:6px; color:#645d56; background:rgba(255,255,255,.28); font-size:13px; line-height:1.75; }
+    .simple-upgrade strong { color:var(--red); }
+    form { display:grid; gap:16px; }
+    .panel { padding:26px; border:1px solid var(--sand); border-radius:8px; background:var(--white); }
+    .panel-head { display:flex; align-items:baseline; gap:12px; margin-bottom:12px; }
+    .panel-num { color:var(--red); font:700 15px Georgia,serif; }
+    .panel h3 { margin:0; font-family:"Songti SC","STSong",serif; font-size:23px; }
+    .panel-note { margin:0 0 22px; color:var(--muted); font-size:13px; line-height:1.7; }
+    .subsection { margin-top:24px; padding-top:22px; border-top:1px solid #e7ded4; }
+    .subsection:first-of-type { margin-top:0; padding-top:0; border-top:0; }
+    .subhead { display:flex; align-items:center; gap:9px; margin:0 0 14px; font-size:15px; font-weight:650; }
+    .subhead span { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%; color:var(--red); background:#f1e4da; font:700 12px Georgia,serif; }
+    .hint { margin:-5px 0 15px; color:var(--muted); font-size:12px; line-height:1.7; }
+    .fields { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+    label { display:flex; flex-direction:column; gap:7px; color:#4c4741; font-size:13px; line-height:1.5; }
+    label.full { grid-column:1 / -1; }
+    textarea, input, select { width:100%; border:1px solid var(--sand); border-radius:4px; outline:0; padding:11px 12px; color:var(--ink); background:#fffefa; font:14px/1.7 "PingFang SC","Microsoft YaHei",sans-serif; }
+    textarea { min-height:102px; resize:vertical; }
+    textarea.compact { min-height:74px; }
+    input:focus, textarea:focus, select:focus { border-color:var(--red); box-shadow:0 0 0 3px rgba(182,75,59,.08); }
+    .five-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .numbered { position:relative; }
+    .numbered b { position:absolute; left:10px; top:11px; color:var(--red); font:700 12px Georgia,serif; }
+    .numbered textarea { padding-left:34px; }
+    .numbered.wide { grid-column:1 / -1; }
+    .plan { display:grid; gap:8px; }
+    .plan-row { display:grid; grid-template-columns:110px 1.25fr 1.35fr .8fr; gap:8px; align-items:start; }
+    .plan-row.head { color:var(--muted); font-size:11px; padding:0 4px 3px; }
+    .plan-row input { min-width:0; }
+    .exit-row { display:grid; grid-template-columns:1.15fr 1.3fr .85fr; gap:8px; }
+    .check-row { display:flex; flex-wrap:wrap; gap:14px 20px; margin-top:18px; }
+    .check { display:flex; flex-direction:row; align-items:center; gap:7px; font-size:13px; }
+    .check input { width:auto; accent-color:var(--red); }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:4px; }
+    button { border:1px solid var(--ink); border-radius:4px; padding:11px 15px; color:var(--ink); background:transparent; cursor:pointer; font:inherit; font-size:13px; }
+    button.primary { border-color:var(--red); color:#fffdf9; background:var(--red); }
+    button:hover { opacity:.84; }
+    .saved { margin-left:auto; color:var(--muted); font-size:12px; align-self:center; }
+    .bottom-note { margin-top:34px; color:var(--muted); font-size:12px; line-height:1.8; font-style:italic; }
+    @media (max-width:760px) {
+      .page { padding:22px 16px 44px; }
+      .masthead { gap:16px; }
+      .mode-toggle { flex:0 0 auto; }
+      .mode-button { min-width:74px; padding:7px 8px; font-size:12px; }
+      .mode-button small { display:none; }
+      .steps { gap:6px; }
+      .step { padding:11px 9px; font-size:11px; }
+      .step strong { font-size:13px; }
+      .coverage { align-items:flex-start; flex-direction:column; gap:3px; }
+      .panel { padding:20px 15px; }
+      .fields, .five-grid { grid-template-columns:1fr; }
+      label.full, .numbered.wide { grid-column:auto; }
+      .plan-row, .exit-row { grid-template-columns:1fr; padding:13px; border:1px solid #e7ded4; border-radius:5px; background:var(--soft); }
+      .plan-row.head { display:none; }
+      .plan-row input::placeholder { color:#9b938b; }
+      .saved { width:100%; margin-left:0; }
+    }
+    @media print {
+      body { background:#fff; }
+      .actions, .steps, .notice, .coverage { display:none; }
+      .page { width:100%; padding:0; }
+      .panel { break-inside:avoid; }
+      textarea, input, select { border-color:#ddd; }
+    }
+  </style>
+</head>
+<body data-mode="simple">
+  <main class="page">
+    <header class="masthead">
+      <div class="brand"><span class="dots"><i class="dot red"></i><i class="dot"></i><i class="dot outline"></i></span><div><h1>投资决策检查清单</h1><p class="kicker">正EV实验 · EV · SIZE · EXIT</p></div></div>
+      <div class="mode-toggle" role="group" aria-label="检查清单版本">
+        <button type="button" class="mode-button" data-mode="simple" aria-pressed="true">简单版<small>先写三段</small></button>
+        <button type="button" class="mode-button" data-mode="full" aria-pressed="false">完整版<small>完整研究</small></button>
+      </div>
+    </header>
+
+    <section class="intro">
+      <h2 id="introTitle">在按下买入前，先留下三段不容易被情绪改写的话。</h2>
+      <p id="introText">简单版只问：为什么参与、为什么是这个尺度、什么会让我行动。需要比较估值、拆分仓位或写止盈计划时，再切到完整版。</p>
+      <p class="mode-hint" id="modeHint">两种模式共用同一份草稿；切换不会丢失已经填写的内容。</p>
+    </section>
+    <div class="notice" id="modeNotice">这不是买卖建议。它只是让“我想参与”先经过 EV、SIZE、EXIT 三道门，再决定要不要点确认。</div>
+
+    <div class="steps"><div class="step active"><strong>01 · EV</strong>理由、风险与估值</div><div class="step"><strong>02 · SIZE</strong>角色与分批仓位</div><div class="step"><strong>03 · EXIT</strong>止盈、止损与复核</div></div>
+    <div class="coverage"><span>这不是评分结果，只显示哪些问题已经留下记录。</span><strong id="coverageText">当前记录：0/5 理由 · 0/5 风险 · 0 个建仓阶段 · 0 条退出规则</strong></div>
+
+    <form id="checklist">
+      <div id="simpleChecklist">
+        <section class="panel">
+          <div class="panel-head"><span class="panel-num">00 / CONTEXT</span><h3>先记下当时的自己</h3></div>
+          <p class="panel-note">留一点背景，避免以后只用结果改写记忆。</p>
+          <div class="fields">
+            <label>记录日期<input type="date" data-bind="context_date"></label>
+            <label>标的 / 机会<input data-bind="context_asset" placeholder="可以写代码，也可以写匿名名称"></label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><span class="panel-num">01 / EV</span><h3>为什么值得参与？</h3></div>
+          <p class="panel-note">先写判断、证据和可能推翻它的事实。愿望不算证据。</p>
+          <div class="fields">
+            <label class="full">我的一句话判断<textarea data-bind="ev_judgement" placeholder="写成可以被未来证据推翻的一句话，不写“长期看好”。"></textarea></label>
+            <label>支持这个判断的一条关键证据<textarea data-bind="reason_1" placeholder="事实、数据或可跟踪的变化。"></textarea></label>
+            <label>什么变化会让我更新判断？<textarea data-bind="exit_invalidated" placeholder="写业务或行业事实，不只写跌幅。"></textarea></label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><span class="panel-num">02 / SIZE</span><h3>为什么是这个尺度？</h3></div>
+          <p class="panel-note">看好不等于重仓。先找角色，再承认这笔投入的边界。</p>
+          <div class="fields">
+            <label>仓位角色<input data-bind="size_role" list="role-options" placeholder="例如：核心 / 防守 / 进攻 / 小仓试错"></label>
+            <label>投入尺度的理由<textarea data-bind="size_not_more" placeholder="哪些不确定性让我不该投得更多？"></textarea></label>
+            <label class="full">最坏情况下，我需要承受什么？<textarea data-bind="size_downside" placeholder="资金、流动性、注意力和心理状态会受什么影响？"></textarea></label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><span class="panel-num">03 / EXIT</span><h3>什么会让我行动？</h3></div>
+          <p class="panel-note">退出不是只在下跌时才想。提前写下来，情绪上来时才有东西可以照着看。</p>
+          <div class="fields">
+            <label>复核时间<input data-bind="exit_review" placeholder="例如：下次财报后 / 每季度 / 某个日期"></label>
+            <label>逻辑不成立时的动作<textarea data-bind="exit_logic_action" placeholder="暂停新增 / 降级为观察仓 / 减仓 / 退出"></textarea></label>
+            <label class="full">我不想被什么情绪牵着走？<textarea data-bind="exit_emotion" placeholder="卖飞、不甘心、怕错过、急于回本……"></textarea></label>
+          </div>
+        </section>
+
+        <p class="simple-upgrade"><strong>什么时候切到完整版？</strong>当你已经决定进一步研究，想把 5 个理由、5 个风险、估值、分批仓位和削峰计划写完整时，再切过去。</p>
+      </div>
+
+      <div id="fullChecklist">
+      <section class="panel">
+        <div class="panel-head"><span class="panel-num">00 / CONTEXT</span><h3>这次决定发生在什么背景下？</h3></div>
+        <p class="panel-note">记录当时的时间和情景，避免以后用结果改写记忆。</p>
+        <div class="fields">
+          <label>记录日期<input type="date" name="context_date"></label>
+          <label>标的 / 机会<input name="context_asset" placeholder="可以写代码，也可以写匿名名称"></label>
+          <label>计划持有周期<input name="context_horizon" placeholder="例如：事件观察 / 中期趋势 / 长期核心"></label>
+          <label>当时的市场情景<input name="context_market" placeholder="例如：板块火热，我担心错过主线"></label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><span class="panel-num">01 / EV</span><h3>这件事为什么值得参与？</h3></div>
+        <p class="panel-note">理由、风险和估值缺一块，都不代表不能参与；但需要让仓位承认这种不完整。</p>
+
+        <div class="subsection">
+          <h4 class="subhead"><span>A</span>一句话判断</h4>
+          <div class="fields">
+            <label class="full">如果只能留一句话，我在判断什么？<textarea name="ev_judgement" placeholder="写成可以被未来证据推翻的一句话，不写“长期看好”。"></textarea></label>
+            <label>市场可能已经知道什么？<textarea name="ev_market_knows" placeholder="价格为什么会处在这里？市场在担心或期待什么？"></textarea></label>
+            <label>我的差异判断是什么？<textarea name="ev_difference" placeholder="我与当前市场隐含判断真正不同的地方在哪里？"></textarea></label>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h4 class="subhead"><span>B</span>5 点投资理由</h4>
+          <p class="hint">优先写事实、数据或可跟踪的变化。五项不必凑满，重复的理由只算一项。</p>
+          <div class="five-grid reason-fields">
+            <label class="numbered"><b>01</b><textarea class="compact" name="reason_1" placeholder="行业需求 / 长期方向"></textarea></label>
+            <label class="numbered"><b>02</b><textarea class="compact" name="reason_2" placeholder="公司地位 / 竞争优势"></textarea></label>
+            <label class="numbered"><b>03</b><textarea class="compact" name="reason_3" placeholder="业绩 / 订单 / 经营兑现"></textarea></label>
+            <label class="numbered"><b>04</b><textarea class="compact" name="reason_4" placeholder="利润率 / 现金流 / 经营改善"></textarea></label>
+            <label class="numbered wide"><b>05</b><textarea class="compact" name="reason_5" placeholder="稀缺性 / 催化 / 其他关键理由"></textarea></label>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h4 class="subhead"><span>C</span>5 个核心风险</h4>
+          <p class="hint">不要只写“市场波动”。尽量写清风险通过什么路径伤害收入、利润、现金流或估值。</p>
+          <div class="five-grid risk-fields">
+            <label class="numbered"><b>01</b><textarea class="compact" name="risk_1" placeholder="估值风险"></textarea></label>
+            <label class="numbered"><b>02</b><textarea class="compact" name="risk_2" placeholder="客户 / 供应链集中风险"></textarea></label>
+            <label class="numbered"><b>03</b><textarea class="compact" name="risk_3" placeholder="行业周期 / 资本开支风险"></textarea></label>
+            <label class="numbered"><b>04</b><textarea class="compact" name="risk_4" placeholder="竞争 / 技术替代风险"></textarea></label>
+            <label class="numbered wide"><b>05</b><textarea class="compact" name="risk_5" placeholder="现金流 / 执行 / 其他关键风险"></textarea></label>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h4 class="subhead"><span>D</span>估值评估</h4>
+          <p class="hint">估值不是精确目标价。这里记录价格已经透支了多少预期，以及什么兑现才能支撑它。</p>
+          <div class="fields">
+            <label>当前估值体感<select name="valuation_level"><option value="">请选择</option><option>明显偏贵</option><option>中性偏贵</option><option>大致合理</option><option>中性偏低</option><option>明显偏低</option><option>暂时无法判断</option></select></label>
+            <label>参考指标<input name="valuation_metrics" placeholder="例如：PE / PS / P-FCF / FCF yield / 同业比较"></label>
+            <label>当前价格大概计入了什么？<textarea name="valuation_priced_in" placeholder="市场已经提前计入了几年增长、怎样的利润率或行业份额？"></textarea></label>
+            <label>什么兑现才能支撑当前估值？<textarea name="valuation_support" placeholder="写经营条件，不只写“股价继续涨”。"></textarea></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><span class="panel-num">02 / SIZE</span><h3>它在组合里负责什么？</h3></div>
+        <p class="panel-note">分批计划不是越跌越买。每一笔新增都需要价格条件和证据条件同时成立。</p>
+        <div class="fields">
+          <label>仓位角色<input name="size_role" list="role-options" placeholder="例如：核心 / 防守 / 进攻 / 小仓试错"></label>
+          <label>最大参与边界<input name="size_limit" placeholder="由自己定义；可以写模糊范围，不要求具体比例"></label>
+          <label>为什么不是更多？<textarea name="size_not_more" placeholder="哪些不确定性限制了仓位？"></textarea></label>
+          <label>为什么不是更少或不参与？<textarea name="size_not_less" placeholder="为什么值得保留一点参与权？"></textarea></label>
+          <label class="full">最坏情况下，我需要承受什么？<textarea name="size_downside" placeholder="资金、流动性、注意力、相关仓位和心理状态分别会受到什么影响？"></textarea></label>
+        </div>
+
+        <div class="subsection">
+          <h4 class="subhead"><span>A</span>分批建仓计划</h4>
+          <p class="hint">“价格到了”不等于“自动加仓”。证据没有改善时，可以选择不动。</p>
+          <div class="plan">
+            <div class="plan-row head"><span>阶段</span><span>价格 / 事件条件</span><span>证据条件与动作</span><span>阶段后仓位</span></div>
+            <div class="plan-row"><input name="stage_1_name" value="第一笔试探" aria-label="第一阶段名称"><input name="stage_1_trigger" placeholder="价格或事件条件" aria-label="第一阶段触发条件"><input name="stage_1_action" placeholder="需要什么证据，做什么动作" aria-label="第一阶段动作"><input name="stage_1_size" placeholder="仓位" aria-label="第一阶段后仓位"></div>
+            <div class="plan-row"><input name="stage_2_name" value="第二笔加仓" aria-label="第二阶段名称"><input name="stage_2_trigger" placeholder="价格或事件条件" aria-label="第二阶段触发条件"><input name="stage_2_action" placeholder="需要什么证据，做什么动作" aria-label="第二阶段动作"><input name="stage_2_size" placeholder="仓位" aria-label="第二阶段后仓位"></div>
+            <div class="plan-row"><input name="stage_3_name" value="第三笔核心买入" aria-label="第三阶段名称"><input name="stage_3_trigger" placeholder="价格或事件条件" aria-label="第三阶段触发条件"><input name="stage_3_action" placeholder="需要什么证据，做什么动作" aria-label="第三阶段动作"><input name="stage_3_size" placeholder="仓位" aria-label="第三阶段后仓位"></div>
+            <div class="plan-row"><input name="stage_4_name" value="深度机会" aria-label="第四阶段名称"><input name="stage_4_trigger" placeholder="价格或事件条件" aria-label="第四阶段触发条件"><input name="stage_4_action" placeholder="需要什么证据，做什么动作" aria-label="第四阶段动作"><input name="stage_4_size" placeholder="仓位" aria-label="第四阶段后仓位"></div>
+            <div class="plan-row"><input name="stage_5_name" value="不参与区" aria-label="不参与阶段名称"><input name="stage_5_trigger" placeholder="什么情况下不追 / 不新增" aria-label="不参与阶段触发条件"><input name="stage_5_action" placeholder="等待什么新证据" aria-label="不参与阶段动作"><input name="stage_5_size" value="0" aria-label="不参与阶段仓位"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><span class="panel-num">03 / EXIT</span><h3>什么新证据会让我行动？</h3></div>
+        <p class="panel-note">把止盈、价格提醒和逻辑退出分开。价格触发复核，基本面决定动作。</p>
+
+        <div class="subsection">
+          <h4 class="subhead"><span>A</span>复核与逻辑退出</h4>
+          <div class="fields">
+            <label>固定复核时间<input name="exit_review" placeholder="例如：每季度 / 下次财报后 / 某个日期"></label>
+            <label>关键复核事件<input name="exit_event" placeholder="例如：订单、指引、产品节点、行业资本开支"></label>
+            <label>什么证据说明逻辑不成立？<textarea name="exit_invalidated" placeholder="写业务或行业事实，不只写跌幅。"></textarea></label>
+            <label>逻辑不成立时的动作<textarea name="exit_logic_action" placeholder="暂停新增 / 降级为观察仓 / 减仓 / 退出"></textarea></label>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h4 class="subhead"><span>B</span>止盈 / 削峰计划</h4>
+          <p class="hint">止盈不等于猜顶部。可以是估值透支、仓位超限或上涨但基本面没有同步上修。</p>
+          <div class="plan">
+            <div class="plan-row head"><span>阶段</span><span>价格 / 估值条件</span><span>基本面条件与动作</span><span>预计保留</span></div>
+            <div class="plan-row"><input name="profit_1_name" value="第一目标区" aria-label="第一止盈阶段名称"><input name="profit_1_trigger" placeholder="价格或估值条件" aria-label="第一止盈阶段触发条件"><input name="profit_1_action" placeholder="基本面未上修时如何削峰" aria-label="第一止盈阶段动作"><input name="profit_1_keep" placeholder="保留仓位" aria-label="第一止盈阶段保留仓位"></div>
+            <div class="plan-row"><input name="profit_2_name" value="第二目标区" aria-label="第二止盈阶段名称"><input name="profit_2_trigger" placeholder="价格或估值条件" aria-label="第二止盈阶段触发条件"><input name="profit_2_action" placeholder="到达后如何处理" aria-label="第二止盈阶段动作"><input name="profit_2_keep" placeholder="保留仓位" aria-label="第二止盈阶段保留仓位"></div>
+            <div class="plan-row"><input name="profit_3_name" value="长期持有条件" aria-label="长期持有阶段名称"><input name="profit_3_trigger" placeholder="需要持续满足的经营条件" aria-label="长期持有阶段触发条件"><input name="profit_3_action" placeholder="满足 / 不满足时分别怎么做" aria-label="长期持有阶段动作"><input name="profit_3_keep" placeholder="角色或仓位" aria-label="长期持有阶段保留仓位"></div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h4 class="subhead"><span>C</span>价格提醒与情绪</h4>
+          <div class="exit-row">
+            <input name="price_alert_1" placeholder="价格情况 1" aria-label="第一价格提醒情况">
+            <input name="price_action_1" placeholder="先复核什么，再做什么" aria-label="第一价格提醒动作">
+            <input name="price_role_1" placeholder="仓位动作" aria-label="第一价格提醒仓位动作">
+          </div>
+          <div class="exit-row" style="margin-top:8px">
+            <input name="price_alert_2" placeholder="价格情况 2" aria-label="第二价格提醒情况">
+            <input name="price_action_2" placeholder="先复核什么，再做什么" aria-label="第二价格提醒动作">
+            <input name="price_role_2" placeholder="仓位动作" aria-label="第二价格提醒仓位动作">
+          </div>
+          <div class="fields" style="margin-top:15px">
+            <label class="full">我最容易被什么情绪牵着走？<textarea name="exit_emotion" placeholder="怕错过主线、卖飞、不甘心、急于回本、想证明自己……"></textarea></label>
+          </div>
+        </div>
+
+        <div class="check-row">
+          <label class="check"><input type="checkbox" name="done_reasons"> 我没有把行业热度当成唯一理由</label>
+          <label class="check"><input type="checkbox" name="done_risks"> 我写了与理由同等具体的风险</label>
+          <label class="check"><input type="checkbox" name="done_valuation"> 我考虑了价格已经计入的预期</label>
+          <label class="check"><input type="checkbox" name="done_scale"> 每次加仓都有价格与证据条件</label>
+          <label class="check"><input type="checkbox" name="done_exit"> 我写清了什么会改变判断</label>
+        </div>
+      </section>
+      </div>
+
+      <datalist id="role-options"><option value="核心"><option value="防守"><option value="进攻"><option value="观察"><option value="小仓试错"></datalist>
+      <div class="actions"><button type="button" class="primary" id="saveBtn">保存这次检查</button><button type="button" id="copyBtn">复制为文字</button><button type="button" id="printBtn">打印 / 存为 PDF</button><button type="button" id="resetBtn">清空</button><span class="saved" id="savedState">仅保存在当前浏览器</span></div>
+    </form>
+    <p class="bottom-note">本文工具仅为个人学习记录与决策练习，不构成任何投资建议。工具不会判断标的好坏，也不会输出目标价、建议仓位或买卖信号。投资有风险，决策需独立，盈亏请自负。</p>
+  </main>
+
+  <script>
+    const form = document.querySelector('#checklist');
+    const state = document.querySelector('#savedState');
+    const coverage = document.querySelector('#coverageText');
+    const introTitle = document.querySelector('#introTitle');
+    const introText = document.querySelector('#introText');
+    const modeNotice = document.querySelector('#modeNotice');
+    const modeButtons = [...document.querySelectorAll('.mode-button')];
+    const KEY = 'positive-ev-investment-checklist-v3';
+    const MODE_KEY = 'positive-ev-investment-checklist-mode';
+    const LEGACY_V2_KEY = 'positive-ev-investment-checklist-v2';
+    const LEGACY_V1_KEY = 'positive-ev-investment-checklist-v1';
+    let mode = localStorage.getItem(MODE_KEY) === 'full' ? 'full' : 'simple';
+    const elements = () => [...form.querySelectorAll('input[name], textarea[name], select[name]')];
+    const simpleElements = () => [...document.querySelectorAll('[data-bind]')];
+    const fields = () => Object.fromEntries(elements().map(el => [el.name, el.type === 'checkbox' ? el.checked : el.value]));
+    const value = (data, name) => String(data[name] || '').trim();
+    const readStorage = key => {
+      try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
+    };
+    const restoreData = data => {
+      if (!data) return;
+      for (const el of elements()) {
+        if (!Object.prototype.hasOwnProperty.call(data, el.name)) continue;
+        el.type === 'checkbox' ? (el.checked = !!data[el.name]) : (el.value = data[el.name]);
+      }
+    };
+    const syncSimpleFromFull = () => {
+      for (const simple of simpleElements()) {
+        const target = form.querySelector(`[name="${simple.dataset.bind}"]`);
+        if (target) simple.value = target.value;
+      }
+    };
+    const setModeCopy = () => {
+      const isSimple = mode === 'simple';
+      introTitle.textContent = isSimple ? '在按下买入前，先留下三段不容易被情绪改写的话。' : '把一笔“我想参与”，写成一套可以复核的计划。';
+      introText.textContent = isSimple
+        ? '简单版只问：为什么参与、为什么是这个尺度、什么会让我行动。需要比较估值、拆分仓位或写止盈计划时，再切到完整版。'
+        : '完整版适合已经准备进一步研究的机会。它不会替你判断标的，也不会根据填表结果给出买卖建议；它只负责把理由、风险、估值、分批仓位和退出条件放在同一张决策记录里。';
+      modeNotice.textContent = isSimple
+        ? '这不是买卖建议。它只是让“我想参与”先经过 EV、SIZE、EXIT 三道门，再决定要不要点确认。'
+        : '先写理由，再写反方；先定义角色，再拆分仓位；先写退出，再点买入。价格条件只能提醒你复核，不能代替基本面判断。';
+    };
+    const setMode = (nextMode, savePreference = true) => {
+      mode = nextMode;
+      document.body.dataset.mode = mode;
+      modeButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
+      setModeCopy();
+      syncSimpleFromFull();
+      updateCoverage();
+      if (savePreference) localStorage.setItem(MODE_KEY, mode);
+    };
+    const countFilled = (data, prefix, total) => Array.from({length:total}, (_,i) => value(data, `${prefix}_${i+1}`)).filter(Boolean).length;
+    const updateCoverage = () => {
+      const data = fields();
+      if (mode === 'simple') {
+        const ev = [value(data, 'ev_judgement'), value(data, 'reason_1'), value(data, 'exit_invalidated')].filter(Boolean).length;
+        const size = [value(data, 'size_role'), value(data, 'size_not_more'), value(data, 'size_downside')].filter(Boolean).length;
+        const exit = [value(data, 'exit_review'), value(data, 'exit_logic_action'), value(data, 'exit_emotion')].filter(Boolean).length;
+        coverage.textContent = `当前记录：EV ${ev}/3 · SIZE ${size}/3 · EXIT ${exit}/3`;
+        return;
+      }
+      const reasons = countFilled(data, 'reason', 5);
+      const risks = countFilled(data, 'risk', 5);
+      const stages = Array.from({length:4}, (_,i) => value(data, `stage_${i+1}_trigger`) || value(data, `stage_${i+1}_action`)).filter(Boolean).length;
+      const exits = [value(data,'exit_invalidated'), value(data,'profit_1_trigger'), value(data,'profit_2_trigger'), value(data,'profit_3_trigger'), value(data,'price_alert_1'), value(data,'price_alert_2')].filter(Boolean).length;
+      coverage.textContent = `当前记录：${reasons}/5 理由 · ${risks}/5 风险 · ${stages} 个建仓阶段 · ${exits} 条退出规则`;
+    };
+    const restore = () => {
+      const current = readStorage(KEY);
+      if (current) {
+        restoreData(current);
+        if (!current.__cleared) state.textContent = '已恢复上次草稿';
+      } else {
+        const v2 = readStorage(LEGACY_V2_KEY);
+        const v1 = readStorage(LEGACY_V1_KEY);
+        if (v2) {
+          restoreData(v2);
+          state.textContent = '已导入完整版旧草稿，请保存到合并版';
+        } else if (v1) {
+          restoreData({
+            context_date: v1.context_date || '',
+            context_asset: v1.context_asset || '',
+            ev_judgement: v1.ev_judgement || '',
+            reason_1: v1.ev_evidence || '',
+            exit_invalidated: v1.ev_invalidated || '',
+            size_role: v1.size_role || '',
+            size_not_more: v1.size_reason || '',
+            size_downside: v1.size_downside || '',
+            exit_review: v1.exit_review || '',
+            exit_logic_action: v1.exit_logic || '',
+            exit_emotion: v1.exit_emotion || '',
+            done_scale: !!v1.done_scale,
+            done_exit: !!v1.done_evidence
+          });
+          state.textContent = '已导入简单版旧草稿，请保存到合并版';
+        }
+      }
+      syncSimpleFromFull();
+      setMode(mode, false);
+    };
+    const save = () => {
+      localStorage.setItem(KEY, JSON.stringify({__version:3, ...fields()}));
+      state.textContent = '已保存 · 仅在本机';
+      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2200);
+    };
+    const numbered = (data, prefix, total) => Array.from({length:total}, (_,i) => `${i+1}. ${value(data, `${prefix}_${i+1}`) || '（未填写）'}`);
+    const planLines = (data, prefix, total, lastKey) => Array.from({length:total}, (_,i) => {
+      const n=i+1;
+      return `${value(data, `${prefix}_${n}_name`) || `阶段 ${n}`}｜条件：${value(data, `${prefix}_${n}_trigger`) || '（未填写）'}｜动作：${value(data, `${prefix}_${n}_action`) || '（未填写）'}｜${lastKey === 'size' ? '阶段后仓位' : '预计保留'}：${value(data, `${prefix}_${n}_${lastKey}`) || '（未填写）'}`;
+    });
+    const buildFullText = () => {
+      const d=fields();
+      return [
+        '投资决策检查清单｜完整版','',
+        '00 / CONTEXT｜决策背景',
+        `记录日期：${value(d,'context_date')||'（未填写）'}`,
+        `标的 / 机会：${value(d,'context_asset')||'（未填写）'}`,
+        `计划持有周期：${value(d,'context_horizon')||'（未填写）'}`,
+        `市场情景：${value(d,'context_market')||'（未填写）'}`,'',
+        '01 / EV｜理由、风险与估值',
+        `一句话判断：${value(d,'ev_judgement')||'（未填写）'}`,
+        `市场已知：${value(d,'ev_market_knows')||'（未填写）'}`,
+        `差异判断：${value(d,'ev_difference')||'（未填写）'}`,'',
+        '5 点投资理由',...numbered(d,'reason',5),'',
+        '5 个核心风险',...numbered(d,'risk',5),'',
+        `估值体感：${value(d,'valuation_level')||'（未填写）'}`,
+        `参考指标：${value(d,'valuation_metrics')||'（未填写）'}`,
+        `价格已计入：${value(d,'valuation_priced_in')||'（未填写）'}`,
+        `估值支撑条件：${value(d,'valuation_support')||'（未填写）'}`,'',
+        '02 / SIZE｜角色与分批仓位',
+        `仓位角色：${value(d,'size_role')||'（未填写）'}`,
+        `最大参与边界：${value(d,'size_limit')||'（未填写）'}`,
+        `为什么不是更多：${value(d,'size_not_more')||'（未填写）'}`,
+        `为什么不是更少：${value(d,'size_not_less')||'（未填写）'}`,
+        `最坏情况：${value(d,'size_downside')||'（未填写）'}`,'',
+        '分批建仓计划',...planLines(d,'stage',5,'size'),'',
+        '03 / EXIT｜止盈、止损与复核',
+        `固定复核时间：${value(d,'exit_review')||'（未填写）'}`,
+        `关键复核事件：${value(d,'exit_event')||'（未填写）'}`,
+        `逻辑失效证据：${value(d,'exit_invalidated')||'（未填写）'}`,
+        `逻辑失效动作：${value(d,'exit_logic_action')||'（未填写）'}`,'',
+        '止盈 / 削峰计划',...planLines(d,'profit',3,'keep'),'',
+        `价格提醒 1：${value(d,'price_alert_1')||'（未填写）'}｜${value(d,'price_action_1')||'（未填写）'}｜${value(d,'price_role_1')||'（未填写）'}`,
+        `价格提醒 2：${value(d,'price_alert_2')||'（未填写）'}｜${value(d,'price_action_2')||'（未填写）'}｜${value(d,'price_role_2')||'（未填写）'}`,
+        `情绪提醒：${value(d,'exit_emotion')||'（未填写）'}`,'',
+        '本文工具仅为个人学习记录与决策练习，不构成投资建议。'
+      ].join('\n');
+    };
+    const buildSimpleText = () => {
+      const d = fields();
+      return [
+        '投资决策检查清单｜简单版', '',
+        '00 / CONTEXT｜决策背景',
+        `记录日期：${value(d,'context_date') || '（未填写）'}`,
+        `标的 / 机会：${value(d,'context_asset') || '（未填写）'}`, '',
+        '01 / EV｜为什么值得参与？',
+        `一句话判断：${value(d,'ev_judgement') || '（未填写）'}`,
+        `关键证据：${value(d,'reason_1') || '（未填写）'}`,
+        `什么会改变判断：${value(d,'exit_invalidated') || '（未填写）'}`, '',
+        '02 / SIZE｜为什么是这个尺度？',
+        `仓位角色：${value(d,'size_role') || '（未填写）'}`,
+        `投入尺度的理由：${value(d,'size_not_more') || '（未填写）'}`,
+        `最坏情况：${value(d,'size_downside') || '（未填写）'}`, '',
+        '03 / EXIT｜什么会让我行动？',
+        `复核时间：${value(d,'exit_review') || '（未填写）'}`,
+        `逻辑不成立时的动作：${value(d,'exit_logic_action') || '（未填写）'}`,
+        `情绪提醒：${value(d,'exit_emotion') || '（未填写）'}`, '',
+        '本文工具仅为个人学习记录与决策练习，不构成投资建议。'
+      ].join('\n');
+    };
+    const buildText = () => mode === 'simple' ? buildSimpleText() : buildFullText();
+    const copy = async () => {
+      const text = buildText();
+      try {
+        await navigator.clipboard.writeText(text);
+        state.textContent='已复制为文字';
+      } catch {
+        const helper=document.createElement('textarea');
+        helper.value=text; helper.style.position='fixed'; helper.style.opacity='0';
+        document.body.appendChild(helper); helper.select();
+        const ok=document.execCommand('copy'); helper.remove();
+        state.textContent=ok ? '已复制为文字' : '复制失败，请手动选择';
+      }
+      setTimeout(()=>state.textContent='仅保存在当前浏览器',2200);
+    };
+    const syncBoundField = event => {
+      const target = form.querySelector(`[name="${event.currentTarget.dataset.bind}"]`);
+      if (!target) return;
+      target.value = event.currentTarget.value;
+      updateCoverage();
+    };
+    simpleElements().forEach(element => {
+      element.addEventListener('input', syncBoundField);
+      element.addEventListener('change', syncBoundField);
+    });
+    form.addEventListener('input', event => {
+      if (event.target.name) syncSimpleFromFull();
+      updateCoverage();
+    });
+    form.addEventListener('change', event => {
+      if (event.target.name) syncSimpleFromFull();
+      updateCoverage();
+    });
+    modeButtons.forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
+    document.querySelector('#saveBtn').addEventListener('click', save);
+    document.querySelector('#copyBtn').addEventListener('click', copy);
+    document.querySelector('#printBtn').addEventListener('click', ()=>window.print());
+    document.querySelector('#resetBtn').addEventListener('click', ()=>{
+      if (!confirm('确认清空这次检查吗？')) return;
+      form.reset();
+      localStorage.setItem(KEY, JSON.stringify({__version:3, __cleared:true}));
+      syncSimpleFromFull();
+      state.textContent='已清空';
+      updateCoverage();
+    });
+    restore();
+  </script>
+</body>
+</html>
