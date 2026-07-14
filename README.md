@@ -30,7 +30,8 @@ Liang Shi · Positive EV, built with Jekyll & GitHub Pages.
 _config.yml          站点配置(标题、社交链接等)
 index.html           品牌首页(定位 + 文章列表)
 _pages/              关于、归档等独立页面
-_pages/about.html    关于我(作品集 + 经历)
+_pages/about.html    关于我与经历
+_pages/work.html     UX 作品
 _pages/archive.html  归档
 _posts/              所有文章
 _layouts/            页面模板

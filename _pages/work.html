@@ -1,0 +1,47 @@
+---
+layout: default
+title: "作品 Work"
+permalink: /work/
+image: "/assets/images/work/unifi-site-manager.png"
+---
+<section class="work wrap">
+  <header class="page-header">
+    <h1 class="page-title" data-en="Work" data-zh="作品">作品</h1>
+    <p class="page-subtitle" data-en="Selected enterprise product work spanning UX strategy, end-to-end workflows, cross-platform experiences and design systems." data-zh="围绕企业级产品，呈现我在 UX 策略、端到端流程、跨平台体验与设计系统方面的代表工作。">围绕企业级产品，呈现我在 UX 策略、端到端流程、跨平台体验与设计系统方面的代表工作。</p>
+  </header>
+
+  <div class="work-list">
+    {% for work in site.data.works.works %}
+    <article class="work-item" id="{{ work.slug }}">
+      <p class="work-item-eyebrow">0{{ forloop.index }}</p>
+      <h2 class="work-item-title">{{ work.title }}</h2>
+      <div class="work-item-media work-media--{{ work.media | default: 'flush' }}">
+        <img src="{{ work.image | relative_url }}" alt="{{ work.alt }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+      </div>
+      <p class="work-item-desc" data-en="{{ work.description_en }}" data-zh="{{ work.description_zh }}">{{ work.description_zh }}</p>
+      <div class="work-challenge">
+        <span data-en="Design question" data-zh="设计命题">设计命题</span>
+        <p data-en="{{ work.challenge_en }}" data-zh="{{ work.challenge_zh }}">{{ work.challenge_zh }}</p>
+      </div>
+      <div class="work-tags">
+        {% for tag in work.tags %}<span>{{ tag }}</span>{% endfor %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <h2 class="work-section-title" data-en="Beyond products" data-zh="产品之外">产品之外</h2>
+  <ul class="capability-list">
+    {% for item in site.data.works.capabilities %}
+    <li>
+      <img class="capability-avatar" src="{{ item.image | relative_url }}" alt="{{ item.alt }}" loading="lazy">
+      <div>
+        <strong data-en="{{ item.title_en }}" data-zh="{{ item.title_zh }}">{{ item.title_zh }}</strong>
+        <span data-en="{{ item.description_en }}" data-zh="{{ item.description_zh }}">{{ item.description_zh }}</span>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <p class="work-contact"><span data-en="Full case studies and project details are available in a conversation." data-zh="完整案例与项目细节，可以在交流中进一步展开。">完整案例与项目细节，可以在交流中进一步展开。</span> <a href="mailto:{{ site.email }}"><span data-en="Get in touch" data-zh="联系我">联系我</span> →</a></p>
+</section>

@@ -8,6 +8,12 @@ image: "/assets/images/blog-home-og.png"
 </section>
 
 <section class="posts wrap" id="articles">
+  <div class="section-heading section-heading-compact">
+    <div>
+      <h2 data-en="Latest writing" data-zh="最新文章">最新文章</h2>
+    </div>
+    <a class="text-cta" href="{{ '/archive/' | relative_url }}"><span data-en="All articles" data-zh="全部文章">全部文章</span> →</a>
+  </div>
   {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
   {% assign home_posts = published_posts | where_exp: "post", "post.home != false" %}
   {% assign home_posts_zh = home_posts | where: "lang", "zh" %}
@@ -43,6 +49,19 @@ image: "/assets/images/blog-home-og.png"
   </ul>
 
   <p class="empty-hint" hidden data-en="No posts in this language yet." data-zh="该语言下暂时还没有文章。">该语言下暂时还没有文章。</p>
+</section>
+
+<section class="work-teaser wrap" id="work">
+  <a class="work-banner" href="{{ '/work/' | relative_url }}">
+    <span class="work-banner-visual">
+      <img src="{{ '/assets/images/work/unifi-site-manager.png' | relative_url }}" alt="UniFi Site Manager desktop and mobile interfaces" loading="lazy">
+    </span>
+    <span class="work-banner-copy">
+      <span class="work-banner-label tool-card-eyebrow" data-en="Selected UX work" data-zh="UX 作品集">UX 作品集</span>
+      <strong data-en="Designing clarity for complex systems" data-zh="为复杂系统设计清晰体验">为复杂系统设计清晰体验</strong>
+    </span>
+    <span class="work-banner-cta text-cta"><span class="work-banner-cta-label" data-en="View all work" data-zh="查看全部作品">查看全部作品</span> →</span>
+  </a>
 </section>
 
 {% include subscribe.html %}

@@ -6,8 +6,11 @@
       <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>
         <span data-en="Home" data-zh="首页">首页</span>
       </a>
+      <a href="{{ '/work/' | relative_url }}"{% if page.url contains 'work' %} class="active"{% endif %}>
+        <span data-en="Work" data-zh="作品">作品</span>
+      </a>
       <a href="{{ '/archive/' | relative_url }}"{% if page.url contains 'archive' %} class="active"{% endif %}>
-        <span data-en="Archive" data-zh="归档">归档</span>
+        <span data-en="Articles" data-zh="文章">文章</span>
       </a>
       <a href="{{ '/tools/' | relative_url }}"{% if page.url contains 'tools' %} class="active"{% endif %}>
         <span data-en="Tools" data-zh="工具">工具</span>
