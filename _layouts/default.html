@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ page.lang | default: site.lang }}">
 {% include head.html %}
-<body>
+<body data-content-slug="{% if page.layout == 'post' %}{{ page.slug | escape }}{% elsif page.url == '/' %}home{% else %}{{ page.url | remove_first: '/' | split: '/' | first | default: 'page' | escape }}{% endif %}">
   {% include header.html %}
 
   <main class="site-main">
@@ -10,6 +10,7 @@
 
   {% include footer.html %}
 
+  <script src="{{ '/assets/js/analytics.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
 </body>
 </html>

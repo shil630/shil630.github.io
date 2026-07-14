@@ -29,13 +29,13 @@ layout: default
   {% if show_previous or show_next %}
   <nav class="post-nav">
     {% if show_previous %}
-    <a class="prev" href="{{ page.previous.url | relative_url }}">
+    <a class="prev" href="{{ page.previous.url | relative_url }}" data-track-cta data-cta-type="related_article" data-placement="post_navigation">
       <span class="dir">← <span data-en="Previous" data-zh="上一篇">上一篇</span></span>
       <span class="ttl">{{ page.previous.title }}</span>
     </a>
     {% endif %}
     {% if show_next %}
-    <a class="next" href="{{ page.next.url | relative_url }}">
+    <a class="next" href="{{ page.next.url | relative_url }}" data-track-cta data-cta-type="related_article" data-placement="post_navigation">
       <span class="dir"><span data-en="Next" data-zh="下一篇">下一篇</span> →</span>
       <span class="ttl">{{ page.next.title }}</span>
     </a>

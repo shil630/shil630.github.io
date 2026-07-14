@@ -1,3 +1,5 @@
+---
+---
 <!doctype html>
 <html lang="zh-CN">
 <head>
@@ -6,6 +8,7 @@
   <title>正EV · 投资决策检查清单</title>
   <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="/assets/images/favicon.png" type="image/png">
+  {% include analytics.html %}
   <style>
     :root {
       --paper:#F5F1EA; --ink:#1E1D1B; --red:#B64B3B; --muted:#8D8881;
@@ -104,7 +107,7 @@
     }
   </style>
 </head>
-<body data-mode="simple">
+<body data-mode="simple" data-content-slug="investment-checklist">
   <main class="page">
     <a class="back-link" href="/tools/">← 返回</a>
     <header class="masthead">
@@ -309,6 +312,7 @@
     <p class="bottom-note">本文工具仅为个人学习记录与决策练习，不构成任何投资建议。工具不会判断标的好坏，也不会输出目标价、建议仓位或买卖信号。投资有风险，决策需独立，盈亏请自负。</p>
   </main>
 
+  <script src="/assets/js/analytics.js"></script>
   <script>
     const form = document.querySelector('#checklist');
     const state = document.querySelector('#savedState');
@@ -318,11 +322,24 @@
     const MODE_KEY = 'positive-ev-investment-checklist-mode';
     const LEGACY_V2_KEY = 'positive-ev-investment-checklist-v2';
     const LEGACY_V1_KEY = 'positive-ev-investment-checklist-v1';
+    const TOOL_NAME = 'investment_decision_checklist';
+    let toolStarted = false;
     let mode = localStorage.getItem(MODE_KEY) === 'full' ? 'full' : 'simple';
     const elements = () => [...form.querySelectorAll('input[name], textarea[name], select[name]')];
     const simpleElements = () => [...document.querySelectorAll('[data-bind]')];
     const fields = () => Object.fromEntries(elements().map(el => [el.name, el.type === 'checkbox' ? el.checked : el.value]));
     const value = (data, name) => String(data[name] || '').trim();
+    const trackEvent = (eventName, params) => {
+      if (window.siteAnalytics) window.siteAnalytics.track(eventName, params);
+    };
+    const trackToolStart = () => {
+      if (toolStarted) return;
+      toolStarted = true;
+      trackEvent('tool_start', {
+        tool_name: TOOL_NAME,
+        entry_source: window.siteAnalytics ? window.siteAnalytics.entrySource() : 'unknown'
+      });
+    };
     const today = () => {
       const now = new Date();
       return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
@@ -466,16 +483,20 @@
     const buildText = () => mode === 'simple' ? buildSimpleText() : buildFullText();
     const copy = async () => {
       const text = buildText();
+      let copied = false;
       try {
         await navigator.clipboard.writeText(text);
+        copied = true;
         state.textContent='已复制为文字';
       } catch {
         const helper=document.createElement('textarea');
         helper.value=text; helper.style.position='fixed'; helper.style.opacity='0';
         document.body.appendChild(helper); helper.select();
         const ok=document.execCommand('copy'); helper.remove();
+        copied = ok;
         state.textContent=ok ? '已复制为文字' : '复制失败，请手动选择';
       }
+      if (copied) trackEvent('tool_copy', {mode});
       setTimeout(()=>state.textContent='仅保存在当前浏览器',2200);
     };
     const syncBoundField = event => {
@@ -488,10 +509,16 @@
       element.addEventListener('change', syncBoundField);
     });
     form.addEventListener('input', event => {
-      if (event.target.name) syncSimpleFromFull();
+      if (event.target.name || event.target.dataset.bind) {
+        trackToolStart();
+        syncSimpleFromFull();
+      }
     });
     form.addEventListener('change', event => {
-      if (event.target.name) syncSimpleFromFull();
+      if (event.target.name || event.target.dataset.bind) {
+        trackToolStart();
+        syncSimpleFromFull();
+      }
     });
     modeButtons.forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
     document.querySelector('#saveBtn').addEventListener('click', save);

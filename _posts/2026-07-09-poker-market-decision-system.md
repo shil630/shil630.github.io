@@ -147,6 +147,9 @@ series: 投资系统
 
 <div class="tool-waitlist">
   <form class="tool-waitlist-form"
+        data-track-cta
+        data-cta-type="tool"
+        data-placement="article_footer_waitlist"
         action="https://buttondown.com/api/emails/embed-subscribe/{{ site.buttondown_username }}"
         method="post" target="_blank">
     <fieldset>

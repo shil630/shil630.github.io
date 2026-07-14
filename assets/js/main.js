@@ -75,27 +75,15 @@
     applyFilter(localStorage.getItem(FILTER_KEY) || "all");
   }
 
-  /* ---------- Analytics: newsletter signup ---------- */
-  // Fire a GA4 event when the subscribe form is submitted.
-  // Guarded so it silently no-ops when gtag isn't present (local/dev).
-  document.querySelectorAll(".subscribe-form").forEach(function (form) {
-    form.addEventListener("submit", function () {
-      if (typeof window.gtag === "function") {
-        window.gtag("event", "newsletter_signup", {
-          method: "buttondown",
-          page_location: window.location.pathname
-        });
-      }
-    });
-  });
-
   // Track which free tool readers explicitly join the waitlist for.
   document.querySelectorAll(".tool-waitlist-form").forEach(function (form) {
     form.addEventListener("submit", function () {
       var selected = form.querySelector('input[name="tag"]:checked');
-      if (selected && typeof window.gtag === "function") {
-        window.gtag("event", "tool_waitlist_vote", {
+      if (selected && window.siteAnalytics) {
+        window.siteAnalytics.track("tool_waitlist_vote", {
           tool: selected.value,
+          content_slug: window.siteAnalytics.contentSlug(form),
+          placement: form.getAttribute("data-placement") || "article_footer_waitlist",
           page_location: window.location.pathname
         });
       }
