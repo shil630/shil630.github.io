@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>正EV · 投资决策检查清单</title>
+  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/assets/images/favicon.png" type="image/png">
   <style>
     :root {
       --paper:#F5F1EA; --ink:#1E1D1B; --red:#B64B3B; --muted:#8D8881;
@@ -28,17 +30,13 @@
     .mode-button { min-width:94px; border:0; border-radius:4px; padding:8px 11px; color:var(--muted); background:transparent; font-size:13px; }
     .mode-button small { display:block; margin-top:2px; font-size:10px; font-weight:400; }
     .mode-button[aria-pressed="true"] { color:var(--ink); background:#f0e2d8; box-shadow:0 1px 2px rgba(30,29,27,.08); }
-    .mode-hint { margin:12px 0 0; color:var(--muted); font-size:12px; line-height:1.7; }
-    .notice { margin:24px 0; padding:14px 16px; border-left:3px solid var(--red); background:var(--card); color:#59534d; font-size:13px; line-height:1.75; }
     .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:26px 0 14px; }
     .step { padding:13px 15px; border:1px solid var(--sand); border-radius:5px; color:var(--muted); background:rgba(255,255,255,.26); font-size:13px; }
     .step strong { display:block; margin-bottom:3px; color:var(--ink); font-family:Georgia,serif; font-size:15px; }
-    .step.active { border-color:var(--red); background:#f0e2d8; }
-    .coverage { display:flex; justify-content:space-between; gap:16px; align-items:center; margin:0 0 24px; padding:12px 15px; border:1px solid var(--sand); border-radius:5px; background:rgba(255,255,255,.34); color:#665f58; font-size:12px; line-height:1.6; }
-    .coverage strong { color:var(--red); font-weight:600; }
     #simpleChecklist { display:none; }
     body[data-mode="simple"] #simpleChecklist { display:grid; gap:16px; }
     body[data-mode="simple"] #fullChecklist { display:none; }
+    body[data-mode="full"] #fullChecklist { display:grid; gap:16px; }
     .simple-upgrade { margin:0; padding:14px 16px; border:1px dashed var(--sand); border-radius:6px; color:#645d56; background:rgba(255,255,255,.28); font-size:13px; line-height:1.75; }
     .simple-upgrade strong { color:var(--red); }
     form { display:grid; gap:16px; }
@@ -87,7 +85,6 @@
       .steps { gap:6px; }
       .step { padding:11px 9px; font-size:11px; }
       .step strong { font-size:13px; }
-      .coverage { align-items:flex-start; flex-direction:column; gap:3px; }
       .panel { padding:20px 15px; }
       .fields, .five-grid { grid-template-columns:1fr; }
       label.full, .numbered.wide { grid-column:auto; }
@@ -96,9 +93,11 @@
       .plan-row input::placeholder { color:#9b938b; }
       .saved { width:100%; margin-left:0; }
     }
+    .back-link { display:inline-block; margin:0 0 20px; color:var(--muted); font-size:13px; text-decoration:none; letter-spacing:.02em; }
+    .back-link:hover { color:var(--red); }
     @media print {
       body { background:#fff; }
-      .actions, .steps, .notice, .coverage { display:none; }
+      .actions, .steps, .back-link { display:none; }
       .page { width:100%; padding:0; }
       .panel { break-inside:avoid; }
       textarea, input, select { border-color:#ddd; }
@@ -107,6 +106,7 @@
 </head>
 <body data-mode="simple">
   <main class="page">
+    <a class="back-link" href="/tools/">← 返回</a>
     <header class="masthead">
       <div class="brand"><span class="dots"><i class="dot red"></i><i class="dot"></i><i class="dot outline"></i></span><div><h1>投资决策检查清单</h1><p class="kicker">正EV实验 · EV · SIZE · EXIT</p></div></div>
       <div class="mode-toggle" role="group" aria-label="检查清单版本">
@@ -117,13 +117,9 @@
 
     <section class="intro">
       <h2 id="introTitle">在按下买入前，先留下三段不容易被情绪改写的话。</h2>
-      <p id="introText">简单版只问：为什么参与、为什么是这个尺度、什么会让我行动。需要比较估值、拆分仓位或写止盈计划时，再切到完整版。</p>
-      <p class="mode-hint" id="modeHint">两种模式共用同一份草稿；切换不会丢失已经填写的内容。</p>
     </section>
-    <div class="notice" id="modeNotice">这不是买卖建议。它只是让“我想参与”先经过 EV、SIZE、EXIT 三道门，再决定要不要点确认。</div>
 
-    <div class="steps"><div class="step active"><strong>01 · EV</strong>理由、风险与估值</div><div class="step"><strong>02 · SIZE</strong>角色与分批仓位</div><div class="step"><strong>03 · EXIT</strong>止盈、止损与复核</div></div>
-    <div class="coverage"><span>这不是评分结果，只显示哪些问题已经留下记录。</span><strong id="coverageText">当前记录：0/5 理由 · 0/5 风险 · 0 个建仓阶段 · 0 条退出规则</strong></div>
+    <div class="steps"><div class="step"><strong>01 · EV</strong>理由、风险与估值</div><div class="step"><strong>02 · SIZE</strong>角色与分批仓位</div><div class="step"><strong>03 · EXIT</strong>止盈、止损与复核</div></div>
 
     <form id="checklist">
       <div id="simpleChecklist">
@@ -316,10 +312,7 @@
   <script>
     const form = document.querySelector('#checklist');
     const state = document.querySelector('#savedState');
-    const coverage = document.querySelector('#coverageText');
     const introTitle = document.querySelector('#introTitle');
-    const introText = document.querySelector('#introText');
-    const modeNotice = document.querySelector('#modeNotice');
     const modeButtons = [...document.querySelectorAll('.mode-button')];
     const KEY = 'positive-ev-investment-checklist-v3';
     const MODE_KEY = 'positive-ev-investment-checklist-mode';
@@ -330,6 +323,14 @@
     const simpleElements = () => [...document.querySelectorAll('[data-bind]')];
     const fields = () => Object.fromEntries(elements().map(el => [el.name, el.type === 'checkbox' ? el.checked : el.value]));
     const value = (data, name) => String(data[name] || '').trim();
+    const today = () => {
+      const now = new Date();
+      return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    };
+    const ensureCurrentDate = () => {
+      const date = form.querySelector('[name="context_date"]');
+      if (date && !date.value) date.value = today();
+    };
     const readStorage = key => {
       try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
     };
@@ -349,12 +350,6 @@
     const setModeCopy = () => {
       const isSimple = mode === 'simple';
       introTitle.textContent = isSimple ? '在按下买入前，先留下三段不容易被情绪改写的话。' : '把一笔“我想参与”，写成一套可以复核的计划。';
-      introText.textContent = isSimple
-        ? '简单版只问：为什么参与、为什么是这个尺度、什么会让我行动。需要比较估值、拆分仓位或写止盈计划时，再切到完整版。'
-        : '完整版适合已经准备进一步研究的机会。它不会替你判断标的，也不会根据填表结果给出买卖建议；它只负责把理由、风险、估值、分批仓位和退出条件放在同一张决策记录里。';
-      modeNotice.textContent = isSimple
-        ? '这不是买卖建议。它只是让“我想参与”先经过 EV、SIZE、EXIT 三道门，再决定要不要点确认。'
-        : '先写理由，再写反方；先定义角色，再拆分仓位；先写退出，再点买入。价格条件只能提醒你复核，不能代替基本面判断。';
     };
     const setMode = (nextMode, savePreference = true) => {
       mode = nextMode;
@@ -362,24 +357,7 @@
       modeButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
       setModeCopy();
       syncSimpleFromFull();
-      updateCoverage();
       if (savePreference) localStorage.setItem(MODE_KEY, mode);
-    };
-    const countFilled = (data, prefix, total) => Array.from({length:total}, (_,i) => value(data, `${prefix}_${i+1}`)).filter(Boolean).length;
-    const updateCoverage = () => {
-      const data = fields();
-      if (mode === 'simple') {
-        const ev = [value(data, 'ev_judgement'), value(data, 'reason_1'), value(data, 'exit_invalidated')].filter(Boolean).length;
-        const size = [value(data, 'size_role'), value(data, 'size_not_more'), value(data, 'size_downside')].filter(Boolean).length;
-        const exit = [value(data, 'exit_review'), value(data, 'exit_logic_action'), value(data, 'exit_emotion')].filter(Boolean).length;
-        coverage.textContent = `当前记录：EV ${ev}/3 · SIZE ${size}/3 · EXIT ${exit}/3`;
-        return;
-      }
-      const reasons = countFilled(data, 'reason', 5);
-      const risks = countFilled(data, 'risk', 5);
-      const stages = Array.from({length:4}, (_,i) => value(data, `stage_${i+1}_trigger`) || value(data, `stage_${i+1}_action`)).filter(Boolean).length;
-      const exits = [value(data,'exit_invalidated'), value(data,'profit_1_trigger'), value(data,'profit_2_trigger'), value(data,'profit_3_trigger'), value(data,'price_alert_1'), value(data,'price_alert_2')].filter(Boolean).length;
-      coverage.textContent = `当前记录：${reasons}/5 理由 · ${risks}/5 风险 · ${stages} 个建仓阶段 · ${exits} 条退出规则`;
     };
     const restore = () => {
       const current = readStorage(KEY);
@@ -411,6 +389,7 @@
           state.textContent = '已导入简单版旧草稿，请保存到合并版';
         }
       }
+      ensureCurrentDate();
       syncSimpleFromFull();
       setMode(mode, false);
     };
@@ -503,7 +482,6 @@
       const target = form.querySelector(`[name="${event.currentTarget.dataset.bind}"]`);
       if (!target) return;
       target.value = event.currentTarget.value;
-      updateCoverage();
     };
     simpleElements().forEach(element => {
       element.addEventListener('input', syncBoundField);
@@ -511,11 +489,9 @@
     });
     form.addEventListener('input', event => {
       if (event.target.name) syncSimpleFromFull();
-      updateCoverage();
     });
     form.addEventListener('change', event => {
       if (event.target.name) syncSimpleFromFull();
-      updateCoverage();
     });
     modeButtons.forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
     document.querySelector('#saveBtn').addEventListener('click', save);
@@ -524,10 +500,10 @@
     document.querySelector('#resetBtn').addEventListener('click', ()=>{
       if (!confirm('确认清空这次检查吗？')) return;
       form.reset();
+      ensureCurrentDate();
       localStorage.setItem(KEY, JSON.stringify({__version:3, __cleared:true}));
       syncSimpleFromFull();
       state.textContent='已清空';
-      updateCoverage();
     });
     restore();
   </script>

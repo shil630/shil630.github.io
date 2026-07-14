@@ -326,6 +326,14 @@ ul.contact-list { list-style: none; margin: 0; padding: 0; }
 .contact-list li { padding: 6px 0; }
 
 /* ---------- Tools ---------- */
+.tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.tool-card { display: flex; flex-direction: column; gap: 10px; padding: 24px 26px; border: 1px solid var(--border); border-radius: 10px; color: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
+.tool-card:hover { text-decoration: none; border-color: var(--accent); box-shadow: 0 2px 12px rgba(30, 29, 27, 0.07); }
+.tool-card-eyebrow { margin: 0; color: var(--accent); font-size: 12px; font-weight: 600; letter-spacing: 0.14em; }
+.tool-card-title { margin: 2px 0 0; font-family: var(--font-serif); font-size: 21px; font-weight: 600; line-height: 1.35; }
+.tool-card-desc { margin: 0; flex: 1; color: var(--fg-soft); font-size: 14px; line-height: 1.7; }
+.tool-card-cta { margin-top: 6px; color: var(--accent); font-size: 14px; }
+.tool-card:hover .tool-card-cta { text-decoration: underline; }
 .tools-note { margin-top: 28px; color: var(--fg-faint); font-size: 13px; line-height: 1.7; }
 
 /* ---------- Subscribe ---------- */
@@ -392,6 +400,7 @@ ul.contact-list { list-style: none; margin: 0; padding: 0; }
   .lang-toggle { padding-inline: 10px; }
   .resume-list li { flex-direction: column; gap: 2px; }
   .resume-when { width: auto; }
+  .tool-grid { grid-template-columns: 1fr; }
   .post-nav { flex-direction: column; }
   .post-nav .next { text-align: left; }
   .subscribe-form { flex-direction: column; }
