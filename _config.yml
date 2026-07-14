@@ -9,7 +9,7 @@ timezone: "America/New_York"
 
 # baseurl "" 因为这是 user page (shil630.github.io)，站点位于域名根目录
 baseurl: ""
-url: "https://shil630.github.io"
+url: "https://shiliang.me"
 
 # --- Social links (留空即不显示) ---
 social:
