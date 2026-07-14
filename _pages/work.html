@@ -14,10 +14,10 @@ image: "/assets/images/work/unifi-site-manager.png"
     {% for work in site.data.works.works %}
     <article class="work-item" id="{{ work.slug }}">
       <p class="work-item-eyebrow">0{{ forloop.index }}</p>
-      <h2 class="work-item-title">{{ work.title }}</h2>
       <div class="work-item-media work-media--{{ work.media | default: 'flush' }}">
         <img src="{{ work.image | relative_url }}" alt="{{ work.alt }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
       </div>
+      <h2 class="work-item-title">{{ work.title }}</h2>
       <p class="work-item-desc" data-en="{{ work.description_en }}" data-zh="{{ work.description_zh }}">{{ work.description_zh }}</p>
       <div class="work-challenge">
         <span data-en="Design question" data-zh="设计命题">设计命题</span>
