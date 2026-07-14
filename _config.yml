@@ -7,7 +7,7 @@ email: "shiliangbj12@gmail.com"
 lang: "zh"
 timezone: "America/New_York"
 
-# baseurl "" 因为这是 user page (shil630.github.io)，站点位于域名根目录
+# baseurl "" 因为站点在自定义域名 shiliang.me 的根目录
 baseurl: ""
 url: "https://shiliang.me"
 

@@ -1,9 +1,9 @@
-# shil630.github.io
+# shiliang.me · 石亮正EV
 
 「石亮正EV」Blog，基于 [Jekyll](https://jekyllrb.com/) + GitHub Pages。
 Liang Shi · Positive EV, built with Jekyll & GitHub Pages.
 
-在线地址 / Live: <https://shil630.github.io>
+在线地址 / Live: <https://shiliang.me>
 
 ## 写一篇新文章 / Writing a new post
 
