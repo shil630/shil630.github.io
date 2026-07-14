@@ -68,3 +68,7 @@ exclude:
   - README.md
   - LICENSE
   - vendor
+  - setup
+  - check
+  - preview
+  - "AI 博客写作与运营解决方案 商业计划.md"
