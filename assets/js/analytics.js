@@ -7,8 +7,16 @@
   var ENTRY_SOURCE_KEY = "positive-ev-entry-source";
 
   function track(eventName, params) {
-    if (typeof window.gtag !== "function") return;
-    window.gtag("event", eventName, params || {});
+    params = params || {};
+
+    if (typeof window.gtag === "function") {
+      window.gtag("event", eventName, params);
+      return;
+    }
+
+    if (Array.isArray(window.dataLayer)) {
+      window.dataLayer.push(Object.assign({ event: eventName }, params));
+    }
   }
 
   function pathSlug() {

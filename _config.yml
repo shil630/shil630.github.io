@@ -19,7 +19,9 @@ social:
   linkedin: "https://www.linkedin.com/in/liang-shi-105172128/"
 
 # --- Analytics & 邮件订阅 (填好 ID 后自动生效，留空则不渲染) ---
-# GA4 衡量 ID，形如 G-XXXXXXXXXX (analytics.google.com 注册后获取)
+# GTM 容器 ID，形如 GTM-XXXXXXX。填入后优先通过 GTM 管理 GA4。
+google_tag_manager: "GTM-PX6G93GX"
+# GA4 衡量 ID，形如 G-XXXXXXXXXX。仅在未配置 GTM 时直连 GA4。
 google_analytics: "G-MQH963M94G"
 # Buttondown 用户名 (buttondown.com 注册后获取)
 buttondown_username: "shiliangbj12"

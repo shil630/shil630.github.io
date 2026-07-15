@@ -2,6 +2,7 @@
 <html lang="{{ page.lang | default: site.lang }}">
 {% include head.html %}
 <body data-content-slug="{% if page.layout == 'post' %}{{ page.slug | escape }}{% elsif page.url == '/' %}home{% else %}{{ page.url | remove_first: '/' | split: '/' | first | default: 'page' | escape }}{% endif %}">
+  {% include tag-manager-noscript.html %}
   {% include header.html %}
 
   <main class="site-main">
