@@ -12,6 +12,7 @@ vendor/
 .vscode/
 .idea/
 .claude/
+.workbuddy/
 
 # Private notes / plans (never publish)
 AI 博客写作与运营解决方案 商业计划.md
