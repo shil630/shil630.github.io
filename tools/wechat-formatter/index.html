@@ -1,0 +1,329 @@
+---
+---
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>正EV · 公众号排版器</title>
+  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/assets/images/favicon.png" type="image/png">
+  {% include analytics.html %}
+  <style>
+    :root { --paper:#F5F1EA; --ink:#1E1D1B; --red:#B64B3B; --muted:#8D8881; --sand:#D9CFC3; --line:rgba(30,29,27,.14); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-width:1080px; color:var(--ink); background:var(--paper); font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; }
+    button, textarea { font:inherit; }
+    .app { min-height:100vh; display:grid; grid-template-columns:272px minmax(420px,1fr) minmax(430px,1.12fr); }
+    .sidebar { border-right:1px solid var(--line); padding:30px 24px; background:#efe9df; }
+    .back-link { display:inline-block; margin:0 0 22px; color:var(--muted); font-size:12px; text-decoration:none; letter-spacing:.02em; }
+    .back-link:hover { color:var(--red); }
+    .brand-mark { display:flex; gap:9px; align-items:center; margin-bottom:39px; }
+    .dots { display:flex; gap:5px; align-items:center; }
+    .dot { display:block; width:9px; height:9px; border-radius:50%; background:var(--ink); }
+    .dot.red { background:var(--red); }
+    .dot.outline { background:transparent; border:1.4px solid var(--red); }
+    .brand { margin:0; font-family:"Songti SC","STSong",serif; font-weight:700; font-size:19px; letter-spacing:.02em; }
+    .tagline { margin:5px 0 0; color:var(--muted); font-size:11px; letter-spacing:.08em; }
+    .label { margin:0 0 10px; color:var(--muted); font-size:11px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; }
+    .step { display:flex; align-items:flex-start; gap:10px; margin:0 0 16px; color:#655f58; font-size:13px; line-height:1.5; }
+    .step i { width:20px; height:20px; display:grid; place-items:center; flex:0 0 auto; border:1px solid var(--sand); border-radius:50%; font-family:Georgia,serif; font-size:11px; font-style:normal; }
+    .step.active { color:var(--ink); font-weight:600; }
+    .step.active i { color:var(--paper); border-color:var(--red); background:var(--red); }
+    .sidebar hr { border:0; border-top:1px solid var(--line); margin:28px 0; }
+    .tip { color:#655f58; font-size:12px; line-height:1.8; }
+    .tip strong { color:var(--ink); font-weight:600; }
+    .workspace { min-width:0; padding:28px 28px 26px; display:flex; flex-direction:column; }
+    .workspace-head, .preview-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+    .eyebrow { color:var(--muted); font-size:11px; letter-spacing:.12em; font-weight:600; }
+    .state { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:11px; }
+    .state b { width:6px; height:6px; border-radius:50%; background:#78966c; }
+    .toolbar { display:flex; align-items:flex-start; gap:16px; margin-bottom:14px; }
+    .insert-tools { min-width:0; display:flex; flex:1 1 auto; flex-wrap:wrap; gap:7px; }
+    .tool-btn { position:relative; padding:7px 10px; border:1px solid var(--line); border-radius:4px; color:#514c46; background:rgba(255,255,255,.32); font-size:12px; cursor:pointer; transition:border-color .16s ease,color .16s ease,background .16s ease; }
+    .tool-btn:hover { border-color:var(--red); color:var(--red); background:rgba(255,255,255,.58); }
+    .insert-btn::before { content:"+"; position:absolute; left:9px; opacity:0; transform:translateX(-4px); font-weight:700; transition:opacity .16s ease,transform .16s ease; }
+    .insert-btn span { display:inline-block; transition:transform .16s ease; }
+    .insert-btn:hover::before, .insert-btn:focus-visible::before { opacity:1; transform:translateX(0); }
+    .insert-btn:hover span, .insert-btn:focus-visible span { transform:translateX(6px); }
+    .toolbar-actions { flex:0 0 auto; display:flex; align-items:center; gap:2px; margin-left:auto; padding-left:12px; border-left:1px solid var(--line); }
+    .utility-btn { padding:7px 8px; border:0; color:var(--muted); background:transparent; }
+    .utility-btn:hover { border-color:transparent; color:var(--ink); background:rgba(30,29,27,.055); }
+    .utility-btn.danger:hover { color:var(--red); background:rgba(182,75,59,.07); }
+    .editor { flex:1; min-height:620px; resize:none; border:1px solid var(--line); border-radius:5px; outline:none; padding:22px; color:#3f3a35; background:#fffdf9; font-family:"SFMono-Regular",Consolas,monospace; font-size:13px; line-height:1.8; }
+    .editor:focus { border-color:rgba(182,75,59,.65); box-shadow:0 0 0 3px rgba(182,75,59,.08); }
+    .editor-foot { display:flex; justify-content:space-between; padding:10px 2px 0; color:var(--muted); font-size:11px; }
+    .preview-area { min-width:0; padding:28px 34px 34px; border-left:1px solid var(--line); background:#e8e1d6; }
+    .preview-actions { display:flex; align-items:center; gap:8px; }
+    .button { border:0; border-radius:4px; padding:8px 12px; color:var(--ink); background:transparent; font-size:12px; cursor:pointer; }
+    .button:hover { background:rgba(30,29,27,.06); }
+    .button.primary { color:#fffdf9; background:var(--red); }
+    .button.primary:hover { background:#9f3f31; }
+    .theme-row { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; }
+    .theme-pill { display:inline-flex; align-items:center; gap:7px; padding:6px 13px; border:1px solid var(--line); border-radius:999px; color:#514c46; background:rgba(255,255,255,.55); font-size:12px; cursor:pointer; transition:.15s ease; }
+    .theme-pill:hover { border-color:#8d8881; }
+    .theme-pill.active { border-color:var(--ink); box-shadow:inset 0 0 0 1px var(--ink); color:var(--ink); font-weight:600; }
+    .theme-dot { width:10px; height:10px; border-radius:50%; flex:0 0 auto; }
+    .article-shell { width:min(100%, 520px); min-height:650px; margin:0 auto; padding:40px 30px 48px; background:#fff; box-shadow:0 14px 35px rgba(50,43,35,.12); }
+    .phone-note { width:min(100%, 520px); margin:12px auto 0; color:#756f67; font-size:11px; text-align:center; }
+    .toast { position:fixed; z-index:5; right:28px; bottom:28px; transform:translateY(18px); opacity:0; pointer-events:none; padding:10px 13px; border-radius:4px; color:#fffdf9; background:var(--ink); font-size:12px; transition:.22s; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    @media (max-width:1180px) { body { min-width:0; } .app { grid-template-columns:230px minmax(330px,1fr) minmax(380px,1fr); } .sidebar,.workspace,.preview-area { padding-left:18px; padding-right:18px; } }
+  </style>
+</head>
+<body data-content-slug="wechat-formatter">
+  <main class="app">
+    <aside class="sidebar">
+      <a class="back-link" href="/tools/">← 返回工具</a>
+      <div class="brand-mark">
+        <span class="dots"><b class="dot red"></b><b class="dot"></b><b class="dot outline"></b></span>
+        <div><h1 class="brand">石亮正EV</h1><p class="tagline">在不确定中，持续做更好的决策</p></div>
+      </div>
+      <p class="label">文章工作流</p>
+      <div class="step active"><i>1</i><span>粘贴 Markdown<br>或直接在左侧修改</span></div>
+      <div class="step"><i>2</i><span>选一套配色主题<br>检查阅读节奏和重点</span></div>
+      <div class="step"><i>3</i><span>复制富文本<br>粘贴进公众号编辑器</span></div>
+      <hr>
+      <p class="label">这一版的原则</p>
+      <p class="tip"><strong>不是花哨模板。</strong><br>每套主题是一整套排版语言：编号、引用、列表、代码块成套变化。文章本身始终是主角。</p>
+      <p class="tip">支持标题、二三级标题、引用、列表、分隔线、图片、加粗、<code>==高亮==</code> 和代码块。表格会转成纵向信息卡。二级标题自动编号。</p>
+    </aside>
+
+    <section class="workspace">
+      <div class="workspace-head"><span class="eyebrow">01 / 编辑原稿</span><span class="state"><b></b><span id="wordCount">0 字</span></span></div>
+      <div class="toolbar">
+        <div class="insert-tools" role="group" aria-label="插入格式">
+          <button class="tool-btn insert-btn" data-insert="## 小标题" aria-label="插入二级标题"><span>二级标题</span></button>
+          <button class="tool-btn insert-btn" data-insert="> 一句值得停下来的话" aria-label="插入引用"><span>引用</span></button>
+          <button class="tool-btn insert-btn" data-insert="- 一个要点" aria-label="插入列表"><span>列表</span></button>
+          <button class="tool-btn insert-btn" data-insert="==值得记住的一句话==" aria-label="插入高亮"><span>高亮</span></button>
+          <button class="tool-btn insert-btn" data-insert="```&#10;echo &quot;代码或引用原文&quot;&#10;```" aria-label="插入代码块"><span>代码块</span></button>
+          <button class="tool-btn insert-btn" data-insert="---" aria-label="插入分隔线"><span>分隔线</span></button>
+        </div>
+        <div class="toolbar-actions" role="group" aria-label="编辑操作">
+          <button class="tool-btn utility-btn" id="sampleBtn">载入示例</button>
+          <button class="tool-btn utility-btn danger" id="clearBtn">清空</button>
+        </div>
+      </div>
+      <textarea id="source" class="editor" spellcheck="false" aria-label="Markdown 原稿"></textarea>
+      <div class="editor-foot"><span>Markdown 会实时转换</span><span>图片请用完整的 https 地址</span></div>
+    </section>
+
+    <section class="preview-area">
+      <div class="preview-head"><span class="eyebrow">02 / 公众号预览</span><div class="preview-actions"><button class="button" id="downloadBtn">下载 HTML</button><button class="button primary" id="copyBtn">复制到公众号</button></div></div>
+      <div class="theme-row" id="themeRow" role="group" aria-label="配色主题"></div>
+      <article id="preview" class="article-shell"></article>
+      <p class="phone-note">这里模拟手机阅读宽度。粘贴后请在公众号编辑器里再检查一次图片与链接。</p>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const source = $('#source');
+    const preview = $('#preview');
+    const toast = $('#toast');
+    const sample = `# 在投资中，你是「紧凶」还是「松弱」？
+
+> 好的决策不是预测对了什么，而是在不确定里守住了什么。
+
+前两年再入美股时，我的账户看起来挺分散。博主推荐的股票，买一点；热点赛道，买一点；每一笔都不大。后来才发现，账户像 ==开超市==。
+
+## 别急着贴标签
+
+我把扑克里的两条轴借到投资里，不是做性格测试，而是照一照自己的动作。
+
+- **紧或松**：愿意玩多少手牌；
+- **凶或弱**：买入以后，是主动调整，还是等价格替自己回答。
+
+## 从开超市到组球队
+
+说白了，它更像一组我还在不断优化的规则：
+
+1. 先想清目标和自己能承受什么；
+2. 再给每个仓位找一个角色；
+3. 偏得太远就拉回来。
+
+> 卖出不是因为我突然看空，而是仓位已经超过系统允许的尺度。
+
+\`\`\`
+削峰规则：单一持仓 > 25% 时，减回 20% 以内
+\`\`\`
+
+---
+
+本文仅为个人学习记录与方法论分享，不构成任何投资建议。`;
+
+    /* ============ 主题系统 ============
+       每套主题 = 调色板 c + 排版变体 v，成套设计而非只换色：
+       h2:  eyebrow-bar 编号眉题+左边线(衬线) / rule 编号+底部细线(衬线) / circle 实心圆徽
+            spaced 大号数字留白 / square 圆角方徽 / pill 胶囊徽
+       quote: classic 左边线+浅底 / minimal 细墨线无底(斜体) / card 圆角卡片+「引言」标签 / airy 无边线浅底圆角
+       list:  plain 原生序号 / badge 彩色圆点+实心编号圆徽
+       hr:    full 主色通栏 / short 居中短线 / hairline 灰细线 / dotted 主色虚线
+       dark:  代码块深色底                                        */
+    const THEMES = [
+      { id:'zheng-ev', name:'正EV', serif:false,
+        c:{ accent:'#B64B3B', deep:'#744033', tint:'#F5F1EA', faint:'#FBF8F3', blockBg:'#EEE6DC', border:'#D9CFC3', borderSoft:'#E8E2D9', codeBg:'#F0EAE2', strong:'#B64B3B', mark:'#F3E4CF', markText:'#7A4B2E' },
+        v:{ h2:'circle', h3:'bar', quote:'card', list:'badge', hr:'dotted', dark:'#26221E' } },
+      { id:'mo-xian', name:'墨线', serif:true,
+        c:{ accent:'#3D3D3B', deep:'#1E1D1B', tint:'#F4F4F2', faint:'#FAFAF8', blockBg:'#ECECE9', border:'#D8D7D2', borderSoft:'#E9E8E4', codeBg:'#EFEFEB', strong:'#1E1D1B', mark:'#E9E9E4', markText:'#1E1D1B' },
+        v:{ h2:'rule', h3:'bar', quote:'minimal', list:'plain', hr:'short', dark:'#1E1D1B' } },
+      { id:'qing-ye', name:'青野', serif:false,
+        c:{ accent:'#2E7D5B', deep:'#1D5540', tint:'#EAF6EE', faint:'#F6FBF8', blockBg:'#E4EEE7', border:'#C9DCD0', borderSoft:'#DFEAE3', codeBg:'#EAF2EC', strong:'#2E7D5B', mark:'#DDF2E4', markText:'#1D5540' },
+        v:{ h2:'circle', h3:'bar', quote:'card', list:'badge', hr:'dotted', dark:'#17332A' } },
+      { id:'liu-bai', name:'留白', serif:false,
+        c:{ accent:'#3B6FB4', deep:'#2A5187', tint:'#EFF4FA', faint:'#F8FAFC', blockBg:'#E5ECF4', border:'#CBD9E8', borderSoft:'#E0E8F1', codeBg:'#EAF0F6', strong:'#3B6FB4', mark:'#E3EDF8', markText:'#2A5187' },
+        v:{ h2:'spaced', h3:'bar', quote:'airy', list:'plain', hr:'hairline', dark:'#1C2B3A' } },
+      { id:'zi-qiong', name:'紫穹', serif:false,
+        c:{ accent:'#6D5BD0', deep:'#4C3FA0', tint:'#F3F1FA', faint:'#FAF9FD', blockBg:'#EAE6F6', border:'#D5CEEC', borderSoft:'#E4DFF3', codeBg:'#EEEBF8', strong:'#6D5BD0', mark:'#EAE4FA', markText:'#4C3FA0' },
+        v:{ h2:'square', h3:'bar', quote:'card', list:'badge', hr:'short', dark:'#262040' } },
+      { id:'shan-hu', name:'珊瑚', serif:false,
+        c:{ accent:'#E25568', deep:'#A93844', tint:'#FDF0F2', faint:'#FDF8F8', blockBg:'#F7E6E8', border:'#EBCDD1', borderSoft:'#F3DFE2', codeBg:'#F9ECEE', strong:'#E25568', mark:'#FBE3E7', markText:'#A93844' },
+        v:{ h2:'pill', h3:'bar', quote:'card', list:'badge', hr:'dotted', dark:'#33202A' } }
+    ];
+    const THEME_KEY = 'positive-ev-wechat-theme';
+    let T = THEMES.find(t => t.id === localStorage.getItem(THEME_KEY)) || THEMES[0];
+
+    const headingFont = () => T.serif ? 'font-family:Songti SC,STSong,serif;' : '';
+    const esc = (text) => text.replace(/[&<>\"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
+    const inline = (text) => esc(text)
+      .replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, '<img src="$2" alt="$1" style="display:block;max-width:100%;height:auto;margin:24px auto;border-radius:2px;">')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, `<a href="$2" style="color:${T.c.accent};text-decoration:underline;text-underline-offset:3px;">$1</a>`)
+      .replace(/==([^=\n]+)==/g, `<span style="background:${T.c.mark};color:${T.c.markText};padding:2px 5px;border-radius:3px;">$1</span>`)
+      .replace(/\*\*([^*]+)\*\*/g, `<strong style="font-weight:650;color:${T.c.strong};">$1</strong>`)
+      .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em style="font-style:italic;">$2</em>')
+      .replace(/`([^`]+)`/g, `<code style="padding:2px 5px;border-radius:3px;background:${T.c.codeBg};color:${T.c.deep};font-family:ui-monospace,monospace;font-size:.9em;">$1</code>`);
+
+    function para(text) { return '<p style="margin:0 0 20px;color:#393632;font-size:16px;line-height:1.9;letter-spacing:.02em;">' + inline(text) + '</p>'; }
+
+    function h2Block(num, content) {
+      const t = inline(content);
+      switch (T.v.h2) {
+        case 'eyebrow-bar': return `<h2 style="margin:38px 0 16px;padding-left:12px;border-left:3px solid ${T.c.accent};${headingFont()}font-size:21px;line-height:1.45;font-weight:700;color:#1E1D1B;"><span style="display:block;color:${T.c.accent};font-family:Georgia,serif;font-size:12px;letter-spacing:.18em;font-weight:700;margin-bottom:6px;">${num}</span>${t}</h2>`;
+        case 'rule': return `<h2 style="margin:42px 0 18px;padding-bottom:10px;border-bottom:1px solid ${T.c.border};${headingFont()}font-size:21px;line-height:1.45;font-weight:700;color:#1E1D1B;"><span style="color:${T.c.accent};font-family:Georgia,serif;font-size:14px;font-style:italic;font-weight:400;margin-right:10px;">${num}</span>${t}</h2>`;
+        case 'circle': return `<h2 style="margin:42px 0 16px;font-size:20px;line-height:1.5;font-weight:700;color:#1E1D1B;"><span style="display:inline-block;width:34px;height:34px;line-height:34px;border-radius:50%;background:${T.c.accent};color:#fff;font-family:Georgia,serif;font-size:14px;font-weight:700;text-align:center;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
+        case 'spaced': return `<h2 style="margin:48px 0 18px;font-size:20px;line-height:1.5;font-weight:700;color:#1E1D1B;"><span style="display:block;color:${T.c.accent};font-family:Georgia,serif;font-size:26px;font-weight:400;letter-spacing:.1em;margin-bottom:4px;">${num}</span>${t}</h2>`;
+        case 'square': return `<h2 style="margin:42px 0 16px;font-size:20px;line-height:1.5;font-weight:700;color:#1E1D1B;"><span style="display:inline-block;width:34px;height:34px;line-height:34px;border-radius:9px;background:${T.c.accent};color:#fff;font-family:Georgia,serif;font-size:14px;font-weight:700;text-align:center;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
+        case 'pill': return `<h2 style="margin:42px 0 16px;font-size:20px;line-height:1.5;font-weight:700;color:#1E1D1B;"><span style="display:inline-block;min-width:44px;height:26px;line-height:26px;border-radius:999px;background:${T.c.accent};color:#fff;font-family:Georgia,serif;font-size:13px;font-weight:700;text-align:center;padding:0 6px;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
+      }
+    }
+    function h3Block(content) {
+      const t = inline(content);
+      if (T.v.h3 === 'bar') return `<h3 style="margin:27px 0 12px;padding-left:10px;border-left:3px solid ${T.c.accent};color:#1E1D1B;${headingFont()}font-size:17px;line-height:1.5;font-weight:650;">${t}</h3>`;
+      return `<h3 style="margin:27px 0 12px;color:#1E1D1B;${headingFont()}font-size:17px;line-height:1.5;font-weight:650;">${t}</h3>`;
+    }
+    function quoteBlock(content, isFirst) {
+      const t = inline(content);
+      switch (T.v.quote) {
+        case 'classic': return `<blockquote style="margin:24px 0;padding:15px 17px;border-left:3px solid ${T.c.accent};background:${T.c.tint};color:#514b44;font-size:15px;line-height:1.8;letter-spacing:.02em;">${t}</blockquote>`;
+        case 'minimal': return `<blockquote style="margin:26px 0;padding:2px 0 2px 16px;border-left:2px solid #1E1D1B;color:#514b44;font-size:15px;line-height:1.9;letter-spacing:.02em;font-style:italic;">${t}</blockquote>`;
+        case 'card': {
+          const label = isFirst ? `<span style="display:block;color:${T.c.accent};font-size:12px;font-weight:700;letter-spacing:.14em;margin-bottom:10px;">引言</span>` : '';
+          return `<blockquote style="margin:26px 0;padding:20px 22px;border-radius:12px;background:${T.c.tint};color:#26302B;font-size:15.5px;line-height:1.9;font-weight:650;">${label}${t}</blockquote>`;
+        }
+        case 'airy': return `<blockquote style="margin:28px 0;padding:18px 22px;border-radius:10px;background:${T.c.tint};color:#41505F;font-size:15px;line-height:1.95;letter-spacing:.02em;">${t}</blockquote>`;
+      }
+    }
+    function hrBlock() {
+      switch (T.v.hr) {
+        case 'full': return `<div style="width:100%;border-top:1px solid ${T.c.accent};margin:34px 0 28px;"></div>`;
+        case 'short': return `<div style="width:48px;border-top:2px solid ${T.c.accent};margin:38px auto 32px;"></div>`;
+        case 'hairline': return `<div style="width:100%;border-top:1px solid ${T.c.borderSoft};margin:36px 0 30px;"></div>`;
+        case 'dotted': return `<div style="width:100%;border-top:1px dashed ${T.c.border};margin:36px 0 30px;"></div>`;
+      }
+    }
+    function codeBlock(lines) {
+      return `<section style="margin:24px 0;padding:16px 19px;border-radius:8px;border-left:3px solid ${T.c.accent};background:${T.v.dark};color:#E8E6E2;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;line-height:1.85;">` + lines.map(line => '<div style="min-height:1.85em;">' + (line.trim() ? esc(line) : '&nbsp;') + '</div>').join('') + '</section>';
+    }
+    function renderTextBlock(lines) {
+      return `<section style="margin:24px 0;padding:18px 20px;border:1px solid ${T.c.border};border-radius:14px;background:${T.c.blockBg};color:#2F2C28;font-size:16px;line-height:1.9;letter-spacing:.015em;">` + lines.map(line => '<div style="min-height:1.9em;">' + (line.trim() ? inline(line) : '&nbsp;') + '</div>').join('') + '</section>';
+    }
+    const isTableRow = (line) => /^\s*\|.+\|\s*$/.test(line) && (line.match(/\|/g) || []).length >= 3;
+    const isTableDivider = (line) => /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
+    const isDisclaimer = (line) => /本文仅为个人学习记录|不构成(?:任何)?投资建议/.test(line);
+    function renderTable(rows) {
+      const cleaned = rows.filter(line => !isTableDivider(line)).map(line => line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(cell => cell.trim()));
+      if (!cleaned.length) return '';
+      const colCount = Math.max(...cleaned.map(row => row.length));
+      const widths = Array.from({length:colCount}, (_, index) => index === 0 ? '19%' : ((81 / Math.max(1, colCount - 1)).toFixed(2) + '%')).join(' ');
+      const cells = cleaned.map((row, rowIndex) => row.map((cell, cellIndex) => {
+        const isHead = rowIndex === 0 || cellIndex === 0;
+        const border = rowIndex === 0 ? `border-bottom:1px solid ${T.c.border};` : `border-bottom:1px solid ${T.c.borderSoft};`;
+        const bg = isHead ? (rowIndex === 0 ? T.c.tint : T.c.faint) : 'transparent';
+        const weight = isHead ? '650' : '400';
+        const align = rowIndex === 0 ? 'center' : 'left';
+        return '<div style="padding:12px 8px;box-sizing:border-box;background:' + bg + ';' + border + 'color:#302D29;font-size:13px;line-height:1.7;font-weight:' + weight + ';text-align:' + align + ';overflow-wrap:anywhere;">' + inline(cell || ' ') + '</div>';
+      }).join('')).join('');
+      return `<section style="margin:24px 0;border:1px solid ${T.c.border};border-radius:6px;overflow:hidden;"><div style="display:grid;grid-template-columns:` + widths + ';">' + cells + '</div></section>';
+    }
+    function render(md) {
+      const lines = md.replace(/^---[\s\S]*?---\s*/,'').replace(/\r/g,'').split('\n');
+      let html = '', i = 0, inList = false, listType = '', listClose = '', olNum = 0, table = [], h2Num = 0, quoteNum = 0;
+      const badge = T.v.list === 'badge';
+      const closeList = () => { if (inList) { html += listClose; inList = false; } };
+      const openList = (type) => { inList = true; listType = type; olNum = 0;
+        if (badge) { html += '<section style="margin:0 0 20px;">'; listClose = '</section>'; }
+        else if (type === 'ul') { html += '<ul style="margin:0 0 20px;padding-left:1.35em;color:#393632;font-size:16px;line-height:1.9;">'; listClose = '</ul>'; }
+        else { html += '<ol style="margin:0 0 20px;padding-left:1.45em;color:#393632;font-size:16px;line-height:1.9;">'; listClose = '</ol>'; } };
+      const listItem = (type, text) => {
+        if (!inList || listType !== type) { closeList(); openList(type); }
+        if (badge) {
+          if (type === 'ul') html += `<p style="margin:8px 0;color:#393632;font-size:16px;line-height:1.9;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${T.c.accent};margin-right:11px;vertical-align:3px;"></span>${inline(text)}</p>`;
+          else { olNum++; html += `<p style="margin:9px 0;color:#393632;font-size:16px;line-height:1.9;"><span style="display:inline-block;width:21px;height:21px;line-height:21px;border-radius:50%;background:${T.c.accent};color:#fff;font-size:12px;font-weight:600;text-align:center;margin-right:10px;">${olNum}</span>${inline(text)}</p>`; }
+        } else html += '<li style="margin:5px 0;padding-left:3px;">' + inline(text) + '</li>';
+      };
+      const flushTable = () => { if (!table.length) return; html += renderTable(table); table = []; };
+      while (i < lines.length) {
+        const line = lines[i];
+        if (isTableRow(line)) { closeList(); table.push(line); i++; continue; }
+        flushTable();
+        if (!line.trim()) { closeList(); i++; continue; }
+        const fence = line.match(/^```(\w*)\s*$/);
+        if (fence) { closeList(); const block = []; i++; while (i < lines.length && !/^```\s*$/.test(lines[i])) { block.push(lines[i]); i++; } html += fence[1] === 'text' ? renderTextBlock(block) : codeBlock(block); }
+        else if (/^# (.+)/.test(line)) { closeList(); html += `<h1 style="margin:0 0 16px;color:#1E1D1B;${headingFont()}font-size:29px;line-height:1.32;font-weight:700;letter-spacing:.02em;">` + inline(line.slice(2)) + '</h1>'; }
+        else if (/^## (.+)/.test(line)) { closeList(); h2Num++; html += h2Block(String(h2Num).padStart(2, '0'), line.slice(3)); }
+        else if (/^### (.+)/.test(line)) { closeList(); html += h3Block(line.slice(4)); }
+        else if (/^> (.+)/.test(line)) { closeList(); quoteNum++; html += quoteBlock(line.slice(2), quoteNum === 1); }
+        else if (/^---+$/.test(line)) { closeList(); html += hrBlock(); }
+        else if (/^[-*] (.+)/.test(line)) { listItem('ul', line.slice(2)); }
+        else if (/^\d+\. (.+)/.test(line)) { listItem('ol', line.replace(/^\d+\. /, '')); }
+        else if (isDisclaimer(line)) { closeList(); html += '<p style="margin:0 0 20px;color:#756f67;font-size:14px;line-height:1.85;letter-spacing:.02em;font-style:italic;">' + inline(line) + '</p>'; }
+        else { closeList(); html += para(line); }
+        i++;
+      }
+      closeList(); flushTable();
+      return html || '<p style="color:#8D8881;font-size:15px;line-height:1.8;">从左侧开始写，右侧会实时预览。</p>';
+    }
+    function update() { preview.innerHTML = render(source.value); $('#wordCount').textContent = (source.value.replace(/\s/g,'').length || 0) + ' 字'; localStorage.setItem('positive-ev-wechat-source', source.value); }
+    function notice(msg) { toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 2300); }
+    function insert(text) { const start=source.selectionStart, end=source.selectionEnd; source.setRangeText((start && source.value[start-1] !== '\n' ? '\n\n' : '') + text + '\n',start,end,'end'); source.focus(); update(); }
+
+    const themeRow = $('#themeRow');
+    THEMES.forEach(t => {
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'theme-pill' + (t.id === T.id ? ' active' : '');
+      pill.dataset.theme = t.id;
+      pill.innerHTML = `<span class="theme-dot" style="background:${t.c.accent}"></span>${t.name}`;
+      pill.addEventListener('click', () => {
+        T = t;
+        localStorage.setItem(THEME_KEY, t.id);
+        themeRow.querySelectorAll('.theme-pill').forEach(p => p.classList.toggle('active', p.dataset.theme === t.id));
+        update();
+      });
+      themeRow.appendChild(pill);
+    });
+
+    source.value = localStorage.getItem('positive-ev-wechat-source') || sample;
+    source.addEventListener('input', update);
+    document.querySelectorAll('[data-insert]').forEach(b=>b.addEventListener('click',()=>insert(b.dataset.insert)));
+    $('#sampleBtn').addEventListener('click',()=>{ source.value=sample; update(); notice('已载入示例原稿'); });
+    $('#clearBtn').addEventListener('click',()=>{ if (source.value && !confirm('清空当前编辑内容？')) return; source.value=''; update(); source.focus(); });
+    // 复制的富文本不带整体背景色，粘进公众号后跟随编辑器的白底
+    $('#copyBtn').addEventListener('click', async () => { const html = '<section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:0;color:#393632;">' + preview.innerHTML + '</section>'; try { await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([preview.innerText],{type:'text/plain'})})]); notice('已复制富文本，可粘贴进公众号'); } catch { await navigator.clipboard.writeText(preview.innerText); notice('浏览器限制：已复制纯文字'); } });
+    $('#downloadBtn').addEventListener('click', () => { const html='<!doctype html><meta charset="utf-8"><title>公众号文章</title><body style="margin:0;background:#fff;"><section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:28px 22px;color:#393632;">'+preview.innerHTML+'</section></body>'; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download='正EV-公众号排版.html'; a.click(); URL.revokeObjectURL(a.href); notice('已下载 HTML 文件'); });
+    update();
+  </script>
+</body>
+</html>
