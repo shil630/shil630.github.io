@@ -260,6 +260,34 @@ img { max-width: 100%; height: auto; }
 
 .empty-hint { text-align: center; color: var(--fg-faint); padding: 40px 0; }
 
+/* ---------- Featured posts ---------- */
+.featured-section { margin-bottom: 32px; }
+.featured-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin: 0 0 4px;
+}
+.featured-item { border-left: 3px solid var(--accent); padding-left: 16px; }
+.featured-item:first-child { border-top: 1px solid var(--border); }
+
+/* ---------- Pagination ---------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 0;
+  font-size: 15px;
+}
+.pagination-prev,
+.pagination-next { color: var(--accent); }
+.pagination-prev:hover,
+.pagination-next:hover { text-decoration: underline; }
+.pagination-disabled { color: var(--fg-faint); pointer-events: none; }
+.pagination-info { color: var(--fg-soft); }
+
 /* ---------- Tool waitlist ---------- */
 .tool-waitlist {
   margin: 24px 0 32px;

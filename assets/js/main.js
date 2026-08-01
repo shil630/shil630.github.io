@@ -62,6 +62,14 @@
       });
       group.style.display = any ? "" : "none";
     });
+    // Hide featured section when all its items are hidden
+    document.querySelectorAll(".featured-section").forEach(function (section) {
+      var sectionItems = section.querySelectorAll(".post-item");
+      var any = Array.prototype.some.call(sectionItems, function (i) {
+        return i.style.display !== "none";
+      });
+      section.style.display = any ? "" : "none";
+    });
   }
 
   if (chips.length) {
