@@ -3,6 +3,7 @@ layout: post
 title: "德州牌桌教会我的，恰恰是市场最想让你忘记的"
 subtitle: "期望值、下注尺度、弃牌纪律，以及为什么这三样东西能重塑你看世界的方式"
 date: 2026-07-09 18:00:00 +0800
+featured: true
 lang: zh
 categories: [投资, 德州扑克]
 tags: [期望值, 仓位管理, 投资系统]

@@ -3,7 +3,6 @@ layout: post
 title: '翻前范围为什么重要：我做了一个工具，把临场判断提前写下来'
 subtitle: '范围不是强牌表，而是把位置、行动和筹码条件写在情绪出现之前'
 date: 2026-08-01 14:22:00 +0800
-featured: true
 lang: zh
 categories: [德州, 决策系统]
 tags: [德州扑克, 翻前范围, 期望值, 决策纪律]
