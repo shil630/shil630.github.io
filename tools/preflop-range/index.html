@@ -1,0 +1,1367 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="石亮正EV：8人桌、200BB以上现金桌翻前开池范围参考。">
+  <title>翻前开池范围｜石亮正EV</title>
+  <style>
+    :root {
+      --paper: #f5f1ea;
+      --ink: #1e1d1b;
+      --body: #5d5750;
+      --muted: #6f6860;
+      --sand: #d9cfc3;
+      --surface: #fffdf9;
+      --surface-soft: #faf7f1;
+      --divider: #e7ded4;
+      --accent: #b64b3b;
+      --accent-hover: #9f3f31;
+      --accent-deep: #744033;
+      --accent-soft: #f1e4da;
+      --radius-cell: 4px;
+      --radius-control: 4px;
+      --radius-card: 8px;
+      --focus-ring: 0 0 0 3px rgba(182, 75, 59, 0.15);
+      --font-serif: "Songti SC", STSong, "Noto Serif CJK SC", serif;
+      --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      color-scheme: light;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 84% 3%, rgba(182, 75, 59, 0.055), transparent 24rem),
+        var(--paper);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button {
+      color: inherit;
+      font: inherit;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--accent-deep);
+      outline-offset: 2px;
+      box-shadow: var(--focus-ring);
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 50px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--sand);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      width: 35px;
+      height: 18px;
+    }
+
+    .brand-mark::before {
+      position: absolute;
+      right: 5px;
+      left: 5px;
+      top: 8px;
+      height: 1px;
+      content: "";
+      background: var(--sand);
+    }
+
+    .brand-dot {
+      position: relative;
+      z-index: 1;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .brand-dot:nth-child(2) {
+      width: 10px;
+      height: 10px;
+      background: var(--ink);
+    }
+
+    .masthead-note {
+      color: var(--body);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+      gap: 48px;
+      align-items: end;
+      padding: 58px 0 38px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 14px;
+      font-family: var(--font-serif);
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 700;
+      line-height: 1.16;
+      letter-spacing: -0.025em;
+    }
+
+    .hero-copy {
+      max-width: 690px;
+      margin-bottom: 0;
+      color: var(--body);
+      font-size: 17px;
+    }
+
+    .hero-note {
+      margin: 0;
+      padding: 18px 20px;
+      color: var(--body);
+      background: rgba(255, 253, 249, 0.58);
+      border-left: 3px solid var(--accent);
+      font-size: 14px;
+    }
+
+    .assumptions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .chip {
+      padding: 6px 11px;
+      color: var(--body);
+      background: var(--surface-soft);
+      border: 1px solid var(--sand);
+      border-radius: 999px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .tool {
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-card);
+    }
+
+    .tool-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .tool-tools {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .tool-head h2 {
+      margin-bottom: 2px;
+      font-family: var(--font-serif);
+      font-size: 22px;
+    }
+
+    .tool-head p {
+      margin-bottom: 0;
+      color: var(--body);
+      font-size: 13px;
+    }
+
+    .position-tabs {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(78px, 1fr));
+      gap: 8px;
+      padding: 18px 24px;
+      background: var(--surface-soft);
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .position-tab {
+      min-height: 44px;
+      padding: 8px 9px;
+      cursor: pointer;
+      background: var(--surface);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-control);
+      font-size: 13px;
+      font-weight: 700;
+      transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .position-tab:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .position-tab[aria-selected="true"] {
+      color: #fffdf9;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .position-tab[aria-selected="true"]:hover {
+      background: var(--accent-hover);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 272px;
+      min-width: 0;
+    }
+
+    .matrix-panel {
+      min-width: 0;
+      padding: 24px;
+      border-right: 1px solid var(--divider);
+    }
+
+    .matrix-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .matrix-label {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .swipe-hint {
+      display: none;
+      margin: 0;
+      color: var(--body);
+      font-size: 12px;
+    }
+
+    .matrix-scroll {
+      max-width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-color: var(--sand) transparent;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(13, minmax(44px, 1fr));
+      gap: 4px;
+      min-width: 668px;
+    }
+
+    .hand-cell {
+      position: relative;
+      aspect-ratio: 1;
+      min-height: 44px;
+      padding: 0;
+      cursor: pointer;
+      background: var(--surface);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-cell);
+      color: var(--body);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: clamp(11px, 1.25vw, 14px);
+      font-weight: 700;
+      line-height: 1;
+      transition: transform 120ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .hand-cell:hover {
+      z-index: 2;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .hand-cell.open {
+      color: var(--accent-deep);
+      background: var(--accent-soft);
+      border-color: rgba(182, 75, 59, 0.58);
+    }
+
+    .summary {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      padding: 26px 24px;
+      background: var(--surface-soft);
+    }
+
+    .summary-section + .summary-section {
+      padding-top: 20px;
+      border-top: 1px solid var(--divider);
+    }
+
+    .summary-kicker {
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .position-name {
+      margin-bottom: 7px;
+      font-family: var(--font-serif);
+      font-size: 26px;
+      line-height: 1.25;
+    }
+
+    .position-desc {
+      margin-bottom: 0;
+      color: var(--body);
+      font-size: 13px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat {
+      padding: 12px;
+      background: var(--surface);
+      border: 1px solid var(--divider);
+      border-radius: var(--radius-control);
+    }
+
+    .stat-value {
+      display: block;
+      color: var(--ink);
+      font-family: Georgia, serif;
+      font-size: 23px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      display: block;
+      margin-top: 4px;
+      color: var(--body);
+      font-size: 11px;
+    }
+
+    .hand-result {
+      min-height: 88px;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--divider);
+      border-radius: var(--radius-control);
+    }
+
+    .hand-result strong {
+      display: block;
+      margin-bottom: 5px;
+      font-family: var(--font-serif);
+      font-size: 20px;
+    }
+
+    .hand-result strong.is-open {
+      color: var(--accent);
+    }
+
+    .hand-result p {
+      margin-bottom: 0;
+      color: var(--body);
+      font-size: 12px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--body);
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .range-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .range-mode {
+      color: var(--body);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .tool-action {
+      min-height: 34px;
+      padding: 6px 11px;
+      cursor: pointer;
+      color: var(--accent);
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-control);
+      font-size: 12px;
+      font-weight: 700;
+      transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .tool-action:hover:not(:disabled) {
+      color: var(--surface);
+      background: var(--accent);
+    }
+
+    .tool-action.secondary {
+      color: var(--body);
+      border-color: var(--sand);
+    }
+
+    .tool-action.secondary:hover:not(:disabled) {
+      color: var(--ink);
+      background: var(--surface-soft);
+      border-color: var(--accent);
+    }
+
+    .tool-action:disabled {
+      cursor: not-allowed;
+      color: var(--muted);
+      background: var(--surface-soft);
+      border-color: var(--divider);
+      opacity: 0.7;
+    }
+
+    .legend-swatch {
+      width: 16px;
+      height: 16px;
+      background: var(--surface);
+      border: 1px solid var(--sand);
+      border-radius: 3px;
+    }
+
+    .legend-swatch.open {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .range-block {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: start;
+      padding: 22px 24px 24px;
+      border-top: 1px solid var(--divider);
+    }
+
+    .range-block h3 {
+      margin-bottom: 7px;
+      font-size: 13px;
+    }
+
+    .range-text {
+      margin-bottom: 0;
+      color: var(--body);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+    }
+
+    .copy-button {
+      min-width: 92px;
+      min-height: 40px;
+      padding: 8px 14px;
+      cursor: pointer;
+      color: var(--accent);
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-control);
+      font-size: 13px;
+      font-weight: 700;
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .copy-button:hover {
+      color: var(--surface);
+      background: var(--accent);
+    }
+
+    .notes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .note-card {
+      padding: 20px;
+      background: rgba(255, 253, 249, 0.6);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-card);
+    }
+
+    .note-card h3 {
+      margin-bottom: 8px;
+      font-family: var(--font-serif);
+      font-size: 17px;
+    }
+
+    .note-card p {
+      margin-bottom: 0;
+      color: var(--body);
+      font-size: 13px;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      margin-top: 28px;
+      padding-top: 18px;
+      color: var(--body);
+      border-top: 1px solid var(--sand);
+      font-size: 12px;
+    }
+
+    footer p {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        padding-top: 42px;
+      }
+
+      .position-tabs {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .matrix-panel {
+        border-right: 0;
+        border-bottom: 1px solid var(--divider);
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .summary-section + .summary-section {
+        padding-top: 0;
+        padding-left: 18px;
+        border-top: 0;
+        border-left: 1px solid var(--divider);
+      }
+
+    }
+
+    @media (max-width: 1080px) {
+      .swipe-hint {
+        display: block;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100% - 32px, 1180px);
+        padding-top: 18px;
+      }
+
+      .masthead {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .masthead-note {
+        padding-left: 47px;
+      }
+
+      .hero {
+        padding: 34px 0 28px;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .hero-copy {
+        font-size: 15px;
+      }
+
+      .hero-note {
+        padding: 15px 16px;
+      }
+
+      .tool-head,
+      .position-tabs,
+      .matrix-panel,
+      .summary,
+      .range-block {
+        padding-right: 16px;
+        padding-left: 16px;
+      }
+
+      .tool-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .tool-tools {
+        width: 100%;
+        align-items: flex-start;
+      }
+
+      .range-actions {
+        justify-content: flex-start;
+      }
+
+      .position-tabs {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 7px;
+      }
+
+      .position-tab {
+        min-width: 0;
+        padding: 7px 4px;
+        font-size: 12px;
+      }
+
+      .matrix {
+        min-width: 620px;
+        grid-template-columns: repeat(13, 44px);
+      }
+
+      .summary {
+        display: flex;
+      }
+
+      .summary-section + .summary-section {
+        padding-top: 18px;
+        padding-left: 0;
+        border-top: 1px solid var(--divider);
+        border-left: 0;
+      }
+
+      .range-block {
+        grid-template-columns: 1fr;
+      }
+
+      .copy-button {
+        width: 100%;
+      }
+
+      .notes {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="masthead">
+      <div class="brand" aria-label="石亮正EV">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="brand-dot"></span>
+          <span class="brand-dot"></span>
+          <span class="brand-dot"></span>
+        </span>
+        <span>石亮正EV</span>
+      </div>
+      <div class="masthead-note">正EV实验 · 德州</div>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">PREFLOP DISCIPLINE</p>
+        <h1 id="page-title">翻前开池范围</h1>
+        <p class="hero-copy">选择一个位置，查看在前面无人入池时，哪些起手牌进入我的开池范围。</p>
+      </div>
+      <p class="hero-note">范围的价值，不是替你做决定，而是在情绪和结果出现之前，先写清楚自己的行动边界。</p>
+    </section>
+
+    <div class="assumptions" aria-label="适用场景">
+      <span class="chip">现金桌</span>
+      <span class="chip">8人桌位置结构</span>
+      <span class="chip">200BB+</span>
+      <span class="chip">前面无人入池</span>
+      <span class="chip">简化 Raise or Fold 参考</span>
+    </div>
+
+    <section class="tool" aria-labelledby="tool-title">
+      <div class="tool-head">
+        <div>
+          <h2 id="tool-title">无人入池时开池（RFI）</h2>
+          <p>默认加载现有范围；点击牌格即可加入或移除，清空后可以自己画一套范围。</p>
+        </div>
+        <div class="tool-tools">
+          <div class="legend" aria-label="牌表图例">
+            <span class="legend-item"><span class="legend-swatch open" aria-hidden="true"></span>当前范围</span>
+            <span class="legend-item"><span class="legend-swatch" aria-hidden="true"></span>范围外</span>
+          </div>
+          <div class="range-actions" aria-label="范围编辑">
+            <span class="range-mode" id="range-mode" aria-live="polite">默认范围</span>
+            <button class="tool-action" id="clear-range" type="button">清空当前范围</button>
+            <button class="tool-action secondary" id="restore-range" type="button">恢复默认</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="position-tabs" id="position-tabs" role="tablist" aria-label="选择位置"></div>
+
+      <div class="workspace" id="range-panel" role="tabpanel" aria-labelledby="tab-UTG">
+        <div class="matrix-panel">
+          <div class="matrix-topline">
+            <p class="matrix-label">13 × 13 起手牌表</p>
+            <p class="swipe-hint">左右滑动查看完整牌表</p>
+          </div>
+          <div class="matrix-scroll" tabindex="0" aria-label="起手牌表，可横向滚动">
+            <div class="matrix" id="matrix" role="group" aria-label="翻前开池范围矩阵"></div>
+          </div>
+        </div>
+
+        <aside class="summary">
+          <div class="summary-section">
+            <p class="summary-kicker">当前位置</p>
+            <h3 class="position-name" id="position-name"></h3>
+            <p class="position-desc" id="position-desc"></p>
+          </div>
+
+          <div class="summary-section">
+            <p class="summary-kicker">当前开池范围</p>
+            <div class="stats">
+              <div class="stat">
+                <span class="stat-value" id="combo-count">—</span>
+                <span class="stat-label">组合数</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value" id="range-percent">—</span>
+                <span class="stat-label">全部起手牌</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-section">
+            <p class="summary-kicker">手牌详情</p>
+            <div class="hand-result" id="hand-result" aria-live="polite"></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="range-block">
+        <div>
+          <h3>范围文本</h3>
+          <p class="range-text" id="range-text" tabindex="-1"></p>
+        </div>
+        <button class="copy-button" id="copy-button" type="button" aria-live="polite">复制范围</button>
+      </div>
+    </section>
+
+    <section class="notes" aria-label="使用说明">
+      <div class="note-card">
+        <h3>如何读这张表</h3>
+        <p>对角线是口袋对子；右上区域是同花牌（s）；左下区域是不同花牌（o）。砖红浅底表示这手牌在当前开池范围内。</p>
+      </div>
+      <div class="note-card">
+        <h3>这版范围的边界</h3>
+        <p>这是我为8人桌位置结构、200BB以上现金桌整理的一版个人开池参考，不是通用答案。9人桌新增前位暂未覆盖；具体决定仍会随人数、尺度和桌况变化。</p>
+      </div>
+    </section>
+
+    <footer>
+      <p>本工具用于概率与决策纪律练习，不构成牌局建议，也不承诺提高胜率或收益。</p>
+      <p>石亮正EV · 先看过程，再看结果</p>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const TOTAL_COMBOS = 1326;
+      const RANKS = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
+      const RANK_INDEX = Object.fromEntries(RANKS.map((rank, index) => [rank, index]));
+
+      const positions = [
+        {
+          id: "UTG",
+          short: "UTG",
+          name: "UTG 枪口位",
+          description: "前位先收紧，让更能承受身后行动的牌进入范围。",
+          range: "55+, A2s+, KTs+, QTs+, JTs, T9s, AQo+"
+        },
+        {
+          id: "UTG1",
+          short: "UTG+1",
+          name: "UTG+1",
+          description: "比 UTG 稍宽，但杂色边缘牌仍留在范围外。",
+          range: "44+, A2s+, K9s+, QTs+, JTs, T9s, 98s, AJo+, KQo"
+        },
+        {
+          id: "MP",
+          short: "MP",
+          name: "MP 中间位",
+          description: "位置改善后，逐步加入中小对子与部分同花连接牌。",
+          range: "33+, A2s+, K9s+, Q9s+, J9s+, T9s, 98s, 87s, AJo+, KQo"
+        },
+        {
+          id: "HJ",
+          short: "HJ",
+          name: "HJ 劫机位",
+          description: "身后玩家减少，开始增加可玩性较好的同花与高张组合。",
+          range: "22+, A2s+, K8s+, Q9s+, J9s+, T8s+, 97s+, 87s, 76s, ATo+, KJo+, QJo"
+        },
+        {
+          id: "CO",
+          short: "CO",
+          name: "CO 关煞位",
+          description: "接近按钮位，范围明显展开，但仍不是任意两张牌。",
+          range: "22+, A2s+, K5s+, Q8s+, J8s+, T8s+, 97s+, 86s+, 75s+, 65s, ATo+, KTo+, QTo+, JTo"
+        },
+        {
+          id: "BTN",
+          short: "BTN",
+          name: "BTN 庄家位",
+          description: "位置优势最强，开池范围最宽；翻后仍需根据对手调整。",
+          range: "22+, A2s+, K2s+, Q5s+, J7s+, T7s+, 97s+, 86s+, 75s+, A2o+, K9o+, Q9o+, J9o+, T9o"
+        },
+        {
+          id: "SB",
+          short: "SB",
+          name: "SB 小盲位",
+          description: "当前版本用简化的 Raise or Fold 方式展示，不代表唯一策略。",
+          range: "22+, A2s+, K2s+, Q4s+, J6s+, T6s+, 96s+, 86s+, 75s+, 64s+, 54s, A2o+, K8o+, Q9o+, J9o+, T9o"
+        }
+      ];
+
+      function normalizeHand(value) {
+        return value.toUpperCase().replace(/S$/, "s").replace(/O$/, "o");
+      }
+
+      function isValidHand(hand) {
+        if (hand.length === 2) {
+          return RANK_INDEX[hand[0]] !== undefined && hand[0] === hand[1];
+        }
+        if (hand.length === 3) {
+          return RANK_INDEX[hand[0]] !== undefined &&
+            RANK_INDEX[hand[1]] !== undefined &&
+            RANK_INDEX[hand[0]] < RANK_INDEX[hand[1]] &&
+            (hand[2] === "s" || hand[2] === "o");
+        }
+        return false;
+      }
+
+      function parseRange(rangeText) {
+        const hands = [];
+        const errors = [];
+
+        rangeText.split(/[,，\n;；]+/).forEach((rawToken) => {
+          let token = rawToken.trim().replace(/\s+/g, "").replace(/10/g, "T");
+          if (!token) return;
+
+          const hasPlus = token.endsWith("+");
+          if (hasPlus) token = token.slice(0, -1);
+
+          const dashParts = token.includes("-")
+            ? token.split("-").map(normalizeHand)
+            : null;
+
+          if (!dashParts) token = normalizeHand(token);
+
+          try {
+            if (dashParts) {
+              const [start, end] = dashParts;
+              if (!isValidHand(start) || !isValidHand(end)) throw new Error("invalid range");
+
+              if (start.length === 2) {
+                if (end.length !== 2) throw new Error("invalid pair range");
+                const first = Math.min(RANK_INDEX[start[0]], RANK_INDEX[end[0]]);
+                const last = Math.max(RANK_INDEX[start[0]], RANK_INDEX[end[0]]);
+                for (let index = first; index <= last; index += 1) {
+                  hands.push(RANKS[index] + RANKS[index]);
+                }
+              } else {
+                if (end.length !== 3 || start[0] !== end[0] || start[2] !== end[2]) {
+                  throw new Error("invalid non-pair range");
+                }
+                const first = Math.min(RANK_INDEX[start[1]], RANK_INDEX[end[1]]);
+                const last = Math.max(RANK_INDEX[start[1]], RANK_INDEX[end[1]]);
+                for (let index = first; index <= last; index += 1) {
+                  hands.push(start[0] + RANKS[index] + start[2]);
+                }
+              }
+            } else if (token.length === 2) {
+              if (!isValidHand(token)) throw new Error("invalid pair");
+              if (hasPlus) {
+                for (let index = RANK_INDEX[token[0]]; index >= 0; index -= 1) {
+                  hands.push(RANKS[index] + RANKS[index]);
+                }
+              } else {
+                hands.push(token);
+              }
+            } else {
+              if (!isValidHand(token)) throw new Error("invalid hand");
+              if (hasPlus) {
+                for (let index = RANK_INDEX[token[1]]; index > RANK_INDEX[token[0]]; index -= 1) {
+                  hands.push(token[0] + RANKS[index] + token[2]);
+                }
+              } else {
+                hands.push(token);
+              }
+            }
+          } catch (_error) {
+            errors.push(rawToken.trim());
+          }
+        });
+
+        return {
+          hands: [...new Set(hands)],
+          errors
+        };
+      }
+
+      function handName(row, column) {
+        if (row === column) return RANKS[row] + RANKS[column];
+        if (column > row) return RANKS[row] + RANKS[column] + "s";
+        return RANKS[column] + RANKS[row] + "o";
+      }
+
+      function combosOf(hand) {
+        if (hand.length === 2) return 6;
+        return hand.endsWith("s") ? 4 : 12;
+      }
+
+      const parsedRanges = new Map(positions.map((position) => {
+        const parsed = parseRange(position.range);
+        if (parsed.errors.length) {
+          throw new Error(`${position.id} 范围文本无法解析：${parsed.errors.join(", ")}`);
+        }
+        return [position.id, {
+          defaultHands: new Set(parsed.hands),
+          hands: new Set(parsed.hands),
+          isEdited: false
+        }];
+      }));
+
+      const state = {
+        positionId: "UTG",
+        activeHand: null,
+        keyboardHand: "AA"
+      };
+
+      const positionTabs = document.getElementById("position-tabs");
+      const matrix = document.getElementById("matrix");
+      const rangePanel = document.getElementById("range-panel");
+      const positionName = document.getElementById("position-name");
+      const positionDesc = document.getElementById("position-desc");
+      const comboCount = document.getElementById("combo-count");
+      const rangePercent = document.getElementById("range-percent");
+      const handResult = document.getElementById("hand-result");
+      const rangeText = document.getElementById("range-text");
+      const copyButton = document.getElementById("copy-button");
+      const rangeMode = document.getElementById("range-mode");
+      const clearRangeButton = document.getElementById("clear-range");
+      const restoreRangeButton = document.getElementById("restore-range");
+
+      function currentPosition() {
+        return positions.find((position) => position.id === state.positionId);
+      }
+
+      function currentRangeState() {
+        return parsedRanges.get(state.positionId);
+      }
+
+      function countCombos(openHands) {
+        return [...openHands].reduce((total, hand) => total + combosOf(hand), 0);
+      }
+
+      function formatEditedRange(openHands) {
+        return RANKS.flatMap((_rowRank, row) => RANKS.map((_columnRank, column) => handName(row, column)))
+          .filter((hand) => openHands.has(hand))
+          .join(", ");
+      }
+
+      function visibleRangeText(position, rangeState) {
+        if (!rangeState.isEdited) return position.range;
+        if (!rangeState.hands.size) return "（空范围｜点击牌格添加）";
+        return formatEditedRange(rangeState.hands);
+      }
+
+      function copyableRangeText(position, rangeState) {
+        if (!rangeState.isEdited) return position.range;
+        return formatEditedRange(rangeState.hands);
+      }
+
+      function initializePositionTabs() {
+        const fragment = document.createDocumentFragment();
+
+        positions.forEach((position) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "position-tab";
+          button.id = `tab-${position.id}`;
+          button.setAttribute("role", "tab");
+          button.setAttribute("aria-controls", "range-panel");
+          button.dataset.position = position.id;
+          button.textContent = position.short;
+          fragment.appendChild(button);
+        });
+
+        positionTabs.appendChild(fragment);
+      }
+
+      function initializeMatrix() {
+        const fragment = document.createDocumentFragment();
+
+        RANKS.forEach((_rowRank, row) => {
+          RANKS.forEach((_columnRank, column) => {
+            const hand = handName(row, column);
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.className = "hand-cell";
+            button.dataset.hand = hand;
+            button.dataset.row = String(row);
+            button.dataset.column = String(column);
+            button.textContent = hand;
+            fragment.appendChild(button);
+          });
+        });
+
+        matrix.appendChild(fragment);
+      }
+
+      function updatePositionTabs() {
+        positionTabs.querySelectorAll("[data-position]").forEach((button) => {
+          const isActive = button.dataset.position === state.positionId;
+          button.setAttribute("aria-selected", String(isActive));
+          button.tabIndex = isActive ? 0 : -1;
+        });
+      }
+
+      function updateMatrix(openHands) {
+        matrix.querySelectorAll("[data-hand]").forEach((button) => {
+          const hand = button.dataset.hand;
+          const isOpen = openHands.has(hand);
+
+          button.classList.toggle("open", isOpen);
+          button.setAttribute("aria-label", `${hand}，${isOpen ? "当前在范围内，点击移除" : "当前在范围外，点击加入"}`);
+          button.setAttribute("aria-pressed", String(isOpen));
+          button.tabIndex = hand === state.keyboardHand ? 0 : -1;
+        });
+      }
+
+      function updateRangeControls(rangeState) {
+        if (!rangeState.isEdited) {
+          rangeMode.textContent = "默认范围";
+        } else if (!rangeState.hands.size) {
+          rangeMode.textContent = "已清空 · 可开始绘制";
+        } else {
+          rangeMode.textContent = `自定义范围 · ${rangeState.hands.size} 格`;
+        }
+
+        clearRangeButton.disabled = rangeState.hands.size === 0;
+        restoreRangeButton.disabled = !rangeState.isEdited;
+      }
+
+      function renderHandResult(openHands) {
+        handResult.innerHTML = "";
+
+        if (!state.activeHand) {
+          const prompt = document.createElement("strong");
+          prompt.textContent = "悬停查看手牌";
+
+          const hint = document.createElement("p");
+          hint.textContent = "将鼠标移到任意牌格上查看开池结果；手机可轻触。";
+
+          handResult.append(prompt, hint);
+          return;
+        }
+
+        const isOpen = openHands.has(state.activeHand);
+        const action = isOpen ? "开池" : "弃牌";
+
+        const title = document.createElement("strong");
+        title.className = isOpen ? "is-open" : "";
+        title.textContent = `${state.activeHand} · ${action}`;
+
+        const detail = document.createElement("p");
+        detail.textContent = isOpen
+          ? "这手牌已写入当前作者开池范围。"
+          : "这手牌未写入当前作者开池范围。";
+
+        handResult.append(title, detail);
+      }
+
+      function render() {
+        const position = currentPosition();
+        const rangeState = currentRangeState();
+        const openHands = rangeState.hands;
+
+        updatePositionTabs();
+        updateMatrix(openHands);
+        renderHandResult(openHands);
+        updateRangeControls(rangeState);
+
+        rangePanel.setAttribute("aria-labelledby", `tab-${position.id}`);
+        positionName.textContent = position.name;
+        positionDesc.textContent = position.description;
+        const combos = countCombos(openHands);
+        comboCount.textContent = String(combos);
+        rangePercent.textContent = `${(combos / TOTAL_COMBOS * 100).toFixed(1)}%`;
+        rangeText.textContent = visibleRangeText(position, rangeState);
+      }
+
+      positionTabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-position]");
+        if (!button) return;
+        state.positionId = button.dataset.position;
+        state.activeHand = null;
+        render();
+      });
+
+      positionTabs.addEventListener("keydown", (event) => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+
+        event.preventDefault();
+        const currentIndex = positions.findIndex((position) => position.id === state.positionId);
+        let nextIndex = currentIndex;
+
+        if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + positions.length) % positions.length;
+        if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % positions.length;
+        if (event.key === "Home") nextIndex = 0;
+        if (event.key === "End") nextIndex = positions.length - 1;
+
+        state.positionId = positions[nextIndex].id;
+        state.activeHand = null;
+        render();
+        document.getElementById(`tab-${state.positionId}`).focus();
+      });
+
+      function toggleHand(hand) {
+        const rangeState = currentRangeState();
+        if (rangeState.hands.has(hand)) {
+          rangeState.hands.delete(hand);
+        } else {
+          rangeState.hands.add(hand);
+        }
+        rangeState.isEdited = true;
+        state.activeHand = hand;
+        render();
+      }
+
+      function showHandDetail(hand) {
+        state.activeHand = hand;
+        renderHandResult(currentRangeState().hands);
+      }
+
+      matrix.addEventListener("mouseover", (event) => {
+        const button = event.target.closest("[data-hand]");
+        if (!button || button.dataset.hand === state.activeHand) return;
+        showHandDetail(button.dataset.hand);
+      });
+
+      matrix.addEventListener("mouseleave", () => {
+        state.activeHand = null;
+        renderHandResult(currentRangeState().hands);
+      });
+
+      matrix.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-hand]");
+        if (!button) return;
+        state.keyboardHand = button.dataset.hand;
+        toggleHand(button.dataset.hand);
+      });
+
+      matrix.addEventListener("focusin", (event) => {
+        const button = event.target.closest("[data-hand]");
+        if (!button) return;
+        state.keyboardHand = button.dataset.hand;
+        showHandDetail(button.dataset.hand);
+      });
+
+      matrix.addEventListener("focusout", (event) => {
+        if (event.relatedTarget && matrix.contains(event.relatedTarget)) return;
+        state.activeHand = null;
+        renderHandResult(currentRangeState().hands);
+      });
+
+      matrix.addEventListener("keydown", (event) => {
+        if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
+
+        const button = event.target.closest("[data-hand]");
+        if (!button) return;
+
+        event.preventDefault();
+        let row = Number(button.dataset.row);
+        let column = Number(button.dataset.column);
+
+        if (event.key === "ArrowUp") row = Math.max(0, row - 1);
+        if (event.key === "ArrowDown") row = Math.min(RANKS.length - 1, row + 1);
+        if (event.key === "ArrowLeft") column = Math.max(0, column - 1);
+        if (event.key === "ArrowRight") column = Math.min(RANKS.length - 1, column + 1);
+
+        state.keyboardHand = handName(row, column);
+        state.activeHand = state.keyboardHand;
+        render();
+        matrix.querySelector(`[data-hand="${state.keyboardHand}"]`).focus();
+      });
+
+      clearRangeButton.addEventListener("click", () => {
+        const rangeState = currentRangeState();
+        rangeState.hands.clear();
+        rangeState.isEdited = true;
+        state.activeHand = null;
+        render();
+      });
+
+      restoreRangeButton.addEventListener("click", () => {
+        const rangeState = currentRangeState();
+        rangeState.hands = new Set(rangeState.defaultHands);
+        rangeState.isEdited = false;
+        state.activeHand = null;
+        render();
+      });
+
+      function selectVisibleRangeText() {
+        rangeText.focus();
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(rangeText);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      async function copyRange() {
+        const value = copyableRangeText(currentPosition(), currentRangeState());
+        let copied = false;
+
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(value);
+            copied = true;
+          }
+        } catch (_error) {
+          copied = false;
+        }
+
+        if (!copied) {
+          let textarea;
+          try {
+            textarea = document.createElement("textarea");
+            textarea.value = value;
+            textarea.setAttribute("readonly", "");
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            copied = document.execCommand("copy") === true;
+          } catch (_error) {
+            copied = false;
+          } finally {
+            if (textarea) textarea.remove();
+          }
+        }
+
+        if (copied) {
+          copyButton.textContent = "已复制";
+          copyButton.focus({ preventScroll: true });
+        } else {
+          selectVisibleRangeText();
+          copyButton.textContent = "范围已选中";
+        }
+
+        window.setTimeout(() => {
+          copyButton.textContent = "复制范围";
+        }, 1600);
+      }
+
+      copyButton.addEventListener("click", copyRange);
+      initializePositionTabs();
+      initializeMatrix();
+      render();
+    })();
+  </script>
+</body>
+</html>
