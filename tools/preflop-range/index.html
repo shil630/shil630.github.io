@@ -61,7 +61,7 @@
     .page {
       width: min(1180px, calc(100% - 48px));
       margin: 0 auto;
-      padding: 28px 0 44px;
+      padding: 18px 0 36px;
     }
 
     .masthead {
@@ -69,14 +69,14 @@
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-      min-height: 50px;
-      padding-bottom: 18px;
+      min-height: 42px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--sand);
     }
 
     .back-link {
       display: inline-block;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       color: var(--body);
       font-size: 13px;
       letter-spacing: 0.02em;
@@ -138,15 +138,15 @@
     .hero {
       display: grid;
       grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
-      gap: 48px;
+      gap: 36px;
       align-items: end;
-      padding: 58px 0 38px;
+      padding: 32px 0 20px;
     }
 
     .eyebrow {
-      margin: 0 0 8px;
+      margin: 0 0 5px;
       color: var(--accent);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.13em;
     }
@@ -159,44 +159,44 @@
     }
 
     h1 {
-      margin-bottom: 14px;
+      margin-bottom: 8px;
       font-family: var(--font-serif);
-      font-size: clamp(34px, 5vw, 56px);
+      font-size: clamp(32px, 4.5vw, 48px);
       font-weight: 700;
       line-height: 1.16;
       letter-spacing: -0.025em;
     }
 
     .hero-copy {
-      max-width: 690px;
+      max-width: 620px;
       margin-bottom: 0;
       color: var(--body);
-      font-size: 17px;
+      font-size: 15px;
     }
 
     .hero-note {
       margin: 0;
-      padding: 18px 20px;
+      padding: 12px 16px;
       color: var(--body);
       background: rgba(255, 253, 249, 0.58);
       border-left: 3px solid var(--accent);
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .assumptions {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     .chip {
-      padding: 6px 11px;
+      padding: 5px 9px;
       color: var(--body);
       background: var(--surface-soft);
       border: 1px solid var(--sand);
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 12px;
       white-space: nowrap;
     }
 
@@ -212,46 +212,45 @@
       align-items: center;
       justify-content: space-between;
       gap: 20px;
-      padding: 22px 24px 18px;
+      padding: 16px 20px 12px;
       border-bottom: 1px solid var(--divider);
     }
 
     .tool-tools {
       display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 12px;
+      align-items: center;
+      gap: 16px;
     }
 
     .tool-head h2 {
-      margin-bottom: 2px;
+      margin-bottom: 1px;
       font-family: var(--font-serif);
-      font-size: 22px;
+      font-size: 19px;
     }
 
     .tool-head p {
       margin-bottom: 0;
       color: var(--body);
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .position-tabs {
       display: grid;
-      grid-template-columns: repeat(7, minmax(78px, 1fr));
-      gap: 8px;
-      padding: 18px 24px;
+      grid-template-columns: repeat(7, minmax(70px, 1fr));
+      gap: 6px;
+      padding: 12px 20px;
       background: var(--surface-soft);
       border-bottom: 1px solid var(--divider);
     }
 
     .position-tab {
-      min-height: 44px;
-      padding: 8px 9px;
+      min-height: 36px;
+      padding: 6px 8px;
       cursor: pointer;
       background: var(--surface);
       border: 1px solid var(--sand);
       border-radius: var(--radius-control);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
     }
@@ -273,13 +272,13 @@
 
     .workspace {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 272px;
+      grid-template-columns: minmax(0, 1fr) 240px;
       min-width: 0;
     }
 
     .matrix-panel {
       min-width: 0;
-      padding: 24px;
+      padding: 16px 20px;
       border-right: 1px solid var(--divider);
     }
 
@@ -288,12 +287,12 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .matrix-label {
       margin: 0;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.04em;
     }
@@ -316,14 +315,15 @@
     .matrix {
       display: grid;
       grid-template-columns: repeat(13, minmax(44px, 1fr));
+      grid-auto-rows: 34px;
       gap: 4px;
       min-width: 668px;
     }
 
     .hand-cell {
       position: relative;
-      aspect-ratio: 1;
-      min-height: 44px;
+      height: 34px;
+      min-height: 0;
       padding: 0;
       cursor: pointer;
       background: var(--surface);
@@ -352,18 +352,18 @@
     .summary {
       display: flex;
       flex-direction: column;
-      gap: 22px;
-      padding: 26px 24px;
+      gap: 16px;
+      padding: 18px;
       background: var(--surface-soft);
     }
 
     .summary-section + .summary-section {
-      padding-top: 20px;
+      padding-top: 16px;
       border-top: 1px solid var(--divider);
     }
 
     .summary-kicker {
-      margin-bottom: 7px;
+      margin-bottom: 5px;
       color: var(--muted);
       font-size: 11px;
       font-weight: 700;
@@ -372,16 +372,16 @@
     }
 
     .position-name {
-      margin-bottom: 7px;
+      margin-bottom: 4px;
       font-family: var(--font-serif);
-      font-size: 26px;
+      font-size: 22px;
       line-height: 1.25;
     }
 
     .position-desc {
       margin-bottom: 0;
       color: var(--body);
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .stats {
@@ -391,7 +391,7 @@
     }
 
     .stat {
-      padding: 12px;
+      padding: 9px;
       background: var(--surface);
       border: 1px solid var(--divider);
       border-radius: var(--radius-control);
@@ -401,7 +401,7 @@
       display: block;
       color: var(--ink);
       font-family: Georgia, serif;
-      font-size: 23px;
+      font-size: 20px;
       font-variant-numeric: tabular-nums;
       line-height: 1.2;
     }
@@ -414,8 +414,8 @@
     }
 
     .hand-result {
-      min-height: 88px;
-      padding: 14px;
+      min-height: 72px;
+      padding: 10px;
       background: var(--surface);
       border: 1px solid var(--divider);
       border-radius: var(--radius-control);
@@ -425,7 +425,7 @@
       display: block;
       margin-bottom: 5px;
       font-family: var(--font-serif);
-      font-size: 20px;
+      font-size: 18px;
     }
 
     .hand-result strong.is-open {
@@ -441,7 +441,7 @@
     .legend {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
       color: var(--body);
       font-size: 12px;
     }
@@ -457,7 +457,7 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: flex-end;
-      gap: 8px;
+      gap: 6px;
     }
 
     .range-mode {
@@ -521,20 +521,20 @@
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 14px;
       align-items: start;
-      padding: 22px 24px 24px;
+      padding: 14px 20px 16px;
       border-top: 1px solid var(--divider);
     }
 
     .range-block h3 {
-      margin-bottom: 7px;
-      font-size: 13px;
+      margin-bottom: 4px;
+      font-size: 12px;
     }
 
     .range-text {
       margin-bottom: 0;
       color: var(--body);
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.8;
       overflow-wrap: anywhere;
     }
@@ -562,7 +562,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 18px;
-      margin-top: 20px;
+      margin-top: 16px;
     }
 
     .note-card {
@@ -602,8 +602,21 @@
     @media (max-width: 900px) {
       .hero {
         grid-template-columns: 1fr;
-        gap: 22px;
-        padding-top: 42px;
+        gap: 16px;
+        padding-top: 26px;
+        padding-bottom: 16px;
+      }
+
+      .tool-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .tool-tools {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
       }
 
       .position-tabs {
@@ -642,7 +655,7 @@
     @media (max-width: 620px) {
       .page {
         width: min(100% - 32px, 1180px);
-        padding-top: 18px;
+        padding-top: 14px;
       }
 
       .masthead {
@@ -656,7 +669,7 @@
       }
 
       .hero {
-        padding: 34px 0 28px;
+        padding: 24px 0 18px;
       }
 
       h1 {
@@ -668,7 +681,7 @@
       }
 
       .hero-note {
-        padding: 15px 16px;
+        padding: 10px 12px;
       }
 
       .tool-head,
@@ -689,6 +702,8 @@
       .tool-tools {
         width: 100%;
         align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
       }
 
       .range-actions {
@@ -709,6 +724,11 @@
       .matrix {
         min-width: 620px;
         grid-template-columns: repeat(13, 44px);
+        grid-auto-rows: 32px;
+      }
+
+      .hand-cell {
+        height: 32px;
       }
 
       .summary {
@@ -769,24 +789,24 @@
       <div>
         <p class="eyebrow">PREFLOP DISCIPLINE</p>
         <h1 id="page-title">翻前开池范围</h1>
-        <p class="hero-copy">选择一个位置，查看在前面无人入池时，哪些起手牌进入我的开池范围。</p>
+        <p class="hero-copy">选择位置，查看前面无人入池时的开池范围。</p>
       </div>
-      <p class="hero-note">范围的价值，不是替你做决定，而是在情绪和结果出现之前，先写清楚自己的行动边界。</p>
+      <p class="hero-note">先写清行动边界，再看结果。</p>
     </section>
 
     <div class="assumptions" aria-label="适用场景">
       <span class="chip">现金桌</span>
-      <span class="chip">8人桌位置结构</span>
+      <span class="chip">8人桌</span>
       <span class="chip">200BB+</span>
-      <span class="chip">前面无人入池</span>
-      <span class="chip">简化 Raise or Fold 参考</span>
+      <span class="chip">无人入池</span>
+      <span class="chip">RFI 参考</span>
     </div>
 
     <section class="tool" aria-labelledby="tool-title">
       <div class="tool-head">
         <div>
           <h2 id="tool-title">无人入池时开池（RFI）</h2>
-          <p>默认加载现有范围；点击牌格即可加入或移除，清空后可以自己画一套范围。</p>
+          <p>点选牌格加入或移除；清空后可自定义。</p>
         </div>
         <div class="tool-tools">
           <div class="legend" aria-label="牌表图例">
