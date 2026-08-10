@@ -5,7 +5,6 @@ layout: default
   <header class="post-header">
     <div class="post-meta">
       <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
-      <span class="post-lang-badge">{% if page.lang == 'en' %}EN{% else %}中文{% endif %}</span>
       {% if page.tags.size > 0 %}
       <span class="post-tags">
         {% for tag in page.tags %}<span class="tag">#{{ tag }}</span>{% endfor %}
@@ -30,13 +29,13 @@ layout: default
   <nav class="post-nav">
     {% if show_previous %}
     <a class="prev" href="{{ page.previous.url | relative_url }}" data-track-cta data-cta-type="related_article" data-placement="post_navigation">
-      <span class="dir">← <span data-en="Previous" data-zh="上一篇">上一篇</span></span>
+      <span class="dir">← 上一篇</span>
       <span class="ttl">{{ page.previous.title }}</span>
     </a>
     {% endif %}
     {% if show_next %}
     <a class="next" href="{{ page.next.url | relative_url }}" data-track-cta data-cta-type="related_article" data-placement="post_navigation">
-      <span class="dir"><span data-en="Next" data-zh="下一篇">下一篇</span> →</span>
+      <span class="dir">下一篇 →</span>
       <span class="ttl">{{ page.next.title }}</span>
     </a>
     {% endif %}

@@ -1,12 +1,12 @@
 ---
 layout: default
-title: "文章 Articles"
+title: "文章"
 permalink: /archive/
 ---
 <section class="archive wrap">
   <header class="page-header">
-    <h1 class="page-title" data-en="Articles" data-zh="文章">文章</h1>
-    <p class="page-subtitle" data-en="All posts, newest first" data-zh="全部文章，按时间倒序">全部文章，按时间倒序</p>
+    <h1 class="page-title">文章</h1>
+    <p class="page-subtitle">全部文章，按时间倒序</p>
   </header>
 
   {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
@@ -16,11 +16,10 @@ permalink: /archive/
     <h2 class="archive-year-title">{{ year.name }}</h2>
     <ul class="archive-list">
       {% for post in year.items %}
-      <li class="archive-item" data-lang="{{ post.lang | default: site.lang }}">
+      <li class="archive-item">
         <a href="{{ post.url | relative_url }}">
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m-%d" }}</time>
           <span class="archive-title">{{ post.title }}</span>
-          <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
         </a>
       </li>
       {% endfor %}

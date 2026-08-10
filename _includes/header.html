@@ -4,21 +4,20 @@
 
     <nav class="site-nav">
       <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>
-        <span data-en="Home" data-zh="首页">首页</span>
+        首页
       </a>
       <a href="{{ '/work/' | relative_url }}"{% if page.url contains 'work' %} class="active"{% endif %}>
-        <span data-en="Work" data-zh="作品">作品</span>
+        作品
       </a>
       <a href="{{ '/archive/' | relative_url }}"{% if page.url contains 'archive' %} class="active"{% endif %}>
-        <span data-en="Articles" data-zh="文章">文章</span>
+        文章
       </a>
       <a href="{{ '/tools/' | relative_url }}"{% if page.url contains 'tools' %} class="active"{% endif %}>
-        <span data-en="Tools" data-zh="工具">工具</span>
+        工具
       </a>
       <a href="{{ '/about/' | relative_url }}"{% if page.url contains 'about' %} class="active"{% endif %}>
-        <span data-en="About" data-zh="关于">关于</span>
+        关于
       </a>
-      <button id="lang-toggle" class="lang-toggle" type="button" aria-label="切换语言 / Switch language">中 / EN</button>
     </nav>
   </div>
 </header>

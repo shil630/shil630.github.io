@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "草稿箱 Drafts"
+title: "草稿箱"
 permalink: /drafts/
 robots: noindex, nofollow
 sitemap: false
@@ -9,22 +9,22 @@ sitemap: false
 <section class="drafts wrap">
   <header class="page-header">
     <h1 class="page-title">404</h1>
-    <p class="page-subtitle" data-en="This page is a local-only tool." data-zh="此页面仅供本地使用。">此页面仅供本地使用。</p>
-    <p><a href="{{ '/' | relative_url }}"><span data-en="Back to home" data-zh="返回首页">返回首页</span></a></p>
+    <p class="page-subtitle">此页面仅供本地使用。</p>
+    <p><a href="{{ '/' | relative_url }}">返回首页</a></p>
   </header>
 </section>
 {% else %}
 <section class="drafts wrap">
   <header class="page-header">
-    <h1 class="page-title" data-en="Drafts" data-zh="草稿箱">草稿箱</h1>
-    <p class="page-subtitle" data-en="Unpublished posts — local preview only" data-zh="未发布的文章，仅供本地预览">未发布的文章，仅供本地预览</p>
+    <h1 class="page-title">草稿箱</h1>
+    <p class="page-subtitle">未发布的文章，仅供本地预览</p>
   </header>
 
   <div class="drafts-help prose">
-    <p data-en="Drafts live in <code>_drafts/</code>. They are never deployed to GitHub Pages." data-zh="草稿存放在 <code>_drafts/</code> 目录，部署到 GitHub Pages 时不会发布。">草稿存放在 <code>_drafts/</code> 目录，部署到 GitHub Pages 时不会发布。</p>
-    <p data-en="To preview locally, run:" data-zh="本地预览请运行：">本地预览请运行：</p>
+    <p>草稿存放在 <code>_drafts/</code> 目录，部署到 GitHub Pages 时不会发布。</p>
+    <p>本地预览请运行：</p>
     <pre><code>bundle exec jekyll serve --draft</code></pre>
-    <p data-en="To publish, move the file to <code>_posts/</code> and rename it <code>YYYY-MM-DD-title.md</code>." data-zh="正式发布时，将文件移至 <code>_posts/</code>，并重命名为 <code>YYYY-MM-DD-标题.md</code>。">正式发布时，将文件移至 <code>_posts/</code>，并重命名为 <code>YYYY-MM-DD-标题.md</code>。</p>
+    <p>正式发布时，将文件移至 <code>_posts/</code>，并重命名为 <code>YYYY-MM-DD-标题.md</code>。</p>
   </div>
 
   {% assign drafts = site.posts | where_exp: "post", "post.draft == true" %}
@@ -32,12 +32,11 @@ sitemap: false
   {% if drafts.size > 0 %}
   <ul class="post-list">
     {% for post in drafts %}
-    <li class="post-item" data-lang="{{ post.lang | default: site.lang }}">
+    <li class="post-item">
       <a class="post-card" href="{{ post.url | relative_url }}">
         <div class="post-card-meta">
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
-          <span class="draft-badge" data-en="Draft" data-zh="草稿">草稿</span>
-          <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
+          <span class="draft-badge">草稿</span>
         </div>
         <h2 class="post-card-title">{{ post.title }}</h2>
         {% if post.subtitle %}<p class="post-card-subtitle">{{ post.subtitle }}</p>{% endif %}
@@ -52,7 +51,7 @@ sitemap: false
     {% endfor %}
   </ul>
   {% else %}
-  <p class="drafts-empty" data-en="No drafts visible. Start the server with <code>--draft</code> to see them here." data-zh="当前看不到草稿。请用 <code>--draft</code> 参数启动本地服务器。">当前看不到草稿。请用 <code>--draft</code> 参数启动本地服务器。</p>
+  <p class="drafts-empty">当前看不到草稿。请用 <code>--draft</code> 参数启动本地服务器。</p>
   {% endif %}
 </section>
 {% endif %}

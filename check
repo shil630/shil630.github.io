@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 快速检查能否成功构建（不启动服务器）
+# 发布前唯一检查入口：生产构建 + 关键产物冒烟检查。
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -19,5 +19,75 @@ if [[ "${1:-}" == "--draft" ]] || [[ "${1:-}" == "-d" ]]; then
   DRAFT_FLAG=(--drafts)
 fi
 
-bundle exec jekyll build ${DRAFT_FLAG[@]+"${DRAFT_FLAG[@]}"}
-echo "✓ 构建成功"
+CHECK_TMP_ROOT="${TMPDIR:-/tmp}"
+CHECK_TMP_ROOT="${CHECK_TMP_ROOT%/}"
+CHECK_BUILD_DIR="$(mktemp -d "$CHECK_TMP_ROOT/shiliang-check.XXXXXX")"
+
+cleanup() {
+  case "$CHECK_BUILD_DIR" in
+    "$CHECK_TMP_ROOT"/shiliang-check.*) rm -rf -- "$CHECK_BUILD_DIR" ;;
+  esac
+}
+trap cleanup EXIT
+
+echo "→ 生产构建"
+JEKYLL_ENV=production bundle exec jekyll build \
+  --destination "$CHECK_BUILD_DIR" \
+  ${DRAFT_FLAG[@]+"${DRAFT_FLAG[@]}"}
+
+echo "→ 关键产物检查"
+ruby - "$CHECK_BUILD_DIR" <<'RUBY'
+build_dir = ARGV.fetch(0)
+
+required_pages = {
+  "首页" => "index.html",
+  "作品页" => "work/index.html",
+  "归档页" => "archive/index.html",
+  "工具页" => "tools/index.html",
+  "关于页" => "about/index.html",
+  "404" => "404.html",
+  "RSS" => "feed.xml",
+  "sitemap" => "sitemap.xml",
+  "robots" => "robots.txt"
+}
+
+missing = required_pages.filter_map do |label, relative_path|
+  label unless File.file?(File.join(build_dir, relative_path))
+end
+abort "缺少构建产物：#{missing.join(' / ')}" unless missing.empty?
+
+def assert!(condition, message)
+  abort message unless condition
+end
+
+home = File.read(File.join(build_dir, "index.html"), encoding: "UTF-8")
+assert!(home.include?('<html lang="zh">'), "首页 html[lang] 不是 zh")
+assert!(!home.include?('id="lang-toggle"'), "首页仍包含语言切换器")
+assert!(!home.match?(/\sdata-(?:en|zh)=/), "首页仍包含伪双语文案属性")
+assert!(home.include?('rel="canonical"'), "首页缺少 canonical")
+assert!(home.include?('property="og:'), "首页缺少 Open Graph 元数据")
+
+markers = ["精选", "最新文章", "UX 作品集", "订阅正EV实验"]
+positions = markers.map { |marker| home.index(marker) }
+assert!(positions.none?(&:nil?) && positions == positions.sort, "首页内容顺序不符合预期")
+
+article_paths = Dir.glob(File.join(build_dir, "posts", "**", "index.html"))
+assert!(!article_paths.empty?, "未生成任何文章页")
+article = File.read(article_paths.max, encoding: "UTF-8")
+assert!(article.include?('<html lang="zh">'), "文章页 html[lang] 不是 zh")
+assert!(article.include?('<article class="post wrap" lang="zh">'), "文章正文 lang 不是 zh")
+
+%w[work archive tools about].each do |slug|
+  page = File.read(File.join(build_dir, slug, "index.html"), encoding: "UTF-8")
+  assert!(page.include?('<html lang="zh">'), "#{slug} 页 html[lang] 不是 zh")
+  assert!(!page.match?(/\sdata-(?:en|zh)=/), "#{slug} 页仍包含伪双语文案属性")
+end
+
+featured_count = home.scan('class="featured-card"').length
+latest_count = home.scan('class="post-item"').length
+puts "✓ 首页内容顺序：精选 → 最新文章 → UX 作品集 → 订阅"
+puts "✓ 首页内容基线：#{featured_count} 篇精选，#{latest_count} 篇最新文章"
+puts "✓ 中文语义、canonical、Open Graph 与关键页面产物正常"
+RUBY
+
+echo "✓ 发布前检查通过"

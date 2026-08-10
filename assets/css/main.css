@@ -13,7 +13,7 @@
   --bg-soft: #eee7de;
   --fg: #1e1d1b;
   --fg-soft: #625f5a;
-  --fg-faint: #8d8881;
+  --fg-faint: #6b665f;
   --border: #d9cfc3;
   --accent: #b64b3b;
   --accent-soft: rgba(182, 75, 59, 0.1);
@@ -26,7 +26,7 @@
     --bg-soft: #171a1f;
     --fg: #e6e8eb;
     --fg-soft: #a7adb6;
-    --fg-faint: #6b727c;
+    --fg-faint: #858c96;
     --border: #262a30;
     --accent: #e5715f;
     --accent-soft: rgba(229, 113, 95, 0.14);
@@ -56,6 +56,17 @@ body {
 
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+:where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@supports selector(:focus-visible) {
+  :where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus:not(:focus-visible) {
+    outline: none;
+  }
+}
 
 img { max-width: 100%; height: auto; }
 
@@ -87,20 +98,6 @@ img { max-width: 100%; height: auto; }
 .site-nav a { color: var(--fg-soft); font-size: 15px; font-weight: 500; white-space: nowrap; }
 .site-nav a:hover { color: var(--fg); text-decoration: none; }
 .site-nav a.active { color: var(--fg); }
-
-.lang-toggle {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--fg-soft);
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 4px 12px;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
-}
-.lang-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
 
 /* ---------- Main ---------- */
 .site-main { flex: 1 0 auto; padding: 56px 0 80px; }
@@ -215,23 +212,6 @@ img { max-width: 100%; height: auto; }
 .capability-list span { color: var(--fg-soft); }
 .work-contact { margin-top: 40px; color: var(--fg-soft); font-size: 15px; line-height: 1.8; }
 
-/* ---------- Filter bar ---------- */
-.filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
-.filter-label { font-size: 13px; color: var(--fg-faint); margin-right: 4px; }
-.filter-chip {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  color: var(--fg-soft);
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 5px 14px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.filter-chip:hover { border-color: var(--fg-faint); color: var(--fg); }
-.filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
 /* ---------- Post list ---------- */
 .post-list { list-style: none; margin: 0; padding: 0; }
 .post-item { border-bottom: 1px solid var(--border); }
@@ -246,19 +226,7 @@ img { max-width: 100%; height: auto; }
 .post-card-tags { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
 .post-tags { display: inline-flex; gap: 8px; flex-wrap: wrap; }
 
-.post-lang-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--fg-soft);
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 1px 6px;
-  letter-spacing: 0.02em;
-}
 .tag { font-size: 12px; color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 2px 8px; }
-
-.empty-hint { text-align: center; color: var(--fg-faint); padding: 40px 0; }
 
 /* ---------- Featured posts ---------- */
 .featured-section { margin: 0 0 46px; }
@@ -352,7 +320,7 @@ img { max-width: 100%; height: auto; }
   border-radius: 8px;
   padding: 10px 14px;
 }
-.tool-waitlist-email input[type="email"]:focus { outline: none; border-color: var(--accent); }
+.tool-waitlist-email input[type="email"]:focus { border-color: var(--accent); }
 .tool-waitlist-email button {
   font: inherit;
   font-size: 15px;
@@ -494,7 +462,7 @@ a.text-cta:hover,
   border-radius: 8px;
   padding: 10px 14px;
 }
-.subscribe-form input:focus { outline: none; border-color: var(--accent); }
+.subscribe-form input:focus { border-color: var(--accent); }
 .subscribe-form button {
   font-family: var(--font-sans);
   font-size: 15px;
@@ -535,7 +503,6 @@ a.text-cta:hover,
   .site-nav { gap: 15px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
   .site-nav::-webkit-scrollbar { display: none; }
   .site-nav a { font-size: 13px; }
-  .lang-toggle { padding-inline: 10px; }
   .resume-list li { flex-direction: column; gap: 2px; }
   .resume-when { width: auto; }
   .tool-grid { grid-template-columns: 1fr; }
