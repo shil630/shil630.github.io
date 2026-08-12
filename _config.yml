@@ -29,10 +29,10 @@ buttondown_username: "shiliangbj12"
 # --- SEO / 社交分享卡片 ---
 twitter:
   username: "shiliangbj12"
-  card: "summary"
+  card: "summary_large_image"
 logo: "/assets/images/avatar-blog-512.png"
 # 站点级默认分享图，可换成自己设计的 og 卡片 (建议 1200x630)
-og_image: "/assets/images/blog-home-og.png"
+og_image: "/assets/images/blog-home-og-1200x630.png"
 
 # --- Build settings ---
 markdown: kramdown
@@ -62,7 +62,7 @@ defaults:
     values:
       layout: "post"
       lang: "zh"
-      image: "/assets/images/blog-home-og.png"
+      image: "/assets/images/blog-home-og-1200x630.png"
 
 exclude:
   - Gemfile
