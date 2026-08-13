@@ -17,3 +17,9 @@ vendor/
 # Private notes / plans (never publish)
 AI 博客写作与运营解决方案 商业计划.md
 _private/
+
+# Local project docs (never commit)
+AGENTS.md
+BACKLOG.md
+CURRENT_SPRINT.md
+PROJECT.md
