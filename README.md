@@ -16,7 +16,7 @@ Liang Shi · Positive EV, built with Jekyll & GitHub Pages.
    title: "文章标题"
    subtitle: "副标题(可选)"
    date: 2026-07-08 10:00:00 -0400
-   lang: zh          # 当前站点界面与内容路径固定为中文
+   lang: zh          # zh = 中文，en = 英文
    tags: [标签一, 标签二]
    ---
    ```
@@ -37,7 +37,7 @@ _posts/              所有文章
 _layouts/            页面模板
 _includes/           头部/底部等片段
 assets/css/main.css  样式
-assets/js/main.js    站点轻量交互
+assets/js/main.js    语言切换 + 文章筛选
 ```
 
 ## 本地预览 / Local preview
@@ -55,7 +55,7 @@ assets/js/main.js    站点轻量交互
 ./check
 ```
 
-`./check` 会在临时目录执行生产环境构建，并核对首页、文章、作品、归档、工具、关于、404、RSS、sitemap 和 robots 产物；同时检查中文语义、canonical、Open Graph 以及首页内容顺序。
+`./check` 会在临时目录执行生产环境构建，并核对首页、文章、作品、归档、工具、关于、404、RSS、sitemap 和 robots 产物；同时检查双语界面、中文内容语义、canonical、Open Graph 以及首页内容顺序。
 
 涉及模板、样式或脚本时，在本地预览中按固定矩阵做一次视觉与键盘复核：
 
@@ -65,4 +65,4 @@ assets/js/main.js    站点轻量交互
 | 移动 375px | 同上 | 无横向溢出、文字不截断、导航可达、卡片和表单正常 |
 | 键盘 + 浅/深色 | 同上，另加 `/tools/` 和 `/about/` | Tab 顺序连续，每个可操作元素都有清晰焦点环，次要文字可读 |
 
-当前不提供全局英文界面切换。英文内容如果恢复，需使用独立 URL/collection，并同时配置 canonical 与 hreflang，不在中文文章外层仅替换界面文案。
+当前保留全局中英界面切换。现有内容仍以中文为主；未来新增英文内容时，应补充独立 URL/collection 与 canonical、hreflang 策略，避免混淆搜索引擎的内容语言判断。

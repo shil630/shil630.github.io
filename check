@@ -62,8 +62,8 @@ end
 
 home = File.read(File.join(build_dir, "index.html"), encoding: "UTF-8")
 assert!(home.include?('<html lang="zh">'), "首页 html[lang] 不是 zh")
-assert!(!home.include?('id="lang-toggle"'), "首页仍包含语言切换器")
-assert!(!home.match?(/\sdata-(?:en|zh)=/), "首页仍包含伪双语文案属性")
+assert!(home.include?('id="lang-toggle"'), "首页缺少语言切换器")
+assert!(home.match?(/\sdata-en=/) && home.match?(/\sdata-zh=/), "首页缺少双语界面文案")
 assert!(home.include?('rel="canonical"'), "首页缺少 canonical")
 assert!(home.include?('property="og:'), "首页缺少 Open Graph 元数据")
 
@@ -80,14 +80,14 @@ assert!(article.include?('<article class="post wrap" lang="zh">'), "文章正文
 %w[work archive tools about].each do |slug|
   page = File.read(File.join(build_dir, slug, "index.html"), encoding: "UTF-8")
   assert!(page.include?('<html lang="zh">'), "#{slug} 页 html[lang] 不是 zh")
-  assert!(!page.match?(/\sdata-(?:en|zh)=/), "#{slug} 页仍包含伪双语文案属性")
+  assert!(page.match?(/\sdata-en=/) && page.match?(/\sdata-zh=/), "#{slug} 页缺少双语界面文案")
 end
 
 featured_count = home.scan('class="featured-card"').length
 latest_count = home.scan('class="post-item"').length
 puts "✓ 首页内容顺序：精选 → 最新文章 → UX 作品集 → 订阅"
 puts "✓ 首页内容基线：#{featured_count} 篇精选，#{latest_count} 篇最新文章"
-puts "✓ 中文语义、canonical、Open Graph 与关键页面产物正常"
+puts "✓ 双语界面、中文内容语义、canonical、Open Graph 与关键页面产物正常"
 RUBY
 
 echo "✓ 发布前检查通过"
