@@ -13,7 +13,7 @@
   --bg-soft: #eee7de;
   --fg: #1e1d1b;
   --fg-soft: #625f5a;
-  --fg-faint: #8d8881;
+  --fg-faint: #6b665f;
   --border: #d9cfc3;
   --accent: #b64b3b;
   --accent-soft: rgba(182, 75, 59, 0.1);
@@ -26,7 +26,7 @@
     --bg-soft: #171a1f;
     --fg: #e6e8eb;
     --fg-soft: #a7adb6;
-    --fg-faint: #6b727c;
+    --fg-faint: #858c96;
     --border: #262a30;
     --accent: #e5715f;
     --accent-soft: rgba(229, 113, 95, 0.14);
@@ -56,6 +56,17 @@ body {
 
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+:where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@supports selector(:focus-visible) {
+  :where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus:not(:focus-visible) {
+    outline: none;
+  }
+}
 
 img { max-width: 100%; height: auto; }
 
@@ -352,7 +363,7 @@ img { max-width: 100%; height: auto; }
   border-radius: 8px;
   padding: 10px 14px;
 }
-.tool-waitlist-email input[type="email"]:focus { outline: none; border-color: var(--accent); }
+.tool-waitlist-email input[type="email"]:focus { border-color: var(--accent); }
 .tool-waitlist-email button {
   font: inherit;
   font-size: 15px;
@@ -494,7 +505,7 @@ a.text-cta:hover,
   border-radius: 8px;
   padding: 10px 14px;
 }
-.subscribe-form input:focus { outline: none; border-color: var(--accent); }
+.subscribe-form input:focus { border-color: var(--accent); }
 .subscribe-form button {
   font-family: var(--font-sans);
   font-size: 15px;
