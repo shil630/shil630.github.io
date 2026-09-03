@@ -246,16 +246,24 @@
       const cleaned = rows.filter(line => !isTableDivider(line)).map(line => line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(cell => cell.trim()));
       if (!cleaned.length) return '';
       const colCount = Math.max(...cleaned.map(row => row.length));
-      const widths = Array.from({length:colCount}, (_, index) => index === 0 ? '19%' : ((81 / Math.max(1, colCount - 1)).toFixed(2) + '%')).join(' ');
-      const cells = cleaned.map((row, rowIndex) => row.map((cell, cellIndex) => {
-        const isHead = rowIndex === 0 || cellIndex === 0;
-        const border = rowIndex === 0 ? `border-bottom:1px solid ${T.c.border};` : `border-bottom:1px solid ${T.c.borderSoft};`;
-        const bg = isHead ? (rowIndex === 0 ? T.c.tint : T.c.faint) : 'transparent';
-        const weight = isHead ? '650' : '400';
-        const align = rowIndex === 0 ? 'center' : 'left';
-        return '<div style="padding:12px 8px;box-sizing:border-box;background:' + bg + ';' + border + 'color:#302D29;font-size:13px;line-height:1.7;font-weight:' + weight + ';text-align:' + align + ';overflow-wrap:anywhere;">' + inline(cell || ' ') + '</div>';
-      }).join('')).join('');
-      return `<section style="margin:24px 0;border:1px solid ${T.c.border};border-radius:6px;overflow:hidden;"><div style="display:grid;grid-template-columns:` + widths + ';">' + cells + '</div></section>';
+      const colWidths = Array.from({length:colCount}, (_, index) => index === 0 ? '20%' : ((80 / Math.max(1, colCount - 1)).toFixed(2) + '%'));
+      const trs = cleaned.map((row, rowIndex) => {
+        const isHeadRow = rowIndex === 0;
+        const isLastRow = rowIndex === cleaned.length - 1;
+        const border = isLastRow ? '' : (isHeadRow ? `border-bottom:1px solid ${T.c.border};` : `border-bottom:1px solid ${T.c.borderSoft};`);
+        const cells = Array.from({length: colCount}, (_, cellIndex) => {
+          const cell = row[cellIndex] || ' ';
+          const isFirstCol = cellIndex === 0;
+          const isHead = isHeadRow || isFirstCol;
+          const bg = isHeadRow ? T.c.tint : (isFirstCol ? T.c.faint : '#ffffff');
+          const weight = isHead ? '650' : '400';
+          const align = isHeadRow ? 'center' : (isFirstCol ? 'center' : 'left');
+          const widthAttr = rowIndex === 0 ? ` width="${colWidths[cellIndex]}" style="width:${colWidths[cellIndex]};` : ' style="';
+          return `<td${widthAttr}padding:12px 10px;box-sizing:border-box;background:${bg};${border}color:#302D29;font-size:13px;line-height:1.7;font-weight:${weight};text-align:${align};overflow-wrap:anywhere;word-break:break-word;vertical-align:middle;">` + inline(cell) + '</td>';
+        }).join('');
+        return '<tr>' + cells + '</tr>';
+      }).join('');
+      return `<section style="margin:24px 0;border:1px solid ${T.c.border};border-radius:6px;overflow:hidden;box-sizing:border-box;"><table style="width:100%;border-collapse:collapse;border-spacing:0;table-layout:fixed;margin:0;padding:0;background:#ffffff;box-sizing:border-box;"><tbody>${trs}</tbody></table></section>`;
     }
     function render(md) {
       const lines = md.replace(/^---[\s\S]*?---\s*/,'').replace(/\r/g,'').split('\n');
