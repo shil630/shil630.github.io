@@ -1,14 +1,16 @@
 ---
+title: "微信公众号 Markdown 排版工具"
+description: "将 Markdown 转为适合公众号的富文本，支持实时预览、主题切换、复制与 HTML 导出。正文在浏览器本地处理。"
+tool_id: wechat-formatter
 ---
 <!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>正EV · 公众号排版器</title>
+  {% include tool-head.html %}
   <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="/assets/images/favicon.png" type="image/png">
-  {% include analytics.html %}
   <style>
     :root { --paper:#F5F1EA; --ink:#1E1D1B; --red:#B64B3B; --muted:#8D8881; --sand:#D9CFC3; --line:rgba(30,29,27,.14); }
     * { box-sizing:border-box; }
@@ -118,6 +120,7 @@
   </main>
   <div class="toast" id="toast" role="status"></div>
 
+  {% include tool-scripts.html %}
   <script>
     const $ = (s) => document.querySelector(s);
     const source = $('#source');
@@ -305,7 +308,7 @@
     }
     function update() { preview.innerHTML = render(source.value); $('#wordCount').textContent = (source.value.replace(/\s/g,'').length || 0) + ' 字'; localStorage.setItem('positive-ev-wechat-source', source.value); }
     function notice(msg) { toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 2300); }
-    function insert(text) { const start=source.selectionStart, end=source.selectionEnd; source.setRangeText((start && source.value[start-1] !== '\n' ? '\n\n' : '') + text + '\n',start,end,'end'); source.focus(); update(); }
+    function insert(text) { window.toolAnalytics?.action('insert'); const start=source.selectionStart, end=source.selectionEnd; source.setRangeText((start && source.value[start-1] !== '\n' ? '\n\n' : '') + text + '\n',start,end,'end'); source.focus(); update(); }
 
     const themeRow = $('#themeRow');
     THEMES.forEach(t => {
@@ -315,6 +318,7 @@
       pill.dataset.theme = t.id;
       pill.innerHTML = `<span class="theme-dot" style="background:${t.c.accent}"></span>${t.name}`;
       pill.addEventListener('click', () => {
+        window.toolAnalytics?.action('theme');
         T = t;
         localStorage.setItem(THEME_KEY, t.id);
         themeRow.querySelectorAll('.theme-pill').forEach(p => p.classList.toggle('active', p.dataset.theme === t.id));
@@ -324,13 +328,29 @@
     });
 
     source.value = localStorage.getItem('positive-ev-wechat-source') || sample;
-    source.addEventListener('input', update);
+    source.addEventListener('input', () => { window.toolAnalytics?.action('edit'); update(); });
     document.querySelectorAll('[data-insert]').forEach(b=>b.addEventListener('click',()=>insert(b.dataset.insert)));
     $('#sampleBtn').addEventListener('click',()=>{ source.value=sample; update(); notice('已载入示例原稿'); });
     $('#clearBtn').addEventListener('click',()=>{ if (source.value && !confirm('清空当前编辑内容？')) return; source.value=''; update(); source.focus(); });
     // 复制的富文本不带整体背景色，粘进公众号后跟随编辑器的白底
-    $('#copyBtn').addEventListener('click', async () => { const html = '<section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:0;color:#393632;">' + preview.innerHTML + '</section>'; try { await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([preview.innerText],{type:'text/plain'})})]); notice('已复制富文本，可粘贴进公众号'); } catch { await navigator.clipboard.writeText(preview.innerText); notice('浏览器限制：已复制纯文字'); } });
-    $('#downloadBtn').addEventListener('click', () => { const html='<!doctype html><meta charset="utf-8"><title>公众号文章</title><body style="margin:0;background:#fff;"><section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:28px 22px;color:#393632;">'+preview.innerHTML+'</section></body>'; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download='正EV-公众号排版.html'; a.click(); URL.revokeObjectURL(a.href); notice('已下载 HTML 文件'); });
+    $('#copyBtn').addEventListener('click', async () => {
+      window.toolAnalytics?.action('copy_rich');
+      const html = '<section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:0;color:#393632;">' + preview.innerHTML + '</section>';
+      try {
+        await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([preview.innerText],{type:'text/plain'})})]);
+        window.toolAnalytics?.complete('copy_rich');
+        notice('已复制富文本，可粘贴进公众号');
+      } catch {
+        try {
+          await navigator.clipboard.writeText(preview.innerText);
+          window.toolAnalytics?.complete('copy_text');
+          notice('浏览器限制：已复制纯文字');
+        } catch {
+          notice('复制失败，请手动选择预览文字');
+        }
+      }
+    });
+    $('#downloadBtn').addEventListener('click', () => { window.toolAnalytics?.action('download_html'); const html='<!doctype html><meta charset="utf-8"><title>公众号文章</title><body style="margin:0;background:#fff;"><section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:28px 22px;color:#393632;">'+preview.innerHTML+'</section></body>'; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download='正EV-公众号排版.html'; a.click(); URL.revokeObjectURL(a.href); window.toolAnalytics?.complete('download_html'); notice('已发起 HTML 下载'); });
     update();
   </script>
 </body>

@@ -1,10 +1,14 @@
+---
+title: "德州扑克翻前开池范围工具"
+description: "查看、编辑和复制 8 人桌、200BB 以上现金桌的各位置翻前开池范围。适用于前面无人入池时的个人学习参考。"
+tool_id: preflop-range
+---
 <!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="石亮正EV：8人桌、200BB以上现金桌翻前开池范围参考。">
-  <title>翻前开池范围｜石亮正EV</title>
+  {% include tool-head.html %}
   <style>
     :root {
       --paper: #f5f1ea;
@@ -888,6 +892,7 @@
     </footer>
   </main>
 
+  {% include tool-scripts.html %}
   <script>
     (() => {
       "use strict";
@@ -1230,6 +1235,7 @@
         const button = event.target.closest("[data-position]");
         if (!button) return;
         state.positionId = button.dataset.position;
+        window.toolAnalytics?.action('select_position');
         state.activeHand = null;
         render();
       });
@@ -1247,12 +1253,14 @@
         if (event.key === "End") nextIndex = positions.length - 1;
 
         state.positionId = positions[nextIndex].id;
+        window.toolAnalytics?.action('select_position');
         state.activeHand = null;
         render();
         document.getElementById(`tab-${state.positionId}`).focus();
       });
 
       function toggleHand(hand) {
+        window.toolAnalytics?.action('edit_range');
         const rangeState = currentRangeState();
         if (rangeState.hands.has(hand)) {
           rangeState.hands.delete(hand);
@@ -1322,6 +1330,7 @@
       });
 
       clearRangeButton.addEventListener("click", () => {
+        window.toolAnalytics?.action('clear_range');
         const rangeState = currentRangeState();
         rangeState.hands.clear();
         rangeState.isEdited = true;
@@ -1330,6 +1339,7 @@
       });
 
       restoreRangeButton.addEventListener("click", () => {
+        window.toolAnalytics?.action('restore_range');
         const rangeState = currentRangeState();
         rangeState.hands = new Set(rangeState.defaultHands);
         rangeState.isEdited = false;
@@ -1347,6 +1357,7 @@
       }
 
       async function copyRange() {
+        window.toolAnalytics?.action('copy_range');
         const value = copyableRangeText(currentPosition(), currentRangeState());
         let copied = false;
 
@@ -1379,6 +1390,7 @@
         }
 
         if (copied) {
+          window.toolAnalytics?.complete('copy_range');
           copyButton.textContent = "已复制";
           copyButton.focus({ preventScroll: true });
         } else {
