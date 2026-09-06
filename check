@@ -50,7 +50,8 @@ required_pages = {
   "404" => "404.html",
   "RSS" => "feed.xml",
   "sitemap" => "sitemap.xml",
-  "robots" => "robots.txt"
+  "robots" => "robots.txt",
+  "llms" => "llms.txt"
 }
 
 missing = required_pages.filter_map do |label, relative_path|
@@ -134,6 +135,13 @@ tool_ids.each do |tool_id|
 end
 assert!(tool_titles.uniq.size == tool_ids.size && tool_descriptions.uniq.size == tool_ids.size, "工具 title/description 必须各自独立")
 puts "✓ 三个工具的唯一元数据、GTM、事件脚本、分享图与 sitemap 正常"
+
+llms = File.read(File.join(build_dir, "llms.txt"), encoding: "UTF-8")
+assert!(llms.include?("# 石亮正EV"), "llms.txt 缺少主标题")
+assert!(llms.include?("https://shiliang.me/tools/investment-checklist/"), "llms.txt 缺少工具链接")
+assert!(llms.scan(%r{https://shiliang\.me/posts/\d{4}/\d{2}/\d{2}/}).size >= 5, "llms.txt 文章链接少于预期")
+assert!(!llms.include?("{%") && !llms.include?("{{"), "llms.txt 存在未渲染 Liquid")
+puts "✓ llms.txt 生成正常且包含站点定位、工具与深度文章索引"
 latest_count = home.scan('class="post-item"').length
 puts "✓ 首页内容顺序：精选 → 最新文章 → UX 作品集 → 订阅"
 puts "✓ 首页内容基线：#{featured_count} 篇精选，#{latest_count} 篇最新文章"
