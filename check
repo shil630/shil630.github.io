@@ -36,7 +36,9 @@ JEKYLL_ENV=production bundle exec jekyll build \
   ${DRAFT_FLAG[@]+"${DRAFT_FLAG[@]}"}
 
 echo "→ 关键产物检查"
-ruby - "$CHECK_BUILD_DIR" <<'RUBY'
+bundle exec ruby - "$CHECK_BUILD_DIR" <<'RUBY'
+require "nokogiri"
+require "uri"
 build_dir = ARGV.fetch(0)
 
 required_pages = {
@@ -84,6 +86,54 @@ assert!(article.include?('<article class="post wrap" lang="zh">'), "文章正文
 end
 
 featured_count = home.scan('class="featured-card"').length
+tool_ids = %w[investment-checklist wechat-formatter preflop-range]
+tool_titles = []
+tool_descriptions = []
+sitemap = File.read(File.join(build_dir, "sitemap.xml"))
+tool_ids.each do |tool_id|
+  relative_path = "tools/#{tool_id}/index.html"
+  assert!(File.file?(File.join(build_dir, relative_path)), "工具页缺失：#{tool_id}")
+  html = File.read(File.join(build_dir, relative_path))
+  doc = Nokogiri::HTML(html)
+  canonical = "https://shiliang.me/tools/#{tool_id}/"
+  head = doc.at_css("head")
+  assert!(head.css("title").size == 1 && !head.at_css("title").text.strip.empty?, "#{tool_id} title 缺失或重复")
+  tool_titles << head.at_css("title").text
+  {
+    'meta[name="description"]' => nil,
+    'link[rel="canonical"]' => canonical,
+    'meta[property="og:url"]' => canonical,
+    'meta[property="og:title"]' => nil,
+    'meta[property="og:description"]' => nil,
+    'meta[property="og:type"]' => "website",
+    'meta[property="og:image"]' => nil,
+    'meta[name="twitter:card"]' => "summary_large_image",
+    'meta[name="twitter:title"]' => nil,
+    'meta[name="twitter:description"]' => nil,
+    'meta[name="twitter:image"]' => nil
+  }.each do |selector, expected|
+    nodes = head.css(selector)
+    assert!(nodes.size == 1, "#{tool_id} #{selector} 缺失或重复")
+    value = nodes.first[selector.start_with?("link") ? "href" : "content"]
+    assert!(value && !value.strip.empty? && (!expected || value == expected), "#{tool_id} #{selector} 值不正确")
+  end
+  tool_descriptions << head.at_css('meta[name="description"]')["content"]
+  assert!(html.scan("googletagmanager.com/gtm.js").size == 1, "#{tool_id} GTM 缺失或重复")
+  trackers = doc.css('script[src^="/assets/js/tool-analytics.js"]')
+  assert!(trackers.size == 1 && trackers.first['data-tool-id'] == tool_id && trackers.first['data-measurement-id'] == 'G-MQH963M94G', "#{tool_id} 工具埋点配置不正确")
+  assert!(!html.include?("{%") && !html.include?("{{"), "#{tool_id} 存在未渲染 Liquid")
+  assert!(sitemap.include?(canonical), "#{tool_id} 未进入 sitemap")
+  resources = doc.css('script[src], link[rel="icon"], link[rel="alternate icon"]').map { |el| el['src'] || el['href'] }
+  resources << head.at_css('meta[property="og:image"]')['content']
+  resources << head.at_css('meta[name="twitter:image"]')['content']
+  resources.each do |url|
+    uri = URI.parse(url)
+    next if uri.host && uri.host != "shiliang.me"
+    assert!(File.file?(File.join(build_dir, uri.path.sub(%r{\A/}, ""))), "#{tool_id} 资源不存在：#{url}")
+  end
+end
+assert!(tool_titles.uniq.size == tool_ids.size && tool_descriptions.uniq.size == tool_ids.size, "工具 title/description 必须各自独立")
+puts "✓ 三个工具的唯一元数据、GTM、事件脚本、分享图与 sitemap 正常"
 latest_count = home.scan('class="post-item"').length
 puts "✓ 首页内容顺序：精选 → 最新文章 → UX 作品集 → 订阅"
 puts "✓ 首页内容基线：#{featured_count} 篇精选，#{latest_count} 篇最新文章"

@@ -65,6 +65,7 @@ defaults:
       image: "/assets/images/blog-home-og-1200x630.png"
 
 exclude:
+  - tests
   - Gemfile
   - Gemfile.lock
   - README.md
