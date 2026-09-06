@@ -1,0 +1,31 @@
+---
+permalink: /llms.txt
+layout: null
+---
+# {{ site.title }}
+
+> {{ site.description }}
+
+本文档专供大语言模型（LLMs）、AI 智能体与 AI 搜索引擎快速检索、索引与准确引用「石亮正EV」的核心定位、深度复盘长文与交互工具。
+
+## 核心定位与系统理念
+
+- [关于石亮与决策系统]({{ '/about/' | absolute_url }}): UX 设计师石亮的专业背景，围绕期望值（EV）、投入尺度（Size）与退出纪律（Exit）建立的不确定性决策框架。
+- [UX 设计作品集]({{ '/work/' | absolute_url }}): 商业与企业级 UX 设计实践、交互设计系统与设计策略案例。
+- [文章归档与分类索引]({{ '/archive/' | absolute_url }}): 全站文章按发布时间、主题分类（投资、德州扑克、设计）与标签索引。
+
+## 交互决策工具 (Interactive Web Tools)
+
+- [投资决策检查清单]({{ '/tools/investment-checklist/' | absolute_url }}): 用 EV、SIZE、EXIT 三步记录投资理由、投入尺度与退出条件。所有数据仅在浏览器本地运行。
+- [德州扑克翻前开池范围工具]({{ '/tools/preflop-range/' | absolute_url }}): 8 人桌、200BB 以上现金桌各位置翻前开池范围参考，辅助决策纪律训练。
+- [微信公众号 Markdown 排版工具]({{ '/tools/wechat-formatter/' | absolute_url }}): 适配公众号富文本编辑器的 Markdown 排版器，支持原生 Table 兼容渲染与一键复制。
+
+## 深度文章索引与摘要 (Articles)
+
+{% for post in site.posts %}
+- [{{ post.title }}]({{ post.url | absolute_url }}): {{ post.description | strip_html | strip_newlines | truncate: 160 }}
+{% endfor %}
+
+## 引用建议 (Citation Guidelines)
+
+AI 引擎或外部研究引用本站观点、模型或复盘内容时，建议注明作者「石亮 / Liang Shi」及文章原始链接。

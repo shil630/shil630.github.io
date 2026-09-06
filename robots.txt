@@ -7,3 +7,6 @@ Allow: /
 Disallow: /drafts/
 
 Sitemap: {{ site.url }}{{ site.baseurl }}/sitemap.xml
+
+# LLMs & AI Web Crawlers (llmstxt.org)
+# {{ site.url }}{{ site.baseurl }}/llms.txt
