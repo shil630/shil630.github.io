@@ -13,7 +13,7 @@ function createEnv() {
   const store = {};
   const mockElements = {
     source: { value: '', addEventListener: () => {}, focus: () => {} },
-    preview: { innerHTML: '', innerText: '' },
+    preview: { innerHTML: '', innerText: '', style: {} },
     toast: { textContent: '', classList: { add: () => {}, remove: () => {} } },
     wordCount: { textContent: '' },
     mobileWordCount: { textContent: '' },
@@ -101,12 +101,38 @@ test('computePalette generates valid derived colors', () => {
   assert.match(palette.dark, /^#[0-9a-fA-F]{6}$/);
 });
 
-test('wechat-formatter HTML contains mobile header, segmented tabs, and brand title', () => {
+test('wechat-formatter HTML contains mobile header, segmented tabs, brand title and no dots', () => {
   assert.ok(html.includes('class="mobile-header"'), 'Must have mobile-header');
   assert.ok(html.includes('id="tabEdit"'), 'Must have tabEdit');
   assert.ok(html.includes('id="tabPreview"'), 'Must have tabPreview');
   assert.ok(html.includes('id="mobileActions"'), 'Must have mobileActions');
   assert.ok(html.includes('id="tunePanel"'), 'Must have tunePanel');
+  assert.ok(html.includes('class="brand-header"'), 'Sidebar must have brand-header class');
+  assert.ok(!html.includes('class="dots"'), 'Sidebar must NOT contain three dots');
   assert.ok(html.includes('公众号排版器'), 'Sidebar must show 公众号排版器 title');
   assert.ok(html.includes('Markdown 实时预览、主题切换，一键复制适配公众号的富文本。'), 'Sidebar must show tagline description');
+});
+
+test('font pairing switching takes effect correctly without style-breaking double quotes', () => {
+  const env = createEnv();
+  const md = '# 测试标题\n\n这是一段正文。';
+
+  // 1. 全篇宋体
+  env.eval("TUNING.fontPair = 'serif'");
+  const serifHtml = env.eval(`render(${JSON.stringify(md)})`);
+  assert.ok(serifHtml.includes("font-family:'Songti SC'"), 'Serif mode must inject Songti SC font family');
+  assert.ok(!serifHtml.includes('font-family:"Songti SC"'), 'Must not contain breaking double quotes in style attribute');
+  assert.ok(!serifHtml.includes('font-family:"PingFang SC"'), 'Must not contain PingFang SC when in full serif mode');
+
+  // 2. 现代黑体
+  env.eval("TUNING.fontPair = 'sans'");
+  const sansHtml = env.eval(`render(${JSON.stringify(md)})`);
+  assert.ok(sansHtml.includes("font-family:-apple-system,BlinkMacSystemFont,'PingFang SC'"), 'Sans mode must inject PingFang SC');
+  assert.ok(!sansHtml.includes("font-family:'Songti SC'"), 'Sans mode must not have Songti SC in body or heading');
+
+  // 3. 宋体标+黑体文
+  env.eval("TUNING.fontPair = 'mixed'");
+  const mixedHtml = env.eval(`render(${JSON.stringify(md)})`);
+  assert.ok(mixedHtml.includes("<h1 style=\"margin:0 0 16px;color:#1E1D1B;font-family:'Songti SC'"), 'Mixed mode heading must be Songti SC');
+  assert.ok(mixedHtml.includes("font-family:-apple-system,BlinkMacSystemFont,'PingFang SC'"), 'Mixed mode body must be PingFang SC');
 });

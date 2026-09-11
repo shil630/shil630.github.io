@@ -58,28 +58,9 @@ tool_id: wechat-formatter
       letter-spacing: .02em;
     }
     .back-link:hover { color: var(--red); }
-    .brand-mark {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      margin-bottom: 32px;
+    .brand-header {
+      margin-bottom: 28px;
     }
-    .dots {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      margin-top: 6px;
-      flex: 0 0 auto;
-    }
-    .dot {
-      display: block;
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--ink);
-    }
-    .dot.red { background: var(--red); }
-    .dot.outline { background: transparent; border: 1.4px solid var(--red); }
     .brand {
       margin: 0;
       font-family: "Songti SC", "STSong", serif;
@@ -708,12 +689,9 @@ tool_id: wechat-formatter
     <!-- Desktop Sidebar -->
     <aside class="sidebar">
       <a class="back-link" href="/tools/">← 返回工具</a>
-      <div class="brand-mark">
-        <span class="dots"><b class="dot red"></b><b class="dot"></b><b class="dot outline"></b></span>
-        <div>
-          <h1 class="brand">公众号排版器</h1>
-          <p class="tagline">Markdown 实时预览、主题切换，一键复制适配公众号的富文本。</p>
-        </div>
+      <div class="brand-header">
+        <h1 class="brand">公众号排版器</h1>
+        <p class="tagline">Markdown 实时预览、主题切换，一键复制适配公众号的富文本。</p>
       </div>
       <p class="label">文章工作流</p>
       <div class="step active"><i>1</i><span>粘贴 Markdown<br>或直接在左侧修改</span></div>
@@ -982,7 +960,7 @@ tool_id: wechat-formatter
       customAccent: '',
       fontSize: '16px',
       lineHeight: '1.9',
-      fontPair: 'sans',
+      fontPair: 'auto',
       h2Style: 'auto',
       quoteStyle: 'auto'
     };
@@ -1052,13 +1030,17 @@ tool_id: wechat-formatter
     function isSongtiHeading() {
       if (TUNING.fontPair === 'serif' || TUNING.fontPair === 'mixed') return true;
       if (TUNING.fontPair === 'sans') return false;
-      return T.serif;
+      return !!T.serif;
     }
     function isSongtiBody() {
-      return TUNING.fontPair === 'serif';
+      if (TUNING.fontPair === 'serif') return true;
+      if (TUNING.fontPair === 'sans' || TUNING.fontPair === 'mixed') return false;
+      return !!T.serif;
     }
-    const headingFont = () => isSongtiHeading() ? 'font-family:"Songti SC","STSong",serif;' : 'font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;';
-    const bodyFont = () => isSongtiBody() ? 'font-family:"Songti SC","STSong",serif;' : 'font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;';
+    const SERIF_STACK = "font-family:'Songti SC','STSong','Source Han Serif SC','Noto Serif SC',SimSun,serif;";
+    const SANS_STACK = "font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;";
+    const headingFont = () => isSongtiHeading() ? SERIF_STACK : SANS_STACK;
+    const bodyFont = () => isSongtiBody() ? SERIF_STACK : SANS_STACK;
     function calcRelativeFont(basePx) {
       const scale = TUNING.fontSize === '15px' ? (15/16) : (TUNING.fontSize === '17px' ? (17/16) : 1);
       return (basePx * scale).toFixed(1) + 'px';
@@ -1203,6 +1185,11 @@ tool_id: wechat-formatter
 
     /* ============ 界面更新与数据持久化 ============ */
     function update() {
+      if (preview && preview.style) {
+        preview.style.fontFamily = isSongtiBody()
+          ? "'Songti SC', 'STSong', 'Source Han Serif SC', 'Noto Serif SC', SimSun, serif"
+          : "-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif";
+      }
       preview.innerHTML = render(source.value);
       const count = (source.value.replace(/\s/g,'').length || 0) + ' 字';
       $('#wordCount').textContent = count;
@@ -1269,8 +1256,9 @@ tool_id: wechat-formatter
       document.querySelectorAll('#tuneFontSizeGroup .tune-opt-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.val === TUNING.fontSize);
       });
+      const effectiveFontPair = TUNING.fontPair === 'auto' ? (T.serif ? 'serif' : 'sans') : TUNING.fontPair;
       document.querySelectorAll('#tuneFontGroup .tune-opt-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.val === TUNING.fontPair);
+        btn.classList.toggle('active', btn.dataset.val === effectiveFontPair);
       });
       document.querySelectorAll('#tuneLineHeightGroup .tune-opt-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.val === TUNING.lineHeight);
