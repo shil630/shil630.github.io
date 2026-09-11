@@ -13,13 +13,13 @@ tool_id: wechat-formatter
   <link rel="alternate icon" href="/assets/images/favicon.png" type="image/png">
   <style>
     :root {
-      --paper: #F5F1EA;
-      --ink: #1E1D1B;
+      --paper: #f4f5f7;
+      --ink: #1f2328;
       --red: #B64B3B;
-      --muted: #8D8881;
-      --sand: #D9CFC3;
-      --line: rgba(30, 29, 27, .14);
-      --sidebar-bg: #efe9df;
+      --muted: #6e7781;
+      --sand: #d0d7de;
+      --line: rgba(31, 35, 40, .12);
+      --sidebar-bg: #eaecf0;
     }
     * { box-sizing: border-box; }
     body {
@@ -198,14 +198,14 @@ tool_id: wechat-formatter
       padding: 7px 10px;
       border: 1px solid var(--line);
       border-radius: 4px;
-      color: #514c46;
-      background: rgba(255, 255, 255, .32);
+      color: #4b5158;
+      background: rgba(255, 255, 255, .6);
       font-size: 12px;
       cursor: pointer;
       white-space: nowrap;
       transition: border-color .16s ease, color .16s ease, background .16s ease;
     }
-    .tool-btn:hover { border-color: var(--red); color: var(--red); background: rgba(255, 255, 255, .58); }
+    .tool-btn:hover { border-color: var(--red); color: var(--red); background: #ffffff; }
     .insert-btn::before {
       content: "+";
       position: absolute;
@@ -228,7 +228,7 @@ tool_id: wechat-formatter
       border-left: 1px solid var(--line);
     }
     .utility-btn { padding: 7px 9px; border: 0; color: var(--muted); background: transparent; font-size: 12px; }
-    .utility-btn:hover { color: var(--ink); background: rgba(30, 29, 27, .055); }
+    .utility-btn:hover { color: var(--ink); background: rgba(31, 35, 40, .06); }
     .utility-btn.danger:hover { color: var(--red); background: rgba(182, 75, 59, .07); }
     .editor {
       flex: 1;
@@ -238,8 +238,8 @@ tool_id: wechat-formatter
       border-radius: 5px;
       outline: none;
       padding: 20px;
-      color: #3f3a35;
-      background: #fffdf9;
+      color: #1f2328;
+      background: #ffffff;
       font-family: "SFMono-Regular", Consolas, Menlo, monospace;
       font-size: 13.5px;
       line-height: 1.8;
@@ -258,7 +258,7 @@ tool_id: wechat-formatter
       min-width: 0;
       padding: 28px 34px 34px;
       border-left: 1px solid var(--line);
-      background: #e8e1d6;
+      background: #e3e6ea;
     }
     .preview-actions { display: flex; align-items: center; gap: 8px; }
     .button {
@@ -296,18 +296,19 @@ tool_id: wechat-formatter
       padding: 5px 12px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      color: #514c46;
-      background: rgba(255, 255, 255, .55);
+      color: #4b5158;
+      background: rgba(255, 255, 255, .7);
       font-size: 12px;
       cursor: pointer;
       transition: .15s ease;
     }
-    .theme-pill:hover { border-color: #8d8881; }
+    .theme-pill:hover { border-color: #8c959f; background: #fff; }
     .theme-pill.active {
       border-color: var(--ink);
       box-shadow: inset 0 0 0 1px var(--ink);
       color: var(--ink);
       font-weight: 600;
+      background: #fff;
     }
     .theme-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
     .tune-toggle-btn {
@@ -317,8 +318,8 @@ tool_id: wechat-formatter
       padding: 5px 12px;
       border: 1px dashed var(--line);
       border-radius: 999px;
-      color: #5d564f;
-      background: rgba(255, 255, 255, .42);
+      color: #4b5158;
+      background: rgba(255, 255, 255, .6);
       font-size: 11.5px;
       cursor: pointer;
       transition: .15s ease;
@@ -330,11 +331,11 @@ tool_id: wechat-formatter
     .tune-panel {
       margin: 0 0 18px;
       padding: 16px 18px;
-      background: rgba(255, 255, 255, .88);
+      background: rgba(255, 255, 255, .94);
       border: 1px solid var(--sand);
       border-radius: 8px;
       backdrop-filter: blur(8px);
-      box-shadow: 0 4px 16px rgba(30, 29, 27, .06);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, .06);
     }
     .tune-panel[hidden] { display: none; }
     .tune-grid {
@@ -343,11 +344,11 @@ tool_id: wechat-formatter
       gap: 14px 18px;
     }
     .tune-item { display: flex; flex-direction: column; gap: 6px; }
-    .tune-label { color: #625c55; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .tune-label { color: #57606a; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
     .tune-btn-group {
       display: flex;
       padding: 2px;
-      background: rgba(30, 29, 27, .06);
+      background: rgba(31, 35, 40, .07);
       border-radius: 5px;
       gap: 2px;
     }
@@ -358,7 +359,7 @@ tool_id: wechat-formatter
       padding: 5px 6px;
       border-radius: 4px;
       font-size: 11px;
-      color: #5d564f;
+      color: #57606a;
       cursor: pointer;
       white-space: nowrap;
       text-align: center;
@@ -425,14 +426,14 @@ tool_id: wechat-formatter
       margin: 0 auto;
       padding: 40px 32px 48px;
       background: #fff;
-      box-shadow: 0 14px 35px rgba(50, 43, 35, .12);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, .08), 0 1px 3px rgba(15, 23, 42, .05);
       border-radius: 2px;
       transition: font-size .15s, line-height .15s;
     }
     .phone-note {
       width: min(100%, 540px);
       margin: 14px auto 0;
-      color: #756f67;
+      color: #656d76;
       font-size: 11px;
       text-align: center;
     }
@@ -527,7 +528,7 @@ tool_id: wechat-formatter
         display: block;
         padding: 16px 12px 96px;
         border-left: 0;
-        background: #f0eae1;
+        background: #e3e6ea;
       }
 
       /* Workspace in mobile */
@@ -621,7 +622,7 @@ tool_id: wechat-formatter
       .mobile-drawer-body {
         margin-top: 12px;
         padding: 14px;
-        background: #efe9df;
+        background: #eaecf0;
         border-radius: 6px;
         border: 1px solid var(--line);
       }
@@ -635,13 +636,13 @@ tool_id: wechat-formatter
         left: 0;
         right: 0;
         z-index: 80;
-        background: rgba(245, 241, 234, .95);
+        background: rgba(244, 245, 247, .95);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-top: 1px solid var(--line);
         padding: 10px 14px max(10px, env(safe-area-inset-bottom));
         gap: 10px;
-        box-shadow: 0 -4px 18px rgba(30, 29, 27, .08);
+        box-shadow: 0 -4px 18px rgba(15, 23, 42, .06);
       }
       .mobile-actions .button {
         flex: 1;
