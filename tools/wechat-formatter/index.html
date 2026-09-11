@@ -13,7 +13,7 @@ tool_id: wechat-formatter
   <link rel="alternate icon" href="/assets/images/favicon.png" type="image/png">
   <style>
     :root {
-      --paper: #f4f5f7;
+      --paper: #fbfbfb;
       --ink: #1f2328;
       --red: #B64B3B;
       --muted: #6e7781;
@@ -169,6 +169,7 @@ tool_id: wechat-formatter
       padding: 28px 28px 26px;
       display: flex;
       flex-direction: column;
+      background: #fbfbfb;
     }
     .workspace-head, .preview-head {
       display: flex;
@@ -258,7 +259,7 @@ tool_id: wechat-formatter
       min-width: 0;
       padding: 28px 34px 34px;
       border-left: 1px solid var(--line);
-      background: #e3e6ea;
+      background: #ffffff;
     }
     .preview-actions { display: flex; align-items: center; gap: 8px; }
     .button {
@@ -426,8 +427,9 @@ tool_id: wechat-formatter
       margin: 0 auto;
       padding: 40px 32px 48px;
       background: #fff;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, .08), 0 1px 3px rgba(15, 23, 42, .05);
-      border-radius: 2px;
+      border: 1px solid var(--line);
+      box-shadow: 0 6px 24px rgba(15, 23, 42, .06), 0 1px 2px rgba(15, 23, 42, .04);
+      border-radius: 4px;
       transition: font-size .15s, line-height .15s;
     }
     .phone-note {
@@ -528,7 +530,7 @@ tool_id: wechat-formatter
         display: block;
         padding: 16px 12px 96px;
         border-left: 0;
-        background: #e3e6ea;
+        background: #ffffff;
       }
 
       /* Workspace in mobile */
@@ -636,7 +638,7 @@ tool_id: wechat-formatter
         left: 0;
         right: 0;
         z-index: 80;
-        background: rgba(244, 245, 247, .95);
+        background: rgba(255, 255, 255, .96);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-top: 1px solid var(--line);
