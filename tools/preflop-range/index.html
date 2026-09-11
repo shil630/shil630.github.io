@@ -588,6 +588,156 @@ tool_id: preflop-range
       font-size: 13px;
     }
 
+    .tool-related-posts {
+      margin-top: 36px;
+      padding-top: 24px;
+      border-top: 1px solid var(--sand);
+    }
+
+    .tool-section-head {
+      margin-bottom: 16px;
+    }
+
+    .tool-section-kicker {
+      display: inline-block;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .tool-section-title {
+      margin: 4px 0 0;
+      font-family: var(--font-serif);
+      font-size: 22px;
+      line-height: 1.35;
+    }
+
+    .tool-posts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .tool-post-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 20px 22px;
+      background: var(--surface);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-card);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .tool-post-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px rgba(30, 29, 27, 0.06);
+      text-decoration: none;
+    }
+
+    .tool-post-kicker {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+    }
+
+    .tool-post-title {
+      margin: 0;
+      font-family: var(--font-serif);
+      font-size: 18px;
+      line-height: 1.4;
+      color: var(--ink);
+    }
+
+    .tool-post-desc {
+      margin: 0;
+      flex: 1;
+      color: var(--body);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .tool-post-link {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .tool-subscribe-card {
+      margin-top: 20px;
+      padding: 32px 24px;
+      background: var(--surface-soft);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-card);
+      text-align: center;
+    }
+
+    .tool-subscribe-kicker {
+      display: inline-block;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .tool-subscribe-title {
+      margin: 4px 0 6px;
+      font-family: var(--font-serif);
+      font-size: 22px;
+    }
+
+    .tool-subscribe-desc {
+      margin: 0 0 18px;
+      color: var(--body);
+      font-size: 13px;
+    }
+
+    .tool-subscribe-card .subscribe-form {
+      display: flex;
+      gap: 10px;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .tool-subscribe-card input[type="email"] {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 14px;
+      background: #fff;
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-control);
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .tool-subscribe-card input[type="email"]:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .tool-subscribe-card button[type="submit"] {
+      padding: 10px 20px;
+      cursor: pointer;
+      color: #fff;
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-control);
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: background 160ms ease;
+    }
+
+    .tool-subscribe-card button[type="submit"]:hover {
+      background: var(--accent-hover);
+    }
+
     footer {
       display: flex;
       justify-content: space-between;
@@ -758,6 +908,22 @@ tool_id: preflop-range
         grid-template-columns: 1fr;
       }
 
+      .tool-posts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tool-subscribe-card {
+        padding: 24px 16px;
+      }
+
+      .tool-subscribe-card .subscribe-form {
+        flex-direction: column;
+      }
+
+      .tool-subscribe-card button[type="submit"] {
+        width: 100%;
+      }
+
       footer {
         flex-direction: column;
         gap: 8px;
@@ -884,6 +1050,42 @@ tool_id: preflop-range
         <h3>这版范围的边界</h3>
         <p>这是我为8人桌位置结构、200BB以上现金桌整理的一版个人开池参考，不是通用答案。9人桌新增前位暂未覆盖；具体决定仍会随人数、尺度和桌况变化。</p>
       </div>
+    </section>
+
+    <section class="tool-related-posts" aria-label="相关思考与方法论">
+      <div class="tool-section-head">
+        <span class="tool-section-kicker">BACKGROUND & ESSAYS</span>
+        <h3 class="tool-section-title">工具背后的思考</h3>
+      </div>
+      <div class="tool-posts-grid">
+        <a class="tool-post-card" href="/posts/2026/08/01/preflop-range-ev/" data-track-cta data-cta-type="tool_related_article" data-placement="tool_footer">
+          <span class="tool-post-kicker">德州扑克 · 翻前纪律</span>
+          <h4 class="tool-post-title">翻前范围为什么重要：我做了一个工具，把临场判断提前写下来</h4>
+          <p class="tool-post-desc">翻前范围不是一张“哪些牌够强”的名单，而是把位置、前序行动和筹码条件写在情绪出现之前。</p>
+          <span class="tool-post-link">阅读文章 →</span>
+        </a>
+        <a class="tool-post-card" href="/posts/2026/07/09/poker-market-decision-system/" data-track-cta data-cta-type="tool_related_article" data-placement="tool_footer">
+          <span class="tool-post-kicker">牌桌与市场 · 决策模型</span>
+          <h4 class="tool-post-title">德州牌桌教会我的，恰恰是市场最想让你忘记的</h4>
+          <p class="tool-post-desc">期望值、下注尺度、弃牌纪律，三条线索如何重塑你看世界与做决策的方式。</p>
+          <span class="tool-post-link">阅读文章 →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="tool-subscribe-card" aria-label="订阅正EV实验">
+      <span class="tool-subscribe-kicker">NEWSLETTER</span>
+      <h3 class="tool-subscribe-title">订阅正EV实验</h3>
+      <p class="tool-subscribe-desc">不定期更新关于设计、投资、德州与决策的文章。无喊单，无噪音。</p>
+      <form class="subscribe-form"
+            data-track-cta
+            data-cta-type="newsletter"
+            data-placement="tool_footer"
+            action="https://buttondown.com/api/emails/embed-subscribe/shiliangbj12"
+            method="post" target="_blank">
+        <input type="email" name="email" placeholder="you@example.com" required aria-label="Email address">
+        <button type="submit">加入实验</button>
+      </form>
     </section>
 
     <footer>

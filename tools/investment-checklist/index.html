@@ -97,12 +97,37 @@ tool_id: investment-checklist
       .plan-row.head { display:none; }
       .plan-row input::placeholder { color:#9b938b; }
       .saved { width:100%; margin-left:0; }
+      .tool-posts-grid { grid-template-columns:1fr; }
+      .tool-subscribe-card { padding:24px 16px; }
+      .tool-subscribe-card .subscribe-form { flex-direction:column; }
+      .tool-subscribe-card button[type="submit"] { width:100%; }
     }
     .back-link { display:inline-block; margin:0 0 20px; color:var(--muted); font-size:13px; text-decoration:none; letter-spacing:.02em; }
     .back-link:hover { color:var(--red); }
+    .tool-related-posts { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--sand); }
+    .tool-section-head { margin-bottom: 18px; }
+    .tool-section-kicker { color: var(--red); font: 700 11px Georgia, serif; letter-spacing: .12em; text-transform: uppercase; }
+    .tool-section-title { margin: 4px 0 0; font-family: "Songti SC", "STSong", serif; font-size: 22px; }
+    .tool-posts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .tool-post-card { display: flex; flex-direction: column; gap: 8px; padding: 20px 22px; border: 1px solid var(--sand); border-radius: 8px; background: var(--white); text-decoration: none; color: inherit; transition: border-color .15s, box-shadow .15s; }
+    .tool-post-card:hover { border-color: var(--red); box-shadow: 0 4px 14px rgba(30, 29, 27, .06); text-decoration: none; }
+    .tool-post-kicker { color: var(--muted); font-size: 11px; letter-spacing: .06em; }
+    .tool-post-title { margin: 0; font-family: "Songti SC", "STSong", serif; font-size: 18px; line-height: 1.4; color: var(--ink); }
+    .tool-post-desc { margin: 0; flex: 1; color: #5d5750; font-size: 13px; line-height: 1.7; }
+    .tool-post-link { color: var(--red); font-size: 13px; font-weight: 600; margin-top: 6px; }
+
+    .tool-subscribe-card { margin-top: 24px; padding: 32px 24px; border: 1px solid var(--sand); border-radius: 8px; background: var(--soft); text-align: center; }
+    .tool-subscribe-kicker { color: var(--red); font: 700 11px Georgia, serif; letter-spacing: .12em; text-transform: uppercase; }
+    .tool-subscribe-title { margin: 4px 0 6px; font-family: "Songti SC", "STSong", serif; font-size: 22px; }
+    .tool-subscribe-desc { margin: 0 0 18px; color: var(--muted); font-size: 13px; }
+    .tool-subscribe-card .subscribe-form { display: flex; gap: 10px; max-width: 420px; margin: 0 auto; }
+    .tool-subscribe-card input[type="email"] { flex: 1; min-width: 0; padding: 10px 14px; border: 1px solid var(--sand); border-radius: 4px; background: #fff; font-size: 14px; color: var(--ink); }
+    .tool-subscribe-card input[type="email"]:focus { border-color: var(--red); outline: none; }
+    .tool-subscribe-card button[type="submit"] { padding: 10px 20px; border: 1px solid var(--red); border-radius: 4px; background: var(--red); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .tool-subscribe-card button[type="submit"]:hover { opacity: .88; }
     @media print {
       body { background:#fff; }
-      .actions, .steps, .back-link { display:none; }
+      .actions, .steps, .back-link, .tool-related-posts, .tool-subscribe-card { display:none; }
       .page { width:100%; padding:0; }
       .panel { break-inside:avoid; }
       textarea, input, select { border-color:#ddd; }
@@ -311,6 +336,43 @@ tool_id: investment-checklist
       <datalist id="role-options"><option value="核心"><option value="防守"><option value="进攻"><option value="观察"><option value="小仓试错"></datalist>
       <div class="actions"><button type="button" class="primary" id="saveBtn">保存这次检查</button><button type="button" id="copyBtn">复制为文字</button><button type="button" id="printBtn">打印 / 存为 PDF</button><button type="button" id="resetBtn">清空</button><span class="saved" id="savedState">仅保存在当前浏览器</span></div>
     </form>
+
+    <section class="tool-related-posts" aria-label="相关思考与方法论">
+      <div class="tool-section-head">
+        <span class="tool-section-kicker">BACKGROUND & ESSAYS</span>
+        <h3 class="tool-section-title">工具背后的思考</h3>
+      </div>
+      <div class="tool-posts-grid">
+        <a class="tool-post-card" href="/posts/2026/07/15/paypal-value-trap-checklist/" data-track-cta data-cta-type="tool_related_article" data-placement="tool_footer">
+          <span class="tool-post-kicker">投资复盘 · 清单思维</span>
+          <h4 class="tool-post-title">一张写在投资前的检查清单</h4>
+          <p class="tool-post-desc">从一笔 PayPal 的价值陷阱，到 LITE 的小仓试错：我怎样用 EV、SIZE、EXIT 把买入前最容易跳过的问题写下来。</p>
+          <span class="tool-post-link">阅读文章 →</span>
+        </a>
+        <a class="tool-post-card" href="/posts/2026/07/10/investment-style-tight-aggressive/" data-track-cta data-cta-type="tool_related_article" data-placement="tool_footer">
+          <span class="tool-post-kicker">投资系统 · 组合管理</span>
+          <h4 class="tool-post-title">在投资中，你是「紧凶」还是「松弱」？</h4>
+          <p class="tool-post-desc">从松弱到紧凶：提高入场门槛，用角色、上限和退出规则组织风险，不再把账户开成超市。</p>
+          <span class="tool-post-link">阅读文章 →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="tool-subscribe-card" aria-label="订阅正EV实验">
+      <span class="tool-subscribe-kicker">NEWSLETTER</span>
+      <h3 class="tool-subscribe-title">订阅正EV实验</h3>
+      <p class="tool-subscribe-desc">不定期更新关于设计、投资、德州与决策的文章。无喊单，无噪音。</p>
+      <form class="subscribe-form"
+            data-track-cta
+            data-cta-type="newsletter"
+            data-placement="tool_footer"
+            action="https://buttondown.com/api/emails/embed-subscribe/shiliangbj12"
+            method="post" target="_blank">
+        <input type="email" name="email" placeholder="you@example.com" required aria-label="Email address">
+        <button type="submit">加入实验</button>
+      </form>
+    </section>
+
     <p class="bottom-note">本文工具仅为个人学习记录与决策练习，不构成任何投资建议。工具不会判断标的好坏，也不会输出目标价、建议仓位或买卖信号。投资有风险，决策需独立，盈亏请自负。</p>
   </main>
 

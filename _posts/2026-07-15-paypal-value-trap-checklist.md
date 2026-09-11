@@ -8,6 +8,7 @@ categories: [投资, 德州扑克]
 tags: [投资系统, 仓位管理, 决策清单, 期望值]
 description: "从一笔 PayPal 的价值陷阱，到 LITE 的小仓试错：我怎样用 EV、SIZE、EXIT 把买入前最容易跳过的问题写下来。"
 series: 投资系统
+related_tool: investment-checklist
 ---
 
 我买 PayPal 时，脑子里只有一句话：**都跌成这样了，还能差到哪儿去？**

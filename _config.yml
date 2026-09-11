@@ -74,4 +74,11 @@ exclude:
   - setup
   - check
   - preview
+  - AGENTS.md
+  - PROJECT.md
+  - ROADMAP.md
+  - BACKLOG.md
+  - CURRENT_SPRINT.md
+  - DECISIONS.md
+  - GA4_GUIDE.md
   - "AI 博客写作与运营解决方案 商业计划.md"

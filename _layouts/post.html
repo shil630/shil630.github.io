@@ -20,6 +20,22 @@ layout: default
     {{ content }}
   </div>
 
+  {% if page.related_tool and site.data.tools[page.related_tool] %}
+  {% assign tool = site.data.tools[page.related_tool] %}
+  <aside class="post-related-tool" aria-label="相关自建工具">
+    <div class="tool-callout-inner">
+      <div class="tool-callout-meta">
+        <span class="tool-callout-kicker" data-en="{{ tool.eyebrow_en }}" data-zh="{{ tool.eyebrow_zh }}">{{ tool.eyebrow_zh }}</span>
+        <h3 class="tool-callout-title" data-en="{{ tool.title_en }}" data-zh="{{ tool.title_zh }}">{{ tool.title_zh }}</h3>
+        <p class="tool-callout-desc" data-en="{{ tool.desc_en }}" data-zh="{{ tool.desc_zh }}">{{ tool.desc_zh }}</p>
+      </div>
+      <a class="tool-callout-btn" href="{{ tool.url | relative_url }}" data-track-cta data-cta-type="article_related_tool" data-placement="post_bottom">
+        <span data-en="{{ tool.cta_en }}" data-zh="{{ tool.cta_zh }}">{{ tool.cta_zh }}</span> →
+      </a>
+    </div>
+  </aside>
+  {% endif %}
+
   {% include subscribe.html %}
 
   {% assign show_previous = false %}

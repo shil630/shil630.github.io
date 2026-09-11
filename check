@@ -132,9 +132,24 @@ tool_ids.each do |tool_id|
     next if uri.host && uri.host != "shiliang.me"
     assert!(File.file?(File.join(build_dir, uri.path.sub(%r{\A/}, ""))), "#{tool_id} 资源不存在：#{url}")
   end
+  assert!(doc.css('form.subscribe-form').size >= 1, "#{tool_id} 缺少订阅表单")
+  assert!(doc.css('a[data-cta-type="tool_related_article"]').size >= 1, "#{tool_id} 缺少深度文章推荐")
 end
 assert!(tool_titles.uniq.size == tool_ids.size && tool_descriptions.uniq.size == tool_ids.size, "工具 title/description 必须各自独立")
-puts "✓ 三个工具的唯一元数据、GTM、事件脚本、分享图与 sitemap 正常"
+puts "✓ 三个工具的唯一元数据、GTM、事件脚本、分享图、文章推荐、订阅与 sitemap 正常"
+
+preflop_article_path = Dir.glob(File.join(build_dir, "posts", "**", "preflop-range-ev", "index.html")).first
+assert!(preflop_article_path && File.file?(preflop_article_path), "德州文章缺失")
+preflop_article = File.read(preflop_article_path, encoding: "UTF-8")
+assert!(preflop_article.include?('class="post-related-tool"'), "德州文章缺少工具 Callout")
+assert!(preflop_article.include?('/tools/preflop-range/'), "德州文章工具 Callout 目标不正确")
+
+checklist_article_path = Dir.glob(File.join(build_dir, "posts", "**", "paypal-value-trap-checklist", "index.html")).first
+assert!(checklist_article_path && File.file?(checklist_article_path), "PayPal 清单文章缺失")
+checklist_article = File.read(checklist_article_path, encoding: "UTF-8")
+assert!(checklist_article.include?('class="post-related-tool"'), "PayPal 清单文章缺少工具 Callout")
+assert!(checklist_article.include?('/tools/investment-checklist/'), "PayPal 清单文章工具 Callout 目标不正确")
+puts "✓ 文章 ⇄ 工具双向 Callout 关联验证正常"
 
 llms = File.read(File.join(build_dir, "llms.txt"), encoding: "UTF-8")
 assert!(llms.include?("# 石亮正EV"), "llms.txt 缺少主标题")
