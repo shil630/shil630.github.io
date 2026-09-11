@@ -8,6 +8,7 @@ categories: [德州, 决策系统]
 tags: [德州扑克, 翻前范围, 期望值, 决策纪律]
 description: '翻前范围不是一张“哪些牌够强”的名单，而是把位置、前序行动和筹码条件写在情绪出现之前。用一手弃掉的 AQ 和一版开池工具，记录我如何把临场判断提前写下来。'
 series: 德州
+related_tool: preflop-range
 image: '/assets/images/posts/preflop-range-ev/hand-role-conditions-blog.png'
 source_version: v1.2
 source_file: '内容项目/06-W7-翻前范围与EV/08-Blog终稿-v1.0.md'

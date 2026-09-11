@@ -35,6 +35,16 @@ tool_id: wechat-formatter
     .sidebar hr { border:0; border-top:1px solid var(--line); margin:28px 0; }
     .tip { color:#655f58; font-size:12px; line-height:1.8; }
     .tip strong { color:var(--ink); font-weight:600; }
+    .sidebar-post { margin-bottom: 10px; }
+    .sidebar-post-link { display: block; text-decoration: none; color: inherit; padding: 10px 12px; background: rgba(255,255,255,.5); border: 1px solid var(--line); border-radius: 5px; transition: border-color .15s, box-shadow .15s; }
+    .sidebar-post-link:hover { border-color: var(--red); box-shadow: 0 2px 8px rgba(30,29,27,.05); text-decoration: none; }
+    .sidebar-post-link strong { display: block; font-size: 12px; color: var(--ink); line-height: 1.45; margin-bottom: 3px; }
+    .sidebar-post-link span { display: block; font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .sidebar-subscribe { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+    .sidebar-subscribe input[type="email"] { width: 100%; padding: 8px 10px; border: 1px solid var(--sand); border-radius: 4px; background: #fff; font-size: 12px; color: var(--ink); box-sizing: border-box; }
+    .sidebar-subscribe input[type="email"]:focus { border-color: var(--red); outline: none; }
+    .sidebar-subscribe button[type="submit"] { width: 100%; padding: 8px 12px; border: 1px solid var(--red); border-radius: 4px; background: var(--red); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .sidebar-subscribe button[type="submit"]:hover { background: #9f3f31; }
     .workspace { min-width:0; padding:28px 28px 26px; display:flex; flex-direction:column; }
     .workspace-head, .preview-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
     .eyebrow { color:var(--muted); font-size:11px; letter-spacing:.12em; font-weight:600; }
@@ -86,9 +96,30 @@ tool_id: wechat-formatter
       <div class="step"><i>2</i><span>选一套配色主题<br>检查阅读节奏和重点</span></div>
       <div class="step"><i>3</i><span>复制富文本<br>粘贴进公众号编辑器</span></div>
       <hr>
-      <p class="label">这一版的原则</p>
-      <p class="tip"><strong>不是花哨模板。</strong><br>每套主题是一整套排版语言：编号、引用、列表、代码块成套变化。文章本身始终是主角。</p>
-      <p class="tip">支持标题、二三级标题、引用、列表、分隔线、图片、加粗、<code>==高亮==</code> 和代码块。表格会转成纵向信息卡。二级标题自动编号。</p>
+      <p class="label">正EV 深度长文</p>
+      <div class="sidebar-post">
+        <a class="sidebar-post-link" href="/posts/2026/07/15/paypal-value-trap-checklist/" data-track-cta data-cta-type="tool_related_article" data-placement="tool_sidebar">
+          <strong>一张写在投资前的检查清单</strong>
+          <span>从 PayPal 价值陷阱到 EV·SIZE·EXIT 清单思维</span>
+        </a>
+      </div>
+      <div class="sidebar-post">
+        <a class="sidebar-post-link" href="/posts/2026/07/09/poker-market-decision-system/" data-track-cta data-cta-type="tool_related_article" data-placement="tool_sidebar">
+          <strong>德州牌桌教会我的决策系统</strong>
+          <span>期望值、下注尺度与弃牌纪律</span>
+        </a>
+      </div>
+      <hr>
+      <p class="label">订阅正EV实验</p>
+      <form class="subscribe-form sidebar-subscribe"
+            data-track-cta
+            data-cta-type="newsletter"
+            data-placement="tool_sidebar"
+            action="https://buttondown.com/api/emails/embed-subscribe/shiliangbj12"
+            method="post" target="_blank">
+        <input type="email" name="email" placeholder="you@example.com" required aria-label="Email address">
+        <button type="submit">加入实验</button>
+      </form>
     </aside>
 
     <section class="workspace">
