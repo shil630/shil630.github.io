@@ -30,6 +30,11 @@ cleanup() {
 }
 trap cleanup EXIT
 
+if command -v node >/dev/null 2>&1; then
+  echo "→ 前端单元测试"
+  node --test tests/*.test.cjs
+fi
+
 echo "→ 生产构建"
 JEKYLL_ENV=production bundle exec jekyll build \
   --destination "$CHECK_BUILD_DIR" \
@@ -134,6 +139,12 @@ tool_ids.each do |tool_id|
   end
   assert!(doc.css('form.subscribe-form').size >= 1, "#{tool_id} 缺少订阅表单")
   assert!(doc.css('a[data-cta-type="tool_related_article"]').size >= 1, "#{tool_id} 缺少深度文章推荐")
+  if tool_id == "wechat-formatter"
+    assert!(doc.css('.mobile-header').size == 1, "wechat-formatter 缺少移动端导航条")
+    assert!(doc.css('#tabEdit').size == 1 && doc.css('#tabPreview').size == 1, "wechat-formatter 缺少移动端 Tab 控件")
+    assert!(doc.css('#tunePanel').size == 1, "wechat-formatter 缺少微调控制面板")
+    assert!(!html.include?('letter-spacing:.14em;margin-bottom:10px;">引言</span>'), "wechat-formatter 依然包含引言标签")
+  end
 end
 assert!(tool_titles.uniq.size == tool_ids.size && tool_descriptions.uniq.size == tool_ids.size, "工具 title/description 必须各自独立")
 puts "✓ 三个工具的唯一元数据、GTM、事件脚本、分享图、文章推荐、订阅与 sitemap 正常"
