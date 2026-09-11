@@ -12,84 +12,708 @@ tool_id: wechat-formatter
   <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="/assets/images/favicon.png" type="image/png">
   <style>
-    :root { --paper:#F5F1EA; --ink:#1E1D1B; --red:#B64B3B; --muted:#8D8881; --sand:#D9CFC3; --line:rgba(30,29,27,.14); }
-    * { box-sizing:border-box; }
-    body { margin:0; min-width:1080px; color:var(--ink); background:var(--paper); font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; }
-    button, textarea { font:inherit; }
-    .app { min-height:100vh; display:grid; grid-template-columns:272px minmax(420px,1fr) minmax(430px,1.12fr); }
-    .sidebar { border-right:1px solid var(--line); padding:30px 24px; background:#efe9df; }
-    .back-link { display:inline-block; margin:0 0 22px; color:var(--muted); font-size:12px; text-decoration:none; letter-spacing:.02em; }
-    .back-link:hover { color:var(--red); }
-    .brand-mark { display:flex; gap:9px; align-items:center; margin-bottom:39px; }
-    .dots { display:flex; gap:5px; align-items:center; }
-    .dot { display:block; width:9px; height:9px; border-radius:50%; background:var(--ink); }
-    .dot.red { background:var(--red); }
-    .dot.outline { background:transparent; border:1.4px solid var(--red); }
-    .brand { margin:0; font-family:"Songti SC","STSong",serif; font-weight:700; font-size:19px; letter-spacing:.02em; }
-    .tagline { margin:5px 0 0; color:var(--muted); font-size:11px; letter-spacing:.08em; }
-    .label { margin:0 0 10px; color:var(--muted); font-size:11px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; }
-    .step { display:flex; align-items:flex-start; gap:10px; margin:0 0 16px; color:#655f58; font-size:13px; line-height:1.5; }
-    .step i { width:20px; height:20px; display:grid; place-items:center; flex:0 0 auto; border:1px solid var(--sand); border-radius:50%; font-family:Georgia,serif; font-size:11px; font-style:normal; }
-    .step.active { color:var(--ink); font-weight:600; }
-    .step.active i { color:var(--paper); border-color:var(--red); background:var(--red); }
-    .sidebar hr { border:0; border-top:1px solid var(--line); margin:28px 0; }
-    .tip { color:#655f58; font-size:12px; line-height:1.8; }
-    .tip strong { color:var(--ink); font-weight:600; }
+    :root {
+      --paper: #F5F1EA;
+      --ink: #1E1D1B;
+      --red: #B64B3B;
+      --muted: #8D8881;
+      --sand: #D9CFC3;
+      --line: rgba(30, 29, 27, .14);
+      --sidebar-bg: #efe9df;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 0;
+      width: 100%;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      overflow-x: hidden;
+    }
+    button, textarea, select, input { font: inherit; }
+
+    /* Desktop Layout */
+    .mobile-header { display: none; }
+    .mobile-actions { display: none; }
+    .mobile-preview-cta { display: none; }
+    .mobile-drawer { display: none; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 272px minmax(380px, 1fr) minmax(420px, 1.15fr);
+    }
+    .sidebar {
+      border-right: 1px solid var(--line);
+      padding: 30px 24px;
+      background: var(--sidebar-bg);
+    }
+    .back-link {
+      display: inline-block;
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 12px;
+      text-decoration: none;
+      letter-spacing: .02em;
+    }
+    .back-link:hover { color: var(--red); }
+    .brand-mark {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 32px;
+    }
+    .dots {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      margin-top: 6px;
+      flex: 0 0 auto;
+    }
+    .dot {
+      display: block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--ink);
+    }
+    .dot.red { background: var(--red); }
+    .dot.outline { background: transparent; border: 1.4px solid var(--red); }
+    .brand {
+      margin: 0;
+      font-family: "Songti SC", "STSong", serif;
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 1.35;
+      letter-spacing: .02em;
+    }
+    .tagline {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      letter-spacing: .01em;
+    }
+    .label {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 0 0 16px;
+      color: #655f58;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .step i {
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid var(--sand);
+      border-radius: 50%;
+      font-family: Georgia, serif;
+      font-size: 11px;
+      font-style: normal;
+    }
+    .step.active { color: var(--ink); font-weight: 600; }
+    .step.active i { color: var(--paper); border-color: var(--red); background: var(--red); }
+    .sidebar hr { border: 0; border-top: 1px solid var(--line); margin: 26px 0; }
     .sidebar-post { margin-bottom: 10px; }
-    .sidebar-post-link { display: block; text-decoration: none; color: inherit; padding: 10px 12px; background: rgba(255,255,255,.5); border: 1px solid var(--line); border-radius: 5px; transition: border-color .15s, box-shadow .15s; }
-    .sidebar-post-link:hover { border-color: var(--red); box-shadow: 0 2px 8px rgba(30,29,27,.05); text-decoration: none; }
-    .sidebar-post-link strong { display: block; font-size: 12px; color: var(--ink); line-height: 1.45; margin-bottom: 3px; }
-    .sidebar-post-link span { display: block; font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .sidebar-post-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, .5);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .sidebar-post-link:hover {
+      border-color: var(--red);
+      box-shadow: 0 2px 8px rgba(30, 29, 27, .05);
+      text-decoration: none;
+    }
+    .sidebar-post-link strong {
+      display: block;
+      font-size: 12px;
+      color: var(--ink);
+      line-height: 1.45;
+      margin-bottom: 3px;
+    }
+    .sidebar-post-link span {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
     .sidebar-subscribe { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
-    .sidebar-subscribe input[type="email"] { width: 100%; padding: 8px 10px; border: 1px solid var(--sand); border-radius: 4px; background: #fff; font-size: 12px; color: var(--ink); box-sizing: border-box; }
+    .sidebar-subscribe input[type="email"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--sand);
+      border-radius: 4px;
+      background: #fff;
+      font-size: 12px;
+      color: var(--ink);
+      box-sizing: border-box;
+    }
     .sidebar-subscribe input[type="email"]:focus { border-color: var(--red); outline: none; }
-    .sidebar-subscribe button[type="submit"] { width: 100%; padding: 8px 12px; border: 1px solid var(--red); border-radius: 4px; background: var(--red); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .sidebar-subscribe button[type="submit"] {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--red);
+      border-radius: 4px;
+      background: var(--red);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
     .sidebar-subscribe button[type="submit"]:hover { background: #9f3f31; }
-    .workspace { min-width:0; padding:28px 28px 26px; display:flex; flex-direction:column; }
-    .workspace-head, .preview-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
-    .eyebrow { color:var(--muted); font-size:11px; letter-spacing:.12em; font-weight:600; }
-    .state { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:11px; }
-    .state b { width:6px; height:6px; border-radius:50%; background:#78966c; }
-    .toolbar { display:flex; align-items:flex-start; gap:16px; margin-bottom:14px; }
-    .insert-tools { min-width:0; display:flex; flex:1 1 auto; flex-wrap:wrap; gap:7px; }
-    .tool-btn { position:relative; padding:7px 10px; border:1px solid var(--line); border-radius:4px; color:#514c46; background:rgba(255,255,255,.32); font-size:12px; cursor:pointer; transition:border-color .16s ease,color .16s ease,background .16s ease; }
-    .tool-btn:hover { border-color:var(--red); color:var(--red); background:rgba(255,255,255,.58); }
-    .insert-btn::before { content:"+"; position:absolute; left:9px; opacity:0; transform:translateX(-4px); font-weight:700; transition:opacity .16s ease,transform .16s ease; }
-    .insert-btn span { display:inline-block; transition:transform .16s ease; }
-    .insert-btn:hover::before, .insert-btn:focus-visible::before { opacity:1; transform:translateX(0); }
-    .insert-btn:hover span, .insert-btn:focus-visible span { transform:translateX(6px); }
-    .toolbar-actions { flex:0 0 auto; display:flex; align-items:center; gap:2px; margin-left:auto; padding-left:12px; border-left:1px solid var(--line); }
-    .utility-btn { padding:7px 8px; border:0; color:var(--muted); background:transparent; }
-    .utility-btn:hover { border-color:transparent; color:var(--ink); background:rgba(30,29,27,.055); }
-    .utility-btn.danger:hover { color:var(--red); background:rgba(182,75,59,.07); }
-    .editor { flex:1; min-height:620px; resize:none; border:1px solid var(--line); border-radius:5px; outline:none; padding:22px; color:#3f3a35; background:#fffdf9; font-family:"SFMono-Regular",Consolas,monospace; font-size:13px; line-height:1.8; }
-    .editor:focus { border-color:rgba(182,75,59,.65); box-shadow:0 0 0 3px rgba(182,75,59,.08); }
-    .editor-foot { display:flex; justify-content:space-between; padding:10px 2px 0; color:var(--muted); font-size:11px; }
-    .preview-area { min-width:0; padding:28px 34px 34px; border-left:1px solid var(--line); background:#e8e1d6; }
-    .preview-actions { display:flex; align-items:center; gap:8px; }
-    .button { border:0; border-radius:4px; padding:8px 12px; color:var(--ink); background:transparent; font-size:12px; cursor:pointer; }
-    .button:hover { background:rgba(30,29,27,.06); }
-    .button.primary { color:#fffdf9; background:var(--red); }
-    .button.primary:hover { background:#9f3f31; }
-    .theme-row { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; }
-    .theme-pill { display:inline-flex; align-items:center; gap:7px; padding:6px 13px; border:1px solid var(--line); border-radius:999px; color:#514c46; background:rgba(255,255,255,.55); font-size:12px; cursor:pointer; transition:.15s ease; }
-    .theme-pill:hover { border-color:#8d8881; }
-    .theme-pill.active { border-color:var(--ink); box-shadow:inset 0 0 0 1px var(--ink); color:var(--ink); font-weight:600; }
-    .theme-dot { width:10px; height:10px; border-radius:50%; flex:0 0 auto; }
-    .article-shell { width:min(100%, 520px); min-height:650px; margin:0 auto; padding:40px 30px 48px; background:#fff; box-shadow:0 14px 35px rgba(50,43,35,.12); }
-    .phone-note { width:min(100%, 520px); margin:12px auto 0; color:#756f67; font-size:11px; text-align:center; }
-    .toast { position:fixed; z-index:5; right:28px; bottom:28px; transform:translateY(18px); opacity:0; pointer-events:none; padding:10px 13px; border-radius:4px; color:#fffdf9; background:var(--ink); font-size:12px; transition:.22s; }
-    .toast.show { transform:translateY(0); opacity:1; }
-    @media (max-width:1180px) { body { min-width:0; } .app { grid-template-columns:230px minmax(330px,1fr) minmax(380px,1fr); } .sidebar,.workspace,.preview-area { padding-left:18px; padding-right:18px; } }
+
+    /* Workspace */
+    .workspace {
+      min-width: 0;
+      padding: 28px 28px 26px;
+      display: flex;
+      flex-direction: column;
+    }
+    .workspace-head, .preview-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+    .eyebrow { color: var(--muted); font-size: 11px; letter-spacing: .12em; font-weight: 600; }
+    .state { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
+    .state b { width: 6px; height: 6px; border-radius: 50%; background: #78966c; }
+    .toolbar {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .insert-tools {
+      min-width: 0;
+      display: flex;
+      flex: 1 1 auto;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .tool-btn {
+      position: relative;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: #514c46;
+      background: rgba(255, 255, 255, .32);
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color .16s ease, color .16s ease, background .16s ease;
+    }
+    .tool-btn:hover { border-color: var(--red); color: var(--red); background: rgba(255, 255, 255, .58); }
+    .insert-btn::before {
+      content: "+";
+      position: absolute;
+      left: 9px;
+      opacity: 0;
+      transform: translateX(-4px);
+      font-weight: 700;
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .insert-btn span { display: inline-block; transition: transform .16s ease; }
+    .insert-btn:hover::before, .insert-btn:focus-visible::before { opacity: 1; transform: translateX(0); }
+    .insert-btn:hover span, .insert-btn:focus-visible span { transform: translateX(6px); }
+    .toolbar-actions {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+      padding-left: 12px;
+      border-left: 1px solid var(--line);
+    }
+    .utility-btn { padding: 7px 9px; border: 0; color: var(--muted); background: transparent; font-size: 12px; }
+    .utility-btn:hover { color: var(--ink); background: rgba(30, 29, 27, .055); }
+    .utility-btn.danger:hover { color: var(--red); background: rgba(182, 75, 59, .07); }
+    .editor {
+      flex: 1;
+      min-height: 600px;
+      resize: none;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      outline: none;
+      padding: 20px;
+      color: #3f3a35;
+      background: #fffdf9;
+      font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+      font-size: 13.5px;
+      line-height: 1.8;
+    }
+    .editor:focus { border-color: rgba(182, 75, 59, .65); box-shadow: 0 0 0 3px rgba(182, 75, 59, .08); }
+    .editor-foot {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 2px 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* Preview Area */
+    .preview-area {
+      min-width: 0;
+      padding: 28px 34px 34px;
+      border-left: 1px solid var(--line);
+      background: #e8e1d6;
+    }
+    .preview-actions { display: flex; align-items: center; gap: 8px; }
+    .button {
+      border: 0;
+      border-radius: 4px;
+      padding: 8px 12px;
+      color: var(--ink);
+      background: transparent;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background .15s, color .15s;
+    }
+    .button:hover { background: rgba(30, 29, 27, .06); }
+    .button.primary { color: #fffdf9; background: var(--red); font-weight: 600; }
+    .button.primary:hover { background: #9f3f31; }
+
+    /* Theme Bar & Tuning */
+    .theme-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 14px;
+    }
+    .theme-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .theme-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #514c46;
+      background: rgba(255, 255, 255, .55);
+      font-size: 12px;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .theme-pill:hover { border-color: #8d8881; }
+    .theme-pill.active {
+      border-color: var(--ink);
+      box-shadow: inset 0 0 0 1px var(--ink);
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .theme-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+    .tune-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border: 1px dashed var(--line);
+      border-radius: 999px;
+      color: #5d564f;
+      background: rgba(255, 255, 255, .42);
+      font-size: 11.5px;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .tune-toggle-btn:hover { border-color: var(--red); color: var(--red); background: #fff; }
+    .tune-toggle-btn.open { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    /* Tuning Panel */
+    .tune-panel {
+      margin: 0 0 18px;
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, .88);
+      border: 1px solid var(--sand);
+      border-radius: 8px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px rgba(30, 29, 27, .06);
+    }
+    .tune-panel[hidden] { display: none; }
+    .tune-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px 18px;
+    }
+    .tune-item { display: flex; flex-direction: column; gap: 6px; }
+    .tune-label { color: #625c55; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .tune-btn-group {
+      display: flex;
+      padding: 2px;
+      background: rgba(30, 29, 27, .06);
+      border-radius: 5px;
+      gap: 2px;
+    }
+    .tune-opt-btn {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      padding: 5px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #5d564f;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+      transition: background .12s, color .12s;
+    }
+    .tune-opt-btn:hover { color: var(--ink); }
+    .tune-opt-btn.active { background: #fff; color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+    .tune-color-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tune-color-picker {
+      width: 32px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--sand);
+      border-radius: 4px;
+      cursor: pointer;
+      background: transparent;
+    }
+    .tune-color-picker::-webkit-color-swatch-wrapper { padding: 2px; }
+    .tune-color-picker::-webkit-color-swatch { border-radius: 2px; border: 0; }
+    .tune-color-val { font-family: monospace; font-size: 11px; color: var(--muted); min-width: 58px; }
+    .tune-sm-btn {
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .7);
+      padding: 4px 8px;
+      font-size: 11px;
+      color: #5d564f;
+      cursor: pointer;
+      transition: .15s;
+    }
+    .tune-sm-btn:hover { color: var(--ink); border-color: #8d8881; }
+    .tune-sm-btn.danger:hover { color: var(--red); border-color: var(--red); }
+    .tune-select {
+      width: 100%;
+      padding: 5px 8px;
+      border: 1px solid var(--sand);
+      border-radius: 4px;
+      background: #fff;
+      font-size: 11.5px;
+      color: var(--ink);
+      outline: none;
+    }
+    .tune-select:focus { border-color: var(--red); }
+    .tune-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Article Shell */
+    .article-shell {
+      width: min(100%, 540px);
+      min-height: 650px;
+      margin: 0 auto;
+      padding: 40px 32px 48px;
+      background: #fff;
+      box-shadow: 0 14px 35px rgba(50, 43, 35, .12);
+      border-radius: 2px;
+      transition: font-size .15s, line-height .15s;
+    }
+    .phone-note {
+      width: min(100%, 540px);
+      margin: 14px auto 0;
+      color: #756f67;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      z-index: 999;
+      right: 28px;
+      bottom: 28px;
+      transform: translateY(18px);
+      opacity: 0;
+      pointer-events: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      color: #fffdf9;
+      background: var(--ink);
+      font-size: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .2);
+      transition: .22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* Responsive Breakpoints */
+    @media (min-width: 900px) and (max-width: 1180px) {
+      .app { grid-template-columns: 230px minmax(320px, 1fr) minmax(360px, 1fr); }
+      .sidebar, .workspace, .preview-area { padding-left: 18px; padding-right: 18px; }
+      .tune-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 899px) {
+      .app { display: block; min-height: auto; }
+      .mobile-header {
+        display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: #efe9df;
+        border-bottom: 1px solid var(--line);
+        padding: 8px 12px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        backdrop-filter: blur(10px);
+      }
+      .mobile-back {
+        color: var(--muted);
+        font-size: 12px;
+        text-decoration: none;
+        flex: 0 0 auto;
+        padding: 4px 6px;
+        border-radius: 4px;
+      }
+      .mobile-back:hover { color: var(--red); background: rgba(30,29,27,.04); }
+      .mobile-tabs {
+        display: inline-flex;
+        background: rgba(30, 29, 27, .08);
+        padding: 3px;
+        border-radius: 7px;
+        gap: 2px;
+      }
+      .mobile-tab-btn {
+        border: 0;
+        background: transparent;
+        padding: 6px 14px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #5d564f;
+        cursor: pointer;
+        transition: background .12s, color .12s;
+      }
+      .mobile-tab-btn.active {
+        background: #fff;
+        color: var(--ink);
+        font-weight: 600;
+        box-shadow: 0 1px 3px rgba(30, 29, 27, .12);
+      }
+      .mobile-stat {
+        font-size: 11px;
+        color: var(--muted);
+        flex: 0 0 auto;
+        padding-right: 4px;
+      }
+
+      /* View switching */
+      .sidebar { display: none; }
+      body.view-edit .workspace { display: flex; padding: 16px 14px 28px; }
+      body.view-edit .preview-area { display: none; }
+      body.view-preview .workspace { display: none; }
+      body.view-preview .preview-area {
+        display: block;
+        padding: 16px 12px 96px;
+        border-left: 0;
+        background: #f0eae1;
+      }
+
+      /* Workspace in mobile */
+      .workspace-head { margin-bottom: 12px; }
+      .toolbar { flex-direction: column; gap: 8px; margin-bottom: 10px; }
+      .insert-tools {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+      }
+      .insert-tools::-webkit-scrollbar { display: none; }
+      .toolbar-actions {
+        width: 100%;
+        margin-left: 0;
+        padding-left: 0;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        padding-top: 6px;
+        justify-content: flex-end;
+      }
+      .editor {
+        min-height: 52vh;
+        font-size: 14px;
+        padding: 14px;
+        line-height: 1.75;
+      }
+      .mobile-preview-cta {
+        display: block;
+        width: 100%;
+        margin-top: 14px;
+        padding: 12px;
+        border: 0;
+        border-radius: 6px;
+        background: var(--red);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+        box-shadow: 0 3px 10px rgba(182, 75, 59, .2);
+      }
+
+      /* Preview in mobile */
+      .preview-head { display: none; }
+      .theme-bar { margin-bottom: 12px; }
+      .theme-row {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+      }
+      .theme-row::-webkit-scrollbar { display: none; }
+      .theme-pill { flex: 0 0 auto; white-space: nowrap; }
+      .tune-toggle-btn { width: 100%; justify-content: center; padding: 7px; margin-top: 4px; }
+      .tune-grid { grid-template-columns: 1fr; gap: 12px; }
+      .article-shell {
+        width: 100%;
+        max-width: 100%;
+        min-height: 420px;
+        padding: 24px 16px 36px;
+        box-shadow: 0 2px 10px rgba(30, 29, 27, .06);
+        border: 1px solid var(--sand);
+      }
+
+      /* Mobile Drawer for Sidebar Content */
+      .mobile-drawer {
+        display: block;
+        margin: 24px 0 12px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+      .mobile-drawer-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        border: 1px solid var(--sand);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, .6);
+        padding: 10px 14px;
+        font-size: 12px;
+        color: var(--ink);
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .mobile-drawer-body {
+        margin-top: 12px;
+        padding: 14px;
+        background: #efe9df;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+      }
+      .mobile-drawer-body[hidden] { display: none; }
+
+      /* Bottom sticky action bar */
+      .mobile-actions {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 80;
+        background: rgba(245, 241, 234, .95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid var(--line);
+        padding: 10px 14px max(10px, env(safe-area-inset-bottom));
+        gap: 10px;
+        box-shadow: 0 -4px 18px rgba(30, 29, 27, .08);
+      }
+      .mobile-actions .button {
+        flex: 1;
+        padding: 11px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 6px;
+      }
+      .mobile-actions .button:not(.primary) {
+        background: #fff;
+        border: 1px solid var(--sand);
+        color: var(--ink);
+      }
+      .mobile-actions .button.primary {
+        flex: 1.5;
+        background: var(--red);
+        color: #fff;
+      }
+
+      /* Mobile toast */
+      .toast {
+        right: auto;
+        left: 50%;
+        bottom: 74px;
+        transform: translate(-50%, 18px);
+        max-width: 90vw;
+        white-space: nowrap;
+      }
+      .toast.show { transform: translate(-50%, 0); }
+    }
   </style>
 </head>
-<body data-content-slug="wechat-formatter">
+<body data-content-slug="wechat-formatter" class="view-edit">
+  <!-- Mobile Header Bar -->
+  <header class="mobile-header" aria-label="移动端排版器导航">
+    <a class="mobile-back" href="/tools/">← 工具</a>
+    <div class="mobile-tabs" role="tablist" aria-label="排版视图模式">
+      <button type="button" class="mobile-tab-btn active" id="tabEdit" role="tab" aria-selected="true" aria-controls="workspacePanel">原稿编辑</button>
+      <button type="button" class="mobile-tab-btn" id="tabPreview" role="tab" aria-selected="false" aria-controls="previewPanel">排版预览</button>
+    </div>
+    <span class="mobile-stat" id="mobileWordCount">0 字</span>
+  </header>
+
   <main class="app">
+    <!-- Desktop Sidebar -->
     <aside class="sidebar">
       <a class="back-link" href="/tools/">← 返回工具</a>
       <div class="brand-mark">
         <span class="dots"><b class="dot red"></b><b class="dot"></b><b class="dot outline"></b></span>
-        <div><h1 class="brand">石亮正EV</h1><p class="tagline">在不确定中，持续做更好的决策</p></div>
+        <div>
+          <h1 class="brand">公众号排版器</h1>
+          <p class="tagline">Markdown 实时预览、主题切换，一键复制适配公众号的富文本。</p>
+        </div>
       </div>
       <p class="label">文章工作流</p>
       <div class="step active"><i>1</i><span>粘贴 Markdown<br>或直接在左侧修改</span></div>
@@ -122,8 +746,12 @@ tool_id: wechat-formatter
       </form>
     </aside>
 
-    <section class="workspace">
-      <div class="workspace-head"><span class="eyebrow">01 / 编辑原稿</span><span class="state"><b></b><span id="wordCount">0 字</span></span></div>
+    <!-- Workspace (Editor) -->
+    <section class="workspace" id="workspacePanel" role="tabpanel" aria-labelledby="tabEdit">
+      <div class="workspace-head">
+        <span class="eyebrow">01 / 编辑原稿</span>
+        <span class="state"><b></b><span id="wordCount">0 字</span></span>
+      </div>
       <div class="toolbar">
         <div class="insert-tools" role="group" aria-label="插入格式">
           <button class="tool-btn insert-btn" data-insert="## 小标题" aria-label="插入二级标题"><span>二级标题</span></button>
@@ -139,16 +767,147 @@ tool_id: wechat-formatter
         </div>
       </div>
       <textarea id="source" class="editor" spellcheck="false" aria-label="Markdown 原稿"></textarea>
-      <div class="editor-foot"><span>Markdown 会实时转换</span><span>图片请用完整的 https 地址</span></div>
+      <div class="editor-foot">
+        <span>Markdown 会实时转换</span>
+        <span>图片请用完整的 https 地址</span>
+      </div>
+      <button type="button" class="mobile-preview-cta" id="mobilePreviewCta">前往预览与一键复制 →</button>
     </section>
 
-    <section class="preview-area">
-      <div class="preview-head"><span class="eyebrow">02 / 公众号预览</span><div class="preview-actions"><button class="button" id="downloadBtn">下载 HTML</button><button class="button primary" id="copyBtn">复制到公众号</button></div></div>
-      <div class="theme-row" id="themeRow" role="group" aria-label="配色主题"></div>
+    <!-- Preview Area -->
+    <section class="preview-area" id="previewPanel" role="tabpanel" aria-labelledby="tabPreview">
+      <div class="preview-head">
+        <span class="eyebrow">02 / 公众号预览</span>
+        <div class="preview-actions">
+          <button class="button" id="downloadBtn">下载 HTML</button>
+          <button class="button primary" id="copyBtn">复制到公众号</button>
+        </div>
+      </div>
+
+      <!-- Theme Row & Tuning Switch -->
+      <div class="theme-bar">
+        <div class="theme-row" id="themeRow" role="group" aria-label="配色主题"></div>
+        <button type="button" class="tune-toggle-btn" id="tuneToggleBtn" aria-expanded="false" aria-controls="tunePanel">
+          ⚙ 微调排版
+        </button>
+      </div>
+
+      <!-- Tuning Panel (Collapsible) -->
+      <div class="tune-panel" id="tunePanel" hidden>
+        <div class="tune-grid">
+          <!-- 1. 自定义主色调 -->
+          <div class="tune-item">
+            <label class="tune-label">自定义主色</label>
+            <div class="tune-color-control">
+              <input type="color" id="tuneColorPicker" class="tune-color-picker" aria-label="选取自定义主色" value="#B64B3B">
+              <span class="tune-color-val" id="tuneColorVal">默认</span>
+              <button type="button" class="tune-sm-btn" id="tuneResetColor">清除自选</button>
+            </div>
+          </div>
+          <!-- 2. 正文字号 -->
+          <div class="tune-item">
+            <label class="tune-label">正文字号</label>
+            <div class="tune-btn-group" id="tuneFontSizeGroup" role="radiogroup">
+              <button type="button" class="tune-opt-btn" data-val="15px">15px 紧凑</button>
+              <button type="button" class="tune-opt-btn active" data-val="16px">16px 标准</button>
+              <button type="button" class="tune-opt-btn" data-val="17px">17px 宽松</button>
+            </div>
+          </div>
+          <!-- 3. 字体搭配 -->
+          <div class="tune-item">
+            <label class="tune-label">字体搭配</label>
+            <div class="tune-btn-group" id="tuneFontGroup" role="radiogroup">
+              <button type="button" class="tune-opt-btn active" data-val="sans">现代黑体</button>
+              <button type="button" class="tune-opt-btn" data-val="serif">全篇宋体</button>
+              <button type="button" class="tune-opt-btn" data-val="mixed">宋体标+黑体文</button>
+            </div>
+          </div>
+          <!-- 4. 行间距 -->
+          <div class="tune-item">
+            <label class="tune-label">段落行距</label>
+            <div class="tune-btn-group" id="tuneLineHeightGroup" role="radiogroup">
+              <button type="button" class="tune-opt-btn" data-val="1.75">紧凑 1.75</button>
+              <button type="button" class="tune-opt-btn active" data-val="1.9">标准 1.90</button>
+              <button type="button" class="tune-opt-btn" data-val="2.1">疏朗 2.10</button>
+            </div>
+          </div>
+          <!-- 5. H2 标题样式 -->
+          <div class="tune-item">
+            <label class="tune-label" for="tuneH2Select">H2 标题徽章</label>
+            <select id="tuneH2Select" class="tune-select">
+              <option value="auto">跟随主题预设</option>
+              <option value="circle">圆形实心徽章 (circle)</option>
+              <option value="rule">底部细线强调 (rule)</option>
+              <option value="eyebrow-bar">侧边强调条 (eyebrow-bar)</option>
+              <option value="spaced">大号留白 (spaced)</option>
+              <option value="square">圆角方徽 (square)</option>
+              <option value="pill">胶囊徽章 (pill)</option>
+            </select>
+          </div>
+          <!-- 6. 引用块样式 -->
+          <div class="tune-item">
+            <label class="tune-label" for="tuneQuoteSelect">引用块样式</label>
+            <select id="tuneQuoteSelect" class="tune-select">
+              <option value="auto">跟随主题预设</option>
+              <option value="card">圆角底色卡片 (card)</option>
+              <option value="classic">经典左边线+底色 (classic)</option>
+              <option value="minimal">极简墨线 (minimal)</option>
+              <option value="airy">柔和无边线 (airy)</option>
+            </select>
+          </div>
+        </div>
+        <div class="tune-foot">
+          <span>微调参数已自动保存，复制或下载时同步生效</span>
+          <button type="button" class="tune-sm-btn danger" id="tuneResetAll">恢复当前主题全部默认</button>
+        </div>
+      </div>
+
+      <!-- Article Shell Preview -->
       <article id="preview" class="article-shell"></article>
       <p class="phone-note">这里模拟手机阅读宽度。粘贴后请在公众号编辑器里再检查一次图片与链接。</p>
+
+      <!-- Mobile Collapsible Section for Long Reads & Subscription -->
+      <div class="mobile-drawer">
+        <button type="button" class="mobile-drawer-toggle" id="mobileDrawerToggle" aria-expanded="false">
+          <span>关于排版器 · 推荐文章与订阅</span>
+          <span id="mobileDrawerArrow">↓</span>
+        </button>
+        <div class="mobile-drawer-body" id="mobileDrawerBody" hidden>
+          <p class="label">正EV 深度长文</p>
+          <div class="sidebar-post">
+            <a class="sidebar-post-link" href="/posts/2026/07/15/paypal-value-trap-checklist/" data-track-cta data-cta-type="tool_related_article" data-placement="tool_sidebar">
+              <strong>一张写在投资前的检查清单</strong>
+              <span>从 PayPal 价值陷阱到 EV·SIZE·EXIT 清单思维</span>
+            </a>
+          </div>
+          <div class="sidebar-post">
+            <a class="sidebar-post-link" href="/posts/2026/07/09/poker-market-decision-system/" data-track-cta data-cta-type="tool_related_article" data-placement="tool_sidebar">
+              <strong>德州牌桌教会我的决策系统</strong>
+              <span>期望值、下注尺度与弃牌纪律</span>
+            </a>
+          </div>
+          <hr style="border:0;border-top:1px solid var(--line);margin:16px 0;">
+          <p class="label">订阅正EV实验</p>
+          <form class="subscribe-form sidebar-subscribe"
+                data-track-cta
+                data-cta-type="newsletter"
+                data-placement="tool_sidebar"
+                action="https://buttondown.com/api/emails/embed-subscribe/shiliangbj12"
+                method="post" target="_blank">
+            <input type="email" name="email" placeholder="you@example.com" required aria-label="Email address">
+            <button type="submit">加入实验</button>
+          </form>
+        </div>
+      </div>
     </section>
   </main>
+
+  <!-- Mobile Fixed Bottom Actions -->
+  <div class="mobile-actions" id="mobileActions">
+    <button type="button" class="button" id="mobileDownloadBtn">下载 HTML</button>
+    <button type="button" class="button primary" id="mobileCopyBtn">复制到公众号</button>
+  </div>
+
   <div class="toast" id="toast" role="status"></div>
 
   {% include tool-scripts.html %}
@@ -188,95 +947,196 @@ tool_id: wechat-formatter
 
 本文仅为个人学习记录与方法论分享，不构成任何投资建议。`;
 
-    /* ============ 主题系统 ============
-       每套主题 = 调色板 c + 排版变体 v，成套设计而非只换色：
-       h2:  eyebrow-bar 编号眉题+左边线(衬线) / rule 编号+底部细线(衬线) / circle 实心圆徽
-            spaced 大号数字留白 / square 圆角方徽 / pill 胶囊徽
-       quote: classic 左边线+浅底 / minimal 细墨线无底(斜体) / card 圆角卡片+「引言」标签 / airy 无边线浅底圆角
-       list:  plain 原生序号 / badge 彩色圆点+实心编号圆徽
-       hr:    full 主色通栏 / short 居中短线 / hairline 灰细线 / dotted 主色虚线
-       dark:  代码块深色底                                        */
+    /* ============ 8套精选主题预设 ============
+       每套主题 = 调色板 c + 排版变体 v + 字体偏好 serif */
     const THEMES = [
       { id:'zheng-ev', name:'正EV', serif:false,
-        c:{ accent:'#B64B3B', deep:'#744033', tint:'#F5F1EA', faint:'#FBF8F3', blockBg:'#EEE6DC', border:'#D9CFC3', borderSoft:'#E8E2D9', codeBg:'#F0EAE2', strong:'#B64B3B', mark:'#F3E4CF', markText:'#7A4B2E' },
-        v:{ h2:'circle', h3:'bar', quote:'card', list:'badge', hr:'dotted', dark:'#26221E' } },
+        c:{ accent:'#B64B3B', deep:'#744033', tint:'#F5F1EA', faint:'#FBF8F3', blockBg:'#EEE6DC', border:'#D9CFC3', borderSoft:'#E8E2D9', codeBg:'#F0EAE2', strong:'#B64B3B', mark:'#F3E4CF', markText:'#7A4B2E', dark:'#26221E' },
+        v:{ h2:'circle', h3:'bar', quote:'card', list:'badge', hr:'dotted' } },
       { id:'mo-xian', name:'墨线', serif:true,
-        c:{ accent:'#3D3D3B', deep:'#1E1D1B', tint:'#F4F4F2', faint:'#FAFAF8', blockBg:'#ECECE9', border:'#D8D7D2', borderSoft:'#E9E8E4', codeBg:'#EFEFEB', strong:'#1E1D1B', mark:'#E9E9E4', markText:'#1E1D1B' },
-        v:{ h2:'rule', h3:'bar', quote:'minimal', list:'plain', hr:'short', dark:'#1E1D1B' } },
+        c:{ accent:'#3D3D3B', deep:'#1E1D1B', tint:'#F4F4F2', faint:'#FAFAF8', blockBg:'#ECECE9', border:'#D8D7D2', borderSoft:'#E9E8E4', codeBg:'#EFEFEB', strong:'#1E1D1B', mark:'#E9E9E4', markText:'#1E1D1B', dark:'#1E1D1B' },
+        v:{ h2:'rule', h3:'bar', quote:'minimal', list:'plain', hr:'short' } },
       { id:'qing-ye', name:'青野', serif:false,
-        c:{ accent:'#2E7D5B', deep:'#1D5540', tint:'#EAF6EE', faint:'#F6FBF8', blockBg:'#E4EEE7', border:'#C9DCD0', borderSoft:'#DFEAE3', codeBg:'#EAF2EC', strong:'#2E7D5B', mark:'#DDF2E4', markText:'#1D5540' },
-        v:{ h2:'circle', h3:'bar', quote:'card', list:'badge', hr:'dotted', dark:'#17332A' } },
+        c:{ accent:'#2E7D5B', deep:'#1D5540', tint:'#EAF6EE', faint:'#F6FBF8', blockBg:'#E4EEE7', border:'#C9DCD0', borderSoft:'#DFEAE3', codeBg:'#EAF2EC', strong:'#2E7D5B', mark:'#DDF2E4', markText:'#1D5540', dark:'#17332A' },
+        v:{ h2:'eyebrow-bar', h3:'bar', quote:'classic', list:'plain', hr:'full' } },
       { id:'liu-bai', name:'留白', serif:false,
-        c:{ accent:'#3B6FB4', deep:'#2A5187', tint:'#EFF4FA', faint:'#F8FAFC', blockBg:'#E5ECF4', border:'#CBD9E8', borderSoft:'#E0E8F1', codeBg:'#EAF0F6', strong:'#3B6FB4', mark:'#E3EDF8', markText:'#2A5187' },
-        v:{ h2:'spaced', h3:'bar', quote:'airy', list:'plain', hr:'hairline', dark:'#1C2B3A' } },
+        c:{ accent:'#3B6FB4', deep:'#2A5187', tint:'#EFF4FA', faint:'#F8FAFC', blockBg:'#E5ECF4', border:'#CBD9E8', borderSoft:'#E0E8F1', codeBg:'#EAF0F6', strong:'#3B6FB4', mark:'#E3EDF8', markText:'#2A5187', dark:'#1C2B3A' },
+        v:{ h2:'spaced', h3:'clean', quote:'airy', list:'plain', hr:'hairline' } },
       { id:'zi-qiong', name:'紫穹', serif:false,
-        c:{ accent:'#6D5BD0', deep:'#4C3FA0', tint:'#F3F1FA', faint:'#FAF9FD', blockBg:'#EAE6F6', border:'#D5CEEC', borderSoft:'#E4DFF3', codeBg:'#EEEBF8', strong:'#6D5BD0', mark:'#EAE4FA', markText:'#4C3FA0' },
-        v:{ h2:'square', h3:'bar', quote:'card', list:'badge', hr:'short', dark:'#262040' } },
+        c:{ accent:'#6D5BD0', deep:'#4C3FA0', tint:'#F3F1FA', faint:'#FAF9FD', blockBg:'#EAE6F6', border:'#D5CEEC', borderSoft:'#E4DFF3', codeBg:'#EEEBF8', strong:'#6D5BD0', mark:'#EAE4FA', markText:'#4C3FA0', dark:'#262040' },
+        v:{ h2:'square', h3:'bar', quote:'card', list:'badge', hr:'short' } },
       { id:'shan-hu', name:'珊瑚', serif:false,
-        c:{ accent:'#E25568', deep:'#A93844', tint:'#FDF0F2', faint:'#FDF8F8', blockBg:'#F7E6E8', border:'#EBCDD1', borderSoft:'#F3DFE2', codeBg:'#F9ECEE', strong:'#E25568', mark:'#FBE3E7', markText:'#A93844' },
-        v:{ h2:'pill', h3:'bar', quote:'card', list:'badge', hr:'dotted', dark:'#33202A' } }
+        c:{ accent:'#E25568', deep:'#A93844', tint:'#FDF0F2', faint:'#FDF8F8', blockBg:'#F7E6E8', border:'#EBCDD1', borderSoft:'#F3DFE2', codeBg:'#F9ECEE', strong:'#E25568', mark:'#FBE3E7', markText:'#A93844', dark:'#33202A' },
+        v:{ h2:'pill', h3:'bar', quote:'card', list:'badge', hr:'dotted' } },
+      { id:'hu-po', name:'琥珀', serif:true,
+        c:{ accent:'#B86A24', deep:'#7A4212', tint:'#FAF4EC', faint:'#FDFBFA', blockBg:'#F2E8D8', border:'#E2D2BD', borderSoft:'#EFE3D3', codeBg:'#F5EBDD', strong:'#B86A24', mark:'#FCEFD9', markText:'#7A4212', dark:'#2B2117' },
+        v:{ h2:'rule', h3:'bar', quote:'classic', list:'badge', hr:'short' } },
+      { id:'song-shi', name:'松石', serif:false,
+        c:{ accent:'#167B80', deep:'#0D5154', tint:'#EBF5F5', faint:'#F7FBFB', blockBg:'#DFECEC', border:'#C2DADA', borderSoft:'#DAE8E8', codeBg:'#E5F0F0', strong:'#167B80', mark:'#DDF2F2', markText:'#0D5154', dark:'#132C2D' },
+        v:{ h2:'eyebrow-bar', h3:'bar', quote:'airy', list:'plain', hr:'full' } }
     ];
+
     const THEME_KEY = 'positive-ev-wechat-theme';
+    const TUNING_KEY = 'positive-ev-wechat-tuning';
+    const DEFAULT_TUNING = {
+      customAccent: '',
+      fontSize: '16px',
+      lineHeight: '1.9',
+      fontPair: 'sans',
+      h2Style: 'auto',
+      quoteStyle: 'auto'
+    };
+
     let T = THEMES.find(t => t.id === localStorage.getItem(THEME_KEY)) || THEMES[0];
+    let TUNING = Object.assign({}, DEFAULT_TUNING);
+    try {
+      const savedTuning = JSON.parse(localStorage.getItem(TUNING_KEY));
+      if (savedTuning && typeof savedTuning === 'object') Object.assign(TUNING, savedTuning);
+    } catch {}
 
-    const headingFont = () => T.serif ? 'font-family:Songti SC,STSong,serif;' : '';
+    /* ============ 调色板与计算算法 ============ */
+    function hexToHsl(hex) {
+      let r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
+      let max = Math.max(r,g,b), min = Math.min(r,g,b);
+      let h = 0, s = 0, l = (max + min) / 2;
+      if (max !== min) {
+        let d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max){
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+    }
+    function hslToHex(h, s, l) {
+      s = Math.max(0, Math.min(100, s)) / 100;
+      l = Math.max(0, Math.min(100, l)) / 100;
+      const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2;
+      let r=0, g=0, b=0;
+      if (0 <= h && h < 60) { r=c; g=x; b=0; }
+      else if (60 <= h && h < 120) { r=x; g=c; b=0; }
+      else if (120 <= h && h < 180) { r=0; g=c; b=x; }
+      else if (180 <= h && h < 240) { r=0; g=x; b=c; }
+      else if (240 <= h && h < 300) { r=x; g=0; b=c; }
+      else if (300 <= h && h < 360) { r=c; g=0; b=x; }
+      const toHex = v => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    }
+    function computePalette(accentHex) {
+      const [h, s] = hexToHsl(accentHex);
+      const sat = Math.max(20, Math.min(75, s));
+      return {
+        accent: accentHex,
+        deep: hslToHex(h, Math.min(85, sat + 15), 22),
+        tint: hslToHex(h, Math.min(32, Math.round(sat * 0.35)), 96),
+        faint: hslToHex(h, Math.min(22, Math.round(sat * 0.2)), 98),
+        blockBg: hslToHex(h, Math.min(26, Math.round(sat * 0.3)), 92),
+        border: hslToHex(h, Math.min(28, Math.round(sat * 0.3)), 82),
+        borderSoft: hslToHex(h, Math.min(22, Math.round(sat * 0.25)), 89),
+        codeBg: hslToHex(h, Math.min(26, Math.round(sat * 0.3)), 94),
+        strong: accentHex,
+        mark: hslToHex(h, Math.min(50, Math.round(sat * 0.6)), 91),
+        markText: hslToHex(h, Math.min(85, sat + 15), 22),
+        dark: hslToHex(h, Math.min(35, Math.round(sat * 0.4)), 13)
+      };
+    }
+    function getPalette() {
+      if (TUNING.customAccent && /^#[0-9a-fA-F]{6}$/.test(TUNING.customAccent)) {
+        return computePalette(TUNING.customAccent);
+      }
+      return T.c;
+    }
+    function isSongtiHeading() {
+      if (TUNING.fontPair === 'serif' || TUNING.fontPair === 'mixed') return true;
+      if (TUNING.fontPair === 'sans') return false;
+      return T.serif;
+    }
+    function isSongtiBody() {
+      return TUNING.fontPair === 'serif';
+    }
+    const headingFont = () => isSongtiHeading() ? 'font-family:"Songti SC","STSong",serif;' : 'font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;';
+    const bodyFont = () => isSongtiBody() ? 'font-family:"Songti SC","STSong",serif;' : 'font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;';
+    function calcRelativeFont(basePx) {
+      const scale = TUNING.fontSize === '15px' ? (15/16) : (TUNING.fontSize === '17px' ? (17/16) : 1);
+      return (basePx * scale).toFixed(1) + 'px';
+    }
+
+    /* ============ Markdown 解析器 ============ */
     const esc = (text) => text.replace(/[&<>\"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
-    const inline = (text) => esc(text)
-      .replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, '<img src="$2" alt="$1" style="display:block;max-width:100%;height:auto;margin:24px auto;border-radius:2px;">')
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, `<a href="$2" style="color:${T.c.accent};text-decoration:underline;text-underline-offset:3px;">$1</a>`)
-      .replace(/==([^=\n]+)==/g, `<span style="background:${T.c.mark};color:${T.c.markText};padding:2px 5px;border-radius:3px;">$1</span>`)
-      .replace(/\*\*([^*]+)\*\*/g, `<strong style="font-weight:650;color:${T.c.strong};">$1</strong>`)
-      .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em style="font-style:italic;">$2</em>')
-      .replace(/`([^`]+)`/g, `<code style="padding:2px 5px;border-radius:3px;background:${T.c.codeBg};color:${T.c.deep};font-family:ui-monospace,monospace;font-size:.9em;">$1</code>`);
+    const inline = (text) => {
+      const C = getPalette();
+      return esc(text)
+        .replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, '<img src="$2" alt="$1" style="display:block;max-width:100%;height:auto;margin:24px auto;border-radius:2px;">')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, `<a href="$2" style="color:${C.accent};text-decoration:underline;text-underline-offset:3px;">$1</a>`)
+        .replace(/==([^=\n]+)==/g, `<span style="background:${C.mark};color:${C.markText};padding:2px 5px;border-radius:3px;">$1</span>`)
+        .replace(/\*\*([^*]+)\*\*/g, `<strong style="font-weight:650;color:${C.strong};">$1</strong>`)
+        .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em style="font-style:italic;">$2</em>')
+        .replace(/`([^`]+)`/g, `<code style="padding:2px 5px;border-radius:3px;background:${C.codeBg};color:${C.deep};font-family:ui-monospace,monospace;font-size:.9em;">$1</code>`);
+    };
 
-    function para(text) { return '<p style="margin:0 0 20px;color:#393632;font-size:16px;line-height:1.9;letter-spacing:.02em;">' + inline(text) + '</p>'; }
+    function para(text) {
+      return `<p style="margin:0 0 20px;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};letter-spacing:.02em;${bodyFont()}">${inline(text)}</p>`;
+    }
 
     function h2Block(num, content) {
       const t = inline(content);
-      switch (T.v.h2) {
-        case 'eyebrow-bar': return `<h2 style="margin:38px 0 16px;padding-left:12px;border-left:3px solid ${T.c.accent};${headingFont()}font-size:21px;line-height:1.45;font-weight:700;color:#1E1D1B;"><span style="display:block;color:${T.c.accent};font-family:Georgia,serif;font-size:12px;letter-spacing:.18em;font-weight:700;margin-bottom:6px;">${num}</span>${t}</h2>`;
-        case 'rule': return `<h2 style="margin:42px 0 18px;padding-bottom:10px;border-bottom:1px solid ${T.c.border};${headingFont()}font-size:21px;line-height:1.45;font-weight:700;color:#1E1D1B;"><span style="color:${T.c.accent};font-family:Georgia,serif;font-size:14px;font-style:italic;font-weight:400;margin-right:10px;">${num}</span>${t}</h2>`;
-        case 'circle': return `<h2 style="margin:42px 0 16px;font-size:20px;line-height:1.5;font-weight:700;color:#1E1D1B;"><span style="display:inline-block;width:34px;height:34px;line-height:34px;border-radius:50%;background:${T.c.accent};color:#fff;font-family:Georgia,serif;font-size:14px;font-weight:700;text-align:center;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
-        case 'spaced': return `<h2 style="margin:48px 0 18px;font-size:20px;line-height:1.5;font-weight:700;color:#1E1D1B;"><span style="display:block;color:${T.c.accent};font-family:Georgia,serif;font-size:26px;font-weight:400;letter-spacing:.1em;margin-bottom:4px;">${num}</span>${t}</h2>`;
-        case 'square': return `<h2 style="margin:42px 0 16px;font-size:20px;line-height:1.5;font-weight:700;color:#1E1D1B;"><span style="display:inline-block;width:34px;height:34px;line-height:34px;border-radius:9px;background:${T.c.accent};color:#fff;font-family:Georgia,serif;font-size:14px;font-weight:700;text-align:center;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
-        case 'pill': return `<h2 style="margin:42px 0 16px;font-size:20px;line-height:1.5;font-weight:700;color:#1E1D1B;"><span style="display:inline-block;min-width:44px;height:26px;line-height:26px;border-radius:999px;background:${T.c.accent};color:#fff;font-family:Georgia,serif;font-size:13px;font-weight:700;text-align:center;padding:0 6px;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
+      const vH2 = TUNING.h2Style !== 'auto' ? TUNING.h2Style : T.v.h2;
+      const C = getPalette();
+      const hFont = headingFont();
+      switch (vH2) {
+        case 'eyebrow-bar': return `<h2 style="margin:38px 0 16px;padding-left:12px;border-left:3px solid ${C.accent};${hFont}font-size:${calcRelativeFont(21)};line-height:1.45;font-weight:700;color:#1E1D1B;"><span style="display:block;color:${C.accent};font-family:Georgia,serif;font-size:12px;letter-spacing:.18em;font-weight:700;margin-bottom:6px;">${num}</span>${t}</h2>`;
+        case 'rule': return `<h2 style="margin:42px 0 18px;padding-bottom:10px;border-bottom:1px solid ${C.border};${hFont}font-size:${calcRelativeFont(21)};line-height:1.45;font-weight:700;color:#1E1D1B;"><span style="color:${C.accent};font-family:Georgia,serif;font-size:14px;font-style:italic;font-weight:400;margin-right:10px;">${num}</span>${t}</h2>`;
+        case 'circle': return `<h2 style="margin:42px 0 16px;font-size:${calcRelativeFont(20)};line-height:1.5;font-weight:700;color:#1E1D1B;${hFont}"><span style="display:inline-block;width:34px;height:34px;line-height:34px;border-radius:50%;background:${C.accent};color:#fff;font-family:Georgia,serif;font-size:14px;font-weight:700;text-align:center;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
+        case 'spaced': return `<h2 style="margin:48px 0 18px;font-size:${calcRelativeFont(20)};line-height:1.5;font-weight:700;color:#1E1D1B;${hFont}"><span style="display:block;color:${C.accent};font-family:Georgia,serif;font-size:26px;font-weight:400;letter-spacing:.1em;margin-bottom:4px;">${num}</span>${t}</h2>`;
+        case 'square': return `<h2 style="margin:42px 0 16px;font-size:${calcRelativeFont(20)};line-height:1.5;font-weight:700;color:#1E1D1B;${hFont}"><span style="display:inline-block;width:34px;height:34px;line-height:34px;border-radius:9px;background:${C.accent};color:#fff;font-family:Georgia,serif;font-size:14px;font-weight:700;text-align:center;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
+        case 'pill': return `<h2 style="margin:42px 0 16px;font-size:${calcRelativeFont(20)};line-height:1.5;font-weight:700;color:#1E1D1B;${hFont}"><span style="display:inline-block;min-width:44px;height:26px;line-height:26px;border-radius:999px;background:${C.accent};color:#fff;font-family:Georgia,serif;font-size:13px;font-weight:700;text-align:center;padding:0 6px;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
       }
     }
     function h3Block(content) {
       const t = inline(content);
-      if (T.v.h3 === 'bar') return `<h3 style="margin:27px 0 12px;padding-left:10px;border-left:3px solid ${T.c.accent};color:#1E1D1B;${headingFont()}font-size:17px;line-height:1.5;font-weight:650;">${t}</h3>`;
-      return `<h3 style="margin:27px 0 12px;color:#1E1D1B;${headingFont()}font-size:17px;line-height:1.5;font-weight:650;">${t}</h3>`;
+      const C = getPalette();
+      const hFont = headingFont();
+      if (T.v.h3 === 'bar') return `<h3 style="margin:27px 0 12px;padding-left:10px;border-left:3px solid ${C.accent};color:#1E1D1B;${hFont}font-size:${calcRelativeFont(17)};line-height:1.5;font-weight:650;">${t}</h3>`;
+      return `<h3 style="margin:27px 0 12px;color:#1E1D1B;${hFont}font-size:${calcRelativeFont(17)};line-height:1.5;font-weight:650;">${t}</h3>`;
     }
-    function quoteBlock(content, isFirst) {
+    function quoteBlock(content) {
       const t = inline(content);
-      switch (T.v.quote) {
-        case 'classic': return `<blockquote style="margin:24px 0;padding:15px 17px;border-left:3px solid ${T.c.accent};background:${T.c.tint};color:#514b44;font-size:15px;line-height:1.8;letter-spacing:.02em;">${t}</blockquote>`;
-        case 'minimal': return `<blockquote style="margin:26px 0;padding:2px 0 2px 16px;border-left:2px solid #1E1D1B;color:#514b44;font-size:15px;line-height:1.9;letter-spacing:.02em;font-style:italic;">${t}</blockquote>`;
+      const vQuote = TUNING.quoteStyle !== 'auto' ? TUNING.quoteStyle : T.v.quote;
+      const C = getPalette();
+      switch (vQuote) {
+        case 'classic': return `<blockquote style="margin:24px 0;padding:15px 17px;border-left:3px solid ${C.accent};background:${C.tint};color:#514b44;font-size:${calcRelativeFont(15)};line-height:${TUNING.lineHeight};letter-spacing:.02em;${bodyFont()}">${t}</blockquote>`;
+        case 'minimal': return `<blockquote style="margin:26px 0;padding:2px 0 2px 16px;border-left:2px solid ${C.deep};color:#514b44;font-size:${calcRelativeFont(15)};line-height:${TUNING.lineHeight};letter-spacing:.02em;font-style:italic;${bodyFont()}">${t}</blockquote>`;
         case 'card': {
-          const label = isFirst ? `<span style="display:block;color:${T.c.accent};font-size:12px;font-weight:700;letter-spacing:.14em;margin-bottom:10px;">引言</span>` : '';
-          return `<blockquote style="margin:26px 0;padding:20px 22px;border-radius:12px;background:${T.c.tint};color:#26302B;font-size:15.5px;line-height:1.9;font-weight:650;">${label}${t}</blockquote>`;
+          return `<blockquote style="margin:26px 0;padding:20px 22px;border-radius:12px;background:${C.tint};color:#26302B;font-size:${calcRelativeFont(15.5)};line-height:${TUNING.lineHeight};font-weight:650;${bodyFont()}">${t}</blockquote>`;
         }
-        case 'airy': return `<blockquote style="margin:28px 0;padding:18px 22px;border-radius:10px;background:${T.c.tint};color:#41505F;font-size:15px;line-height:1.95;letter-spacing:.02em;">${t}</blockquote>`;
+        case 'airy': return `<blockquote style="margin:28px 0;padding:18px 22px;border-radius:10px;background:${C.tint};color:#41505F;font-size:${calcRelativeFont(15)};line-height:${TUNING.lineHeight};letter-spacing:.02em;${bodyFont()}">${t}</blockquote>`;
       }
     }
     function hrBlock() {
+      const C = getPalette();
       switch (T.v.hr) {
-        case 'full': return `<div style="width:100%;border-top:1px solid ${T.c.accent};margin:34px 0 28px;"></div>`;
-        case 'short': return `<div style="width:48px;border-top:2px solid ${T.c.accent};margin:38px auto 32px;"></div>`;
-        case 'hairline': return `<div style="width:100%;border-top:1px solid ${T.c.borderSoft};margin:36px 0 30px;"></div>`;
-        case 'dotted': return `<div style="width:100%;border-top:1px dashed ${T.c.border};margin:36px 0 30px;"></div>`;
+        case 'full': return `<div style="width:100%;border-top:1px solid ${C.accent};margin:34px 0 28px;"></div>`;
+        case 'short': return `<div style="width:48px;border-top:2px solid ${C.accent};margin:38px auto 32px;"></div>`;
+        case 'hairline': return `<div style="width:100%;border-top:1px solid ${C.borderSoft};margin:36px 0 30px;"></div>`;
+        case 'dotted': return `<div style="width:100%;border-top:1px dashed ${C.border};margin:36px 0 30px;"></div>`;
       }
     }
     function codeBlock(lines) {
-      return `<section style="margin:24px 0;padding:16px 19px;border-radius:8px;border-left:3px solid ${T.c.accent};background:${T.v.dark};color:#E8E6E2;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;line-height:1.85;">` + lines.map(line => '<div style="min-height:1.85em;">' + (line.trim() ? esc(line) : '&nbsp;') + '</div>').join('') + '</section>';
+      const C = getPalette();
+      return `<section style="margin:24px 0;padding:16px 19px;border-radius:8px;border-left:3px solid ${C.accent};background:${C.dark || T.c.dark};color:#E8E6E2;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;line-height:1.85;">` + lines.map(line => '<div style="min-height:1.85em;">' + (line.trim() ? esc(line) : '&nbsp;') + '</div>').join('') + '</section>';
     }
     function renderTextBlock(lines) {
-      return `<section style="margin:24px 0;padding:18px 20px;border:1px solid ${T.c.border};border-radius:14px;background:${T.c.blockBg};color:#2F2C28;font-size:16px;line-height:1.9;letter-spacing:.015em;">` + lines.map(line => '<div style="min-height:1.9em;">' + (line.trim() ? inline(line) : '&nbsp;') + '</div>').join('') + '</section>';
+      const C = getPalette();
+      return `<section style="margin:24px 0;padding:18px 20px;border:1px solid ${C.border};border-radius:14px;background:${C.blockBg};color:#2F2C28;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};letter-spacing:.015em;${bodyFont()}">` + lines.map(line => '<div style="min-height:1.9em;">' + (line.trim() ? inline(line) : '&nbsp;') + '</div>').join('') + '</section>';
     }
     const isTableRow = (line) => /^\s*\|.+\|\s*$/.test(line) && (line.match(/\|/g) || []).length >= 3;
     const isTableDivider = (line) => /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
     const isDisclaimer = (line) => /本文仅为个人学习记录|不构成(?:任何)?投资建议/.test(line);
     function renderTable(rows) {
+      const C = getPalette();
       const cleaned = rows.filter(line => !isTableDivider(line)).map(line => line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(cell => cell.trim()));
       if (!cleaned.length) return '';
       const colCount = Math.max(...cleaned.map(row => row.length));
@@ -284,36 +1144,39 @@ tool_id: wechat-formatter
       const trs = cleaned.map((row, rowIndex) => {
         const isHeadRow = rowIndex === 0;
         const isLastRow = rowIndex === cleaned.length - 1;
-        const border = isLastRow ? '' : (isHeadRow ? `border-bottom:1px solid ${T.c.border};` : `border-bottom:1px solid ${T.c.borderSoft};`);
+        const border = isLastRow ? '' : (isHeadRow ? `border-bottom:1px solid ${C.border};` : `border-bottom:1px solid ${C.borderSoft};`);
         const cells = Array.from({length: colCount}, (_, cellIndex) => {
           const cell = row[cellIndex] || ' ';
           const isFirstCol = cellIndex === 0;
           const isHead = isHeadRow || isFirstCol;
-          const bg = isHeadRow ? T.c.tint : (isFirstCol ? T.c.faint : '#ffffff');
+          const bg = isHeadRow ? C.tint : (isFirstCol ? C.faint : '#ffffff');
           const weight = isHead ? '650' : '400';
           const align = isHeadRow ? 'center' : (isFirstCol ? 'center' : 'left');
           const widthAttr = rowIndex === 0 ? ` width="${colWidths[cellIndex]}" style="width:${colWidths[cellIndex]};` : ' style="';
-          return `<td${widthAttr}padding:12px 10px;box-sizing:border-box;background:${bg};${border}color:#302D29;font-size:13px;line-height:1.7;font-weight:${weight};text-align:${align};overflow-wrap:anywhere;word-break:break-word;vertical-align:middle;">` + inline(cell) + '</td>';
+          return `<td${widthAttr}padding:12px 10px;box-sizing:border-box;background:${bg};${border}color:#302D29;font-size:${calcRelativeFont(13)};line-height:1.7;font-weight:${weight};text-align:${align};overflow-wrap:anywhere;word-break:break-word;vertical-align:middle;${bodyFont()}">` + inline(cell) + '</td>';
         }).join('');
         return '<tr>' + cells + '</tr>';
       }).join('');
-      return `<section style="margin:24px 0;border:1px solid ${T.c.border};border-radius:6px;overflow:hidden;box-sizing:border-box;"><table style="width:100%;border-collapse:collapse;border-spacing:0;table-layout:fixed;margin:0;padding:0;background:#ffffff;box-sizing:border-box;"><tbody>${trs}</tbody></table></section>`;
+      return `<section style="margin:24px 0;border:1px solid ${C.border};border-radius:6px;overflow:hidden;box-sizing:border-box;"><table style="width:100%;border-collapse:collapse;border-spacing:0;table-layout:fixed;margin:0;padding:0;background:#ffffff;box-sizing:border-box;"><tbody>${trs}</tbody></table></section>`;
     }
     function render(md) {
       const lines = md.replace(/^---[\s\S]*?---\s*/,'').replace(/\r/g,'').split('\n');
-      let html = '', i = 0, inList = false, listType = '', listClose = '', olNum = 0, table = [], h2Num = 0, quoteNum = 0;
+      let html = '', i = 0, inList = false, listType = '', listClose = '', olNum = 0, table = [], h2Num = 0;
       const badge = T.v.list === 'badge';
+      const C = getPalette();
       const closeList = () => { if (inList) { html += listClose; inList = false; } };
-      const openList = (type) => { inList = true; listType = type; olNum = 0;
+      const openList = (type) => {
+        inList = true; listType = type; olNum = 0;
         if (badge) { html += '<section style="margin:0 0 20px;">'; listClose = '</section>'; }
-        else if (type === 'ul') { html += '<ul style="margin:0 0 20px;padding-left:1.35em;color:#393632;font-size:16px;line-height:1.9;">'; listClose = '</ul>'; }
-        else { html += '<ol style="margin:0 0 20px;padding-left:1.45em;color:#393632;font-size:16px;line-height:1.9;">'; listClose = '</ol>'; } };
+        else if (type === 'ul') { html += `<ul style="margin:0 0 20px;padding-left:1.35em;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}">`; listClose = '</ul>'; }
+        else { html += `<ol style="margin:0 0 20px;padding-left:1.45em;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}">`; listClose = '</ol>'; }
+      };
       const listItem = (type, text) => {
         if (!inList || listType !== type) { closeList(); openList(type); }
         if (badge) {
-          if (type === 'ul') html += `<p style="margin:8px 0;color:#393632;font-size:16px;line-height:1.9;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${T.c.accent};margin-right:11px;vertical-align:3px;"></span>${inline(text)}</p>`;
-          else { olNum++; html += `<p style="margin:9px 0;color:#393632;font-size:16px;line-height:1.9;"><span style="display:inline-block;width:21px;height:21px;line-height:21px;border-radius:50%;background:${T.c.accent};color:#fff;font-size:12px;font-weight:600;text-align:center;margin-right:10px;">${olNum}</span>${inline(text)}</p>`; }
-        } else html += '<li style="margin:5px 0;padding-left:3px;">' + inline(text) + '</li>';
+          if (type === 'ul') html += `<p style="margin:8px 0;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${C.accent};margin-right:11px;vertical-align:3px;"></span>${inline(text)}</p>`;
+          else { olNum++; html += `<p style="margin:9px 0;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}"><span style="display:inline-block;width:21px;height:21px;line-height:21px;border-radius:50%;background:${C.accent};color:#fff;font-size:12px;font-weight:600;text-align:center;margin-right:10px;">${olNum}</span>${inline(text)}</p>`; }
+        } else html += `<li style="margin:5px 0;padding-left:3px;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}">${inline(text)}</li>`;
       };
       const flushTable = () => { if (!table.length) return; html += renderTable(table); table = []; };
       while (i < lines.length) {
@@ -323,24 +1186,46 @@ tool_id: wechat-formatter
         if (!line.trim()) { closeList(); i++; continue; }
         const fence = line.match(/^```(\w*)\s*$/);
         if (fence) { closeList(); const block = []; i++; while (i < lines.length && !/^```\s*$/.test(lines[i])) { block.push(lines[i]); i++; } html += fence[1] === 'text' ? renderTextBlock(block) : codeBlock(block); }
-        else if (/^# (.+)/.test(line)) { closeList(); html += `<h1 style="margin:0 0 16px;color:#1E1D1B;${headingFont()}font-size:29px;line-height:1.32;font-weight:700;letter-spacing:.02em;">` + inline(line.slice(2)) + '</h1>'; }
+        else if (/^# (.+)/.test(line)) { closeList(); html += `<h1 style="margin:0 0 16px;color:#1E1D1B;${headingFont()}font-size:${calcRelativeFont(29)};line-height:1.32;font-weight:700;letter-spacing:.02em;">` + inline(line.slice(2)) + '</h1>'; }
         else if (/^## (.+)/.test(line)) { closeList(); h2Num++; html += h2Block(String(h2Num).padStart(2, '0'), line.slice(3)); }
         else if (/^### (.+)/.test(line)) { closeList(); html += h3Block(line.slice(4)); }
-        else if (/^> (.+)/.test(line)) { closeList(); quoteNum++; html += quoteBlock(line.slice(2), quoteNum === 1); }
+        else if (/^> (.+)/.test(line)) { closeList(); html += quoteBlock(line.slice(2)); }
         else if (/^---+$/.test(line)) { closeList(); html += hrBlock(); }
         else if (/^[-*] (.+)/.test(line)) { listItem('ul', line.slice(2)); }
         else if (/^\d+\. (.+)/.test(line)) { listItem('ol', line.replace(/^\d+\. /, '')); }
-        else if (isDisclaimer(line)) { closeList(); html += '<p style="margin:0 0 20px;color:#756f67;font-size:14px;line-height:1.85;letter-spacing:.02em;font-style:italic;">' + inline(line) + '</p>'; }
+        else if (isDisclaimer(line)) { closeList(); html += `<p style="margin:0 0 20px;color:#756f67;font-size:${calcRelativeFont(14)};line-height:1.85;letter-spacing:.02em;font-style:italic;${bodyFont()}">` + inline(line) + '</p>'; }
         else { closeList(); html += para(line); }
         i++;
       }
       closeList(); flushTable();
       return html || '<p style="color:#8D8881;font-size:15px;line-height:1.8;">从左侧开始写，右侧会实时预览。</p>';
     }
-    function update() { preview.innerHTML = render(source.value); $('#wordCount').textContent = (source.value.replace(/\s/g,'').length || 0) + ' 字'; localStorage.setItem('positive-ev-wechat-source', source.value); }
-    function notice(msg) { toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 2300); }
-    function insert(text) { window.toolAnalytics?.action('insert'); const start=source.selectionStart, end=source.selectionEnd; source.setRangeText((start && source.value[start-1] !== '\n' ? '\n\n' : '') + text + '\n',start,end,'end'); source.focus(); update(); }
 
+    /* ============ 界面更新与数据持久化 ============ */
+    function update() {
+      preview.innerHTML = render(source.value);
+      const count = (source.value.replace(/\s/g,'').length || 0) + ' 字';
+      $('#wordCount').textContent = count;
+      $('#mobileWordCount').textContent = count;
+      localStorage.setItem('positive-ev-wechat-source', source.value);
+    }
+    function notice(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2300);
+    }
+    function insert(text) {
+      window.toolAnalytics?.action('insert');
+      const start = source.selectionStart, end = source.selectionEnd;
+      source.setRangeText((start && source.value[start-1] !== '\n' ? '\n\n' : '') + text + '\n', start, end, 'end');
+      source.focus();
+      update();
+    }
+    function saveTuning() {
+      localStorage.setItem(TUNING_KEY, JSON.stringify(TUNING));
+    }
+
+    /* ============ 主题渲染与切换 ============ */
     const themeRow = $('#themeRow');
     THEMES.forEach(t => {
       const pill = document.createElement('button');
@@ -353,22 +1238,152 @@ tool_id: wechat-formatter
         T = t;
         localStorage.setItem(THEME_KEY, t.id);
         themeRow.querySelectorAll('.theme-pill').forEach(p => p.classList.toggle('active', p.dataset.theme === t.id));
+        syncTuningUI();
         update();
       });
       themeRow.appendChild(pill);
     });
 
+    /* ============ 微调控制面板交互 ============ */
+    const tuneToggleBtn = $('#tuneToggleBtn');
+    const tunePanel = $('#tunePanel');
+    const tuneColorPicker = $('#tuneColorPicker');
+    const tuneColorVal = $('#tuneColorVal');
+    const tuneResetColor = $('#tuneResetColor');
+    const tuneH2Select = $('#tuneH2Select');
+    const tuneQuoteSelect = $('#tuneQuoteSelect');
+    const tuneResetAll = $('#tuneResetAll');
+
+    tuneToggleBtn.addEventListener('click', () => {
+      const open = !tunePanel.hidden;
+      tunePanel.hidden = open;
+      tuneToggleBtn.classList.toggle('open', !open);
+      tuneToggleBtn.setAttribute('aria-expanded', String(!open));
+    });
+
+    function syncTuningUI() {
+      const activeColor = TUNING.customAccent || T.c.accent;
+      tuneColorPicker.value = activeColor;
+      tuneColorVal.textContent = TUNING.customAccent ? TUNING.customAccent.toUpperCase() : '主题默认';
+
+      document.querySelectorAll('#tuneFontSizeGroup .tune-opt-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.val === TUNING.fontSize);
+      });
+      document.querySelectorAll('#tuneFontGroup .tune-opt-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.val === TUNING.fontPair);
+      });
+      document.querySelectorAll('#tuneLineHeightGroup .tune-opt-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.val === TUNING.lineHeight);
+      });
+
+      tuneH2Select.value = TUNING.h2Style;
+      tuneQuoteSelect.value = TUNING.quoteStyle;
+    }
+
+    tuneColorPicker.addEventListener('input', (e) => {
+      TUNING.customAccent = e.target.value;
+      tuneColorVal.textContent = e.target.value.toUpperCase();
+      saveTuning();
+      update();
+    });
+    tuneResetColor.addEventListener('click', () => {
+      TUNING.customAccent = '';
+      tuneColorPicker.value = T.c.accent;
+      tuneColorVal.textContent = '主题默认';
+      saveTuning();
+      update();
+      notice('已恢复主题默认主色');
+    });
+
+    document.querySelectorAll('#tuneFontSizeGroup .tune-opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        TUNING.fontSize = btn.dataset.val;
+        syncTuningUI();
+        saveTuning();
+        update();
+      });
+    });
+    document.querySelectorAll('#tuneFontGroup .tune-opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        TUNING.fontPair = btn.dataset.val;
+        syncTuningUI();
+        saveTuning();
+        update();
+      });
+    });
+    document.querySelectorAll('#tuneLineHeightGroup .tune-opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        TUNING.lineHeight = btn.dataset.val;
+        syncTuningUI();
+        saveTuning();
+        update();
+      });
+    });
+
+    tuneH2Select.addEventListener('change', (e) => {
+      TUNING.h2Style = e.target.value;
+      saveTuning();
+      update();
+    });
+    tuneQuoteSelect.addEventListener('change', (e) => {
+      TUNING.quoteStyle = e.target.value;
+      saveTuning();
+      update();
+    });
+
+    tuneResetAll.addEventListener('click', () => {
+      TUNING = Object.assign({}, DEFAULT_TUNING);
+      saveTuning();
+      syncTuningUI();
+      update();
+      notice('已恢复当前主题全部默认排版');
+    });
+
+    /* ============ 移动端 Tab 模式交互 ============ */
+    const tabEdit = $('#tabEdit');
+    const tabPreview = $('#tabPreview');
+    const mobilePreviewCta = $('#mobilePreviewCta');
+    const mobileDrawerToggle = $('#mobileDrawerToggle');
+    const mobileDrawerBody = $('#mobileDrawerBody');
+    const mobileDrawerArrow = $('#mobileDrawerArrow');
+
+    function switchMobileView(view) {
+      document.body.classList.remove('view-edit', 'view-preview');
+      document.body.classList.add('view-' + view);
+      tabEdit.classList.toggle('active', view === 'edit');
+      tabEdit.setAttribute('aria-selected', String(view === 'edit'));
+      tabPreview.classList.toggle('active', view === 'preview');
+      tabPreview.setAttribute('aria-selected', String(view === 'preview'));
+      if (view === 'preview') window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    tabEdit.addEventListener('click', () => switchMobileView('edit'));
+    tabPreview.addEventListener('click', () => switchMobileView('preview'));
+    mobilePreviewCta.addEventListener('click', () => switchMobileView('preview'));
+
+    mobileDrawerToggle.addEventListener('click', () => {
+      const open = !mobileDrawerBody.hidden;
+      mobileDrawerBody.hidden = open;
+      mobileDrawerToggle.setAttribute('aria-expanded', String(!open));
+      mobileDrawerArrow.textContent = open ? '↑' : '↓';
+    });
+
+    /* ============ 编辑器与操作 ============ */
     source.value = localStorage.getItem('positive-ev-wechat-source') || sample;
     source.addEventListener('input', () => { window.toolAnalytics?.action('edit'); update(); });
-    document.querySelectorAll('[data-insert]').forEach(b=>b.addEventListener('click',()=>insert(b.dataset.insert)));
-    $('#sampleBtn').addEventListener('click',()=>{ source.value=sample; update(); notice('已载入示例原稿'); });
-    $('#clearBtn').addEventListener('click',()=>{ if (source.value && !confirm('清空当前编辑内容？')) return; source.value=''; update(); source.focus(); });
-    // 复制的富文本不带整体背景色，粘进公众号后跟随编辑器的白底
-    $('#copyBtn').addEventListener('click', async () => {
+    document.querySelectorAll('[data-insert]').forEach(b => b.addEventListener('click', () => insert(b.dataset.insert)));
+    $('#sampleBtn').addEventListener('click', () => { source.value = sample; update(); notice('已载入示例原稿'); });
+    $('#clearBtn').addEventListener('click', () => { if (source.value && !confirm('清空当前编辑内容？')) return; source.value = ''; update(); source.focus(); });
+
+    /* ============ 复制与导出 ============ */
+    async function handleCopy() {
       window.toolAnalytics?.action('copy_rich');
-      const html = '<section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:0;color:#393632;">' + preview.innerHTML + '</section>';
+      const html = `<section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:0;color:#393632;${bodyFont()}">` + preview.innerHTML + '</section>';
       try {
-        await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([preview.innerText],{type:'text/plain'})})]);
+        await navigator.clipboard.write([new ClipboardItem({
+          'text/html': new Blob([html], { type: 'text/html' }),
+          'text/plain': new Blob([preview.innerText], { type: 'text/plain' })
+        })]);
         window.toolAnalytics?.complete('copy_rich');
         notice('已复制富文本，可粘贴进公众号');
       } catch {
@@ -380,8 +1395,26 @@ tool_id: wechat-formatter
           notice('复制失败，请手动选择预览文字');
         }
       }
-    });
-    $('#downloadBtn').addEventListener('click', () => { window.toolAnalytics?.action('download_html'); const html='<!doctype html><meta charset="utf-8"><title>公众号文章</title><body style="margin:0;background:#fff;"><section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:28px 22px;color:#393632;">'+preview.innerHTML+'</section></body>'; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download='正EV-公众号排版.html'; a.click(); URL.revokeObjectURL(a.href); window.toolAnalytics?.complete('download_html'); notice('已发起 HTML 下载'); });
+    }
+
+    function handleDownload() {
+      window.toolAnalytics?.action('download_html');
+      const html = `<!doctype html><meta charset="utf-8"><title>公众号文章</title><body style="margin:0;background:#fff;"><section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:28px 22px;color:#393632;${bodyFont()}">` + preview.innerHTML + '</section></body>';
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+      a.download = '正EV-公众号排版.html';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      window.toolAnalytics?.complete('download_html');
+      notice('已发起 HTML 下载');
+    }
+
+    $('#copyBtn').addEventListener('click', handleCopy);
+    $('#mobileCopyBtn').addEventListener('click', handleCopy);
+    $('#downloadBtn').addEventListener('click', handleDownload);
+    $('#mobileDownloadBtn').addEventListener('click', handleDownload);
+
+    syncTuningUI();
     update();
   </script>
 </body>
