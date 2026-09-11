@@ -9,6 +9,7 @@ categories: [投资, 德州扑克]
 tags: [期望值, 仓位管理, 投资系统]
 description: "从阿里割肉到重建交易系统——期望值、下注尺度、弃牌纪律，三条线索如何重塑你看市场的方式。"
 series: 投资系统
+related_tool: preflop-range
 ---
 
 2020 年，我在美国留学，第一次开美股账户。
@@ -141,42 +142,3 @@ series: 投资系统
 ---
 
 *本文内容仅为个人学习记录与方法论分享，不构成任何投资建议。投资有风险，决策需独立，盈亏请自负。*
-
-### 免费工具候补
-
-我准备先做其中一份。你更需要哪一个？
-
-<div class="tool-waitlist">
-  <form class="tool-waitlist-form"
-        data-track-cta
-        data-cta-type="tool"
-        data-placement="article_footer_waitlist"
-        action="https://buttondown.com/api/emails/embed-subscribe/{{ site.buttondown_username }}"
-        method="post" target="_blank">
-    <fieldset>
-      <legend>选择你希望优先发布的工具</legend>
-      <div class="tool-options">
-        <label class="tool-option">
-          <input type="radio" name="tag" value="waitlist-investment-checklist" required>
-          <span>
-            <strong>A. 投资决策检查清单</strong>
-            <small>像翻前范围表一样，帮助你检查买入与卖出决策。</small>
-          </span>
-        </label>
-        <label class="tool-option">
-          <input type="radio" name="tag" value="waitlist-position-calculator" required>
-          <span>
-            <strong>B. 仓位计算器</strong>
-            <small>输入关键参数，用凯利公式估算建议仓位。</small>
-          </span>
-        </label>
-      </div>
-    </fieldset>
-    <div class="tool-waitlist-email">
-      <input type="email" name="email" placeholder="你的邮箱" required aria-label="邮箱地址">
-      <input type="hidden" name="embed" value="1">
-      <button type="submit">加入候补并投票</button>
-    </div>
-    <p class="tool-waitlist-note">票数更高的工具会优先制作；完成后会通过邮件第一时间发给你。</p>
-  </form>
-</div>
