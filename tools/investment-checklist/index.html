@@ -334,7 +334,15 @@ tool_id: investment-checklist
       </div>
 
       <datalist id="role-options"><option value="核心"><option value="防守"><option value="进攻"><option value="观察"><option value="小仓试错"></datalist>
-      <div class="actions"><button type="button" class="primary" id="saveBtn">保存这次检查</button><button type="button" id="copyBtn">复制为文字</button><button type="button" id="printBtn">打印 / 存为 PDF</button><button type="button" id="resetBtn">清空</button><span class="saved" id="savedState">仅保存在当前浏览器</span></div>
+      <div class="actions">
+        <button type="button" class="primary" id="saveBtn">保存这次检查</button>
+        <button type="button" id="copyMdBtn">复制 Markdown</button>
+        <button type="button" id="downloadMdBtn">下载 .md</button>
+        <button type="button" id="copyBtn">复制纯文本</button>
+        <button type="button" id="printBtn">打印 / 存为 PDF</button>
+        <button type="button" id="resetBtn">清空</button>
+        <span class="saved" id="savedState">仅保存在当前浏览器</span>
+      </div>
     </form>
 
     <section class="tool-related-posts" aria-label="相关思考与方法论">
@@ -556,6 +564,191 @@ tool_id: investment-checklist
       if (copied) window.toolAnalytics?.complete('copy_text');
       setTimeout(()=>state.textContent='仅保存在当前浏览器',2200);
     };
+    const buildFullMarkdown = () => {
+      const d = fields();
+      const asset = value(d, 'context_asset');
+      const date = value(d, 'context_date') || today();
+      const horizon = value(d, 'context_horizon');
+      const role = value(d, 'size_role');
+      const title = asset ? `投资决策检查清单 - ${asset}` : '投资决策检查清单';
+
+      const frontMatter = [
+        '---',
+        `title: "${title.replace(/"/g, '\\"')}"`,
+        `date: "${date}"`,
+        `asset: "${asset.replace(/"/g, '\\"')}"`,
+        `horizon: "${horizon.replace(/"/g, '\\"')}"`,
+        `role: "${role.replace(/"/g, '\\"')}"`,
+        'type: "investment-checklist"',
+        'mode: "full"',
+        'source: "https://shiliang.me/tools/investment-checklist/"',
+        '---',
+        ''
+      ].join('\n');
+
+      const body = [
+        `# ${title}（完整版）`, '',
+        '> 在按下买入前，先留下不容易被情绪改写的逻辑、尺度与退出条件。', '',
+        '## 00 / CONTEXT 决策背景',
+        `- **记录日期**：${date}`,
+        `- **标的 / 机会**：${asset || '（未填写）'}`,
+        `- **计划持有周期**：${horizon || '（未填写）'}`,
+        `- **当时的市场情景**：${value(d, 'context_market') || '（未填写）'}`, '',
+        '## 01 / EV 理由、风险与估值',
+        '### 一句话判断',
+        `> ${value(d, 'ev_judgement') || '（未填写核心判断）'}`, '',
+        '### 认知与差异',
+        `- **市场可能已经知道什么**：${value(d, 'ev_market_knows') || '（未填写）'}`,
+        `- **我的差异判断是什么**：${value(d, 'ev_difference') || '（未填写）'}`, '',
+        '### 5 点投资理由',
+        `1. **行业需求 / 长期方向**：${value(d, 'reason_1') || '（未填写）'}`,
+        `2. **公司地位 / 竞争优势**：${value(d, 'reason_2') || '（未填写）'}`,
+        `3. **业绩 / 订单 / 经营兑现**：${value(d, 'reason_3') || '（未填写）'}`,
+        `4. **利润率 / 现金流 / 经营改善**：${value(d, 'reason_4') || '（未填写）'}`,
+        `5. **稀缺性 / 催化 / 其他关键理由**：${value(d, 'reason_5') || '（未填写）'}`, '',
+        '### 5 个核心风险（排雷核对）',
+        `1. **估值风险**：${value(d, 'risk_1') || '（未填写）'}`,
+        `2. **客户 / 供应链集中风险**：${value(d, 'risk_2') || '（未填写）'}`,
+        `3. **行业周期 / 资本开支风险**：${value(d, 'risk_3') || '（未填写）'}`,
+        `4. **竞争 / 技术替代风险**：${value(d, 'risk_4') || '（未填写）'}`,
+        `5. **现金流 / 执行 / 其他关键风险**：${value(d, 'risk_5') || '（未填写）'}`, '',
+        '### 估值评估',
+        `- **当前估值体感**：${value(d, 'valuation_level') || '（未选择）'}`,
+        `- **参考指标**：${value(d, 'valuation_metrics') || '（未填写）'}`,
+        `- **当前价格大概计入了什么**：${value(d, 'valuation_priced_in') || '（未填写）'}`,
+        `- **什么兑现才能支撑当前估值**：${value(d, 'valuation_support') || '（未填写）'}`, '',
+        '## 02 / SIZE 组合角色与分批仓位',
+        `- **仓位角色**：${role || '（未填写）'}`,
+        `- **最大参与边界**：${value(d, 'size_limit') || '（未填写）'}`,
+        `- **为什么不是更多（不确定性约束）**：${value(d, 'size_not_more') || '（未填写）'}`,
+        `- **为什么不是更少或不参与**：${value(d, 'size_not_less') || '（未填写）'}`,
+        `- **最坏情况下，我需要承受什么**：${value(d, 'size_downside') || '（未填写）'}`, '',
+        '### 分批建仓计划',
+        '| 阶段 | 价格 / 事件条件 | 证据条件与动作 | 阶段后目标仓位 |',
+        '|---|---|---|---|',
+        `| ${value(d, 'stage_1_name') || '第一笔试探'} | ${value(d, 'stage_1_trigger') || '-'} | ${value(d, 'stage_1_action') || '-'} | ${value(d, 'stage_1_size') || '-'} |`,
+        `| ${value(d, 'stage_2_name') || '第二笔加仓'} | ${value(d, 'stage_2_trigger') || '-'} | ${value(d, 'stage_2_action') || '-'} | ${value(d, 'stage_2_size') || '-'} |`,
+        `| ${value(d, 'stage_3_name') || '第三笔核心买入'} | ${value(d, 'stage_3_trigger') || '-'} | ${value(d, 'stage_3_action') || '-'} | ${value(d, 'stage_3_size') || '-'} |`,
+        `| ${value(d, 'stage_4_name') || '深度机会'} | ${value(d, 'stage_4_trigger') || '-'} | ${value(d, 'stage_4_action') || '-'} | ${value(d, 'stage_4_size') || '-'} |`,
+        `| ${value(d, 'stage_5_name') || '不参与区'} | ${value(d, 'stage_5_trigger') || '-'} | ${value(d, 'stage_5_action') || '-'} | ${value(d, 'stage_5_size') || '0'} |`, '',
+        '## 03 / EXIT 止盈、止损与复核',
+        '### 复核与逻辑退出（止损底线）',
+        `- **固定复核时间**：${value(d, 'exit_review') || '（未填写）'}`,
+        `- **关键复核事件**：${value(d, 'exit_event') || '（未填写）'}`,
+        `- **什么证据说明逻辑不成立**：${value(d, 'exit_invalidated') || '（未填写）'}`,
+        `- **逻辑不成立时的动作**：${value(d, 'exit_logic_action') || '（未填写）'}`, '',
+        '### 止盈 / 削峰计划',
+        '| 阶段 | 价格 / 估值条件 | 基本面条件与动作 | 预计保留 |',
+        '|---|---|---|---|',
+        `| ${value(d, 'profit_1_name') || '第一目标区'} | ${value(d, 'profit_1_trigger') || '-'} | ${value(d, 'profit_1_action') || '-'} | ${value(d, 'profit_1_keep') || '-'} |`,
+        `| ${value(d, 'profit_2_name') || '第二目标区'} | ${value(d, 'profit_2_trigger') || '-'} | ${value(d, 'profit_2_action') || '-'} | ${value(d, 'profit_2_keep') || '-'} |`,
+        `| ${value(d, 'profit_3_name') || '长期持有条件'} | ${value(d, 'profit_3_trigger') || '-'} | ${value(d, 'profit_3_action') || '-'} | ${value(d, 'profit_3_keep') || '-'} |`, '',
+        '### 价格提醒与情绪纪律',
+        `- **价格情况 1**：${value(d, 'price_alert_1') || '-'} ｜ 动作：${value(d, 'price_action_1') || '-'} ｜ 仓位：${value(d, 'price_role_1') || '-'}`,
+        `- **价格情况 2**：${value(d, 'price_alert_2') || '-'} ｜ 动作：${value(d, 'price_action_2') || '-'} ｜ 仓位：${value(d, 'price_role_2') || '-'}`,
+        `- **我最容易被什么情绪牵着走**：${value(d, 'exit_emotion') || '（未填写）'}`, '',
+        '### 买入前底线检查项',
+        `- [${d.done_reasons ? 'x' : ' '}] 我没有把行业热度当成唯一理由`,
+        `- [${d.done_risks ? 'x' : ' '}] 我写了与理由同等具体的风险`,
+        `- [${d.done_valuation ? 'x' : ' '}] 我考虑了价格已经计入的预期`,
+        `- [${d.done_scale ? 'x' : ' '}] 每次加仓都有价格与证据条件`,
+        `- [${d.done_exit ? 'x' : ' '}] 我写清了什么会改变判断`, '',
+        '---',
+        '*声明：本文工具仅为个人学习记录与决策练习，不构成任何投资建议。投资有风险，决策需独立。*'
+      ].join('\n');
+
+      return frontMatter + body;
+    };
+
+    const buildSimpleMarkdown = () => {
+      const d = fields();
+      const asset = value(d, 'context_asset');
+      const date = value(d, 'context_date') || today();
+      const role = value(d, 'size_role');
+      const title = asset ? `投资决策检查清单 - ${asset}` : '投资决策检查清单';
+
+      const frontMatter = [
+        '---',
+        `title: "${title.replace(/"/g, '\\"')}"`,
+        `date: "${date}"`,
+        `asset: "${asset.replace(/"/g, '\\"')}"`,
+        `role: "${role.replace(/"/g, '\\"')}"`,
+        'type: "investment-checklist"',
+        'mode: "simple"',
+        'source: "https://shiliang.me/tools/investment-checklist/"',
+        '---',
+        ''
+      ].join('\n');
+
+      const body = [
+        `# ${title}（极简版）`, '',
+        '> 在按下买入前，先留下三段不容易被情绪改写的话。', '',
+        '## 00 / CONTEXT 决策背景',
+        `- **记录日期**：${date}`,
+        `- **标的 / 机会**：${asset || '（未填写）'}`, '',
+        '## 01 / EV 为什么值得参与？',
+        '### 一句话判断',
+        `> ${value(d, 'ev_judgement') || '（未填写核心判断）'}`, '',
+        `- **支持这个判断的关键证据**：${value(d, 'reason_1') || '（未填写）'}`,
+        `- **什么变化会让我更新判断（逻辑失效底线）**：${value(d, 'exit_invalidated') || '（未填写）'}`, '',
+        '## 02 / SIZE 为什么是这个尺度？',
+        `- **仓位角色**：${role || '（未填写）'}`,
+        `- **投入尺度的理由（哪些不确定性让我不该投更多）**：${value(d, 'size_not_more') || '（未填写）'}`,
+        `- **最坏情况下，我需要承受什么**：${value(d, 'size_downside') || '（未填写）'}`, '',
+        '## 03 / EXIT 什么会让我行动？',
+        `- **复核时间**：${value(d, 'exit_review') || '（未填写）'}`,
+        `- **逻辑不成立时的动作**：${value(d, 'exit_logic_action') || '（未填写）'}`,
+        `- **我不想被什么情绪牵着走**：${value(d, 'exit_emotion') || '（未填写）'}`, '',
+        '---',
+        '*声明：本文工具仅为个人学习记录与决策练习，不构成任何投资建议。投资有风险，决策需独立。*'
+      ].join('\n');
+
+      return frontMatter + body;
+    };
+
+    const buildMarkdown = () => mode === 'simple' ? buildSimpleMarkdown() : buildFullMarkdown();
+
+    const getFilename = () => {
+      const d = fields();
+      const asset = value(d, 'context_asset').replace(/[/\\?%*:|"<>]/g, '_').trim();
+      const date = value(d, 'context_date') || today();
+      return asset ? `投资检查清单-${asset}-${date}.md` : `投资检查清单-${date}.md`;
+    };
+
+    const copyMarkdown = async () => {
+      window.toolAnalytics?.action('copy_markdown');
+      const md = buildMarkdown();
+      let copied = false;
+      try {
+        await navigator.clipboard.writeText(md);
+        copied = true;
+        state.textContent = '已复制 Markdown';
+      } catch {
+        const helper = document.createElement('textarea');
+        helper.value = md; helper.style.position = 'fixed'; helper.style.opacity = '0';
+        document.body.appendChild(helper); helper.select();
+        const ok = document.execCommand('copy'); helper.remove();
+        copied = ok;
+        state.textContent = ok ? '已复制 Markdown' : '复制失败，请手动选择';
+      }
+      if (copied) window.toolAnalytics?.complete('copy_markdown');
+      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2200);
+    };
+
+    const downloadMarkdown = () => {
+      window.toolAnalytics?.action('download_markdown');
+      const md = buildMarkdown();
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = getFilename();
+      a.click();
+      URL.revokeObjectURL(a.href);
+      window.toolAnalytics?.complete('download_markdown');
+      state.textContent = '已发起 Markdown 下载';
+      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2200);
+    };
+
     const syncBoundField = event => {
       const target = form.querySelector(`[name="${event.currentTarget.dataset.bind}"]`);
       if (!target) return;
@@ -579,6 +772,8 @@ tool_id: investment-checklist
     });
     modeButtons.forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
     document.querySelector('#saveBtn').addEventListener('click', save);
+    document.querySelector('#copyMdBtn').addEventListener('click', copyMarkdown);
+    document.querySelector('#downloadMdBtn').addEventListener('click', downloadMarkdown);
     document.querySelector('#copyBtn').addEventListener('click', copy);
     document.querySelector('#printBtn').addEventListener('click', ()=>{
       window.toolAnalytics?.action('print');
