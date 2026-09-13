@@ -14,4 +14,64 @@
 <meta name="twitter:title" content="{{ page.title | escape }}｜{{ site.title | escape }}">
 <meta name="twitter:description" content="{{ page.description | escape }}">
 <meta name="twitter:image" content="{{ tool_image }}">
+{% assign tool_data = site.data.tools[page.tool_id] %}
+{% assign app_category = page.application_category | default: tool_data.application_category | default: "WebApplication" %}
+{% assign app_features = page.feature_list | default: tool_data.feature_list | default: page.description | default: page.title %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "{{ tool_url }}#webapp",
+      "name": {{ page.title | jsonify }},
+      "description": {{ page.description | jsonify }},
+      "url": "{{ tool_url }}",
+      "applicationCategory": {{ app_category | jsonify }},
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CNY"
+      },
+      "author": {
+        "@type": "Person",
+        "name": {{ site.author | jsonify }},
+        "url": "{{ '/about/' | absolute_url }}"
+      },
+      "inLanguage": "zh-CN",
+      "image": "{{ tool_image }}",
+      "featureList": {{ app_features | jsonify }},
+      "permissions": "无需特殊权限，纯浏览器本地运行，数据不上传服务器"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "{{ tool_url }}#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "首页",
+          "item": "{{ '/' | absolute_url }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "工具",
+          "item": "{{ '/tools/' | absolute_url }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ page.title | jsonify }},
+          "item": "{{ tool_url }}"
+        }
+      ]
+    }
+  ]
+}
+</script>
 {% include analytics.html %}
+
