@@ -70,3 +70,13 @@ test('development is silent, existing queue is preserved, analytics failures are
   const broken = boot('preflop-range', true, { push() { throw new Error('blocked'); } });
   assert.doesNotThrow(() => broken.toolAnalytics.complete('copy_range'));
 });
+
+test('investment-checklist correctly records copy_markdown and download_markdown', () => {
+  const w = boot('investment-checklist');
+  w.toolAnalytics.complete('copy_markdown');
+  w.toolAnalytics.complete('download_markdown');
+  const actionNames = events(w).filter(e => e[1] === 'tool_complete').map(e => e[2].action);
+  assert.deepEqual(actionNames, ['copy_markdown', 'download_markdown']);
+});
+
+

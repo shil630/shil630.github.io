@@ -178,6 +178,10 @@ tool_ids.each do |tool_id|
   end
   assert!(doc.css('form.subscribe-form').size >= 1, "#{tool_id} 缺少订阅表单")
   assert!(doc.css('a[data-cta-type="tool_related_article"]').size >= 1, "#{tool_id} 缺少深度文章推荐")
+  if tool_id == "investment-checklist"
+    assert!(doc.css('#copyMdBtn').size == 1, "investment-checklist 缺少复制 Markdown 按钮")
+    assert!(doc.css('#downloadMdBtn').size == 1, "investment-checklist 缺少下载 Markdown 按钮")
+  end
   if tool_id == "wechat-formatter"
     assert!(doc.css('.mobile-header').size == 1, "wechat-formatter 缺少移动端导航条")
     assert!(doc.css('#tabEdit').size == 1 && doc.css('#tabPreview').size == 1, "wechat-formatter 缺少移动端 Tab 控件")
