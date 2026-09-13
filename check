@@ -44,6 +44,8 @@ echo "→ 关键产物检查"
 bundle exec ruby - "$CHECK_BUILD_DIR" <<'RUBY'
 require "nokogiri"
 require "uri"
+require "json"
+
 build_dir = ARGV.fetch(0)
 
 required_pages = {
@@ -92,7 +94,11 @@ assert!(article.include?('<article class="post wrap" lang="zh">'), "文章正文
 end
 
 featured_count = home.scan('class="featured-card"').length
-tool_ids = %w[investment-checklist wechat-formatter preflop-range]
+tool_dirs = Dir.glob(File.join(build_dir, "tools", "*", "index.html")).map do |path|
+  File.basename(File.dirname(path))
+end
+tool_ids = tool_dirs.sort
+assert!(tool_ids.size >= 3, "工具目录少于预期：#{tool_ids.inspect}")
 tool_titles = []
 tool_descriptions = []
 sitemap = File.read(File.join(build_dir, "sitemap.xml"))
@@ -124,6 +130,39 @@ tool_ids.each do |tool_id|
     assert!(value && !value.strip.empty? && (!expected || value == expected), "#{tool_id} #{selector} 值不正确")
   end
   tool_descriptions << head.at_css('meta[name="description"]')["content"]
+
+  # JSON-LD (WebApplication + BreadcrumbList) 结构化数据深度断言
+  ld_json_nodes = head.css('script[type="application/ld+json"]')
+  assert!(ld_json_nodes.size == 1, "#{tool_id} application/ld+json 脚本必须恰好有 1 个")
+  schema = JSON.parse(ld_json_nodes.first.text)
+  assert!(schema["@context"] == "https://schema.org", "#{tool_id} JSON-LD @context 必须为 https://schema.org")
+  graph = schema["@graph"]
+  assert!(graph.is_a?(Array) && graph.size >= 2, "#{tool_id} JSON-LD 必须包含 @graph 数组且至少有 2 个实体")
+
+  webapp = graph.find { |node| node["@type"] == "WebApplication" }
+  assert!(webapp, "#{tool_id} 缺少 WebApplication 结构化数据")
+  assert!(webapp["@id"] == "#{canonical}#webapp", "#{tool_id} WebApplication @id 必须为 #{canonical}#webapp")
+  assert!(webapp["name"] && !webapp["name"].strip.empty?, "#{tool_id} WebApplication 缺少 name")
+  assert!(webapp["description"] && !webapp["description"].strip.empty?, "#{tool_id} WebApplication 缺少 description")
+  assert!(webapp["url"] == canonical, "#{tool_id} WebApplication url 必须匹配 canonical")
+  assert!(webapp["applicationCategory"] && !webapp["applicationCategory"].strip.empty?, "#{tool_id} WebApplication 缺少 applicationCategory")
+  assert!(webapp["operatingSystem"] == "All", "#{tool_id} WebApplication operatingSystem 必须为 All")
+  assert!(webapp["browserRequirements"] == "Requires JavaScript. Requires HTML5.", "#{tool_id} WebApplication browserRequirements 声明不正确")
+  assert!(webapp["isAccessibleForFree"] == true, "#{tool_id} WebApplication isAccessibleForFree 必须为 true")
+  assert!(webapp.dig("offers", "@type") == "Offer" && webapp.dig("offers", "price") == "0", "#{tool_id} WebApplication offers 必须为免费 Offer")
+  assert!(webapp.dig("author", "@type") == "Person" && webapp.dig("author", "name") == "石亮 / Liang Shi", "#{tool_id} WebApplication author 声明不正确")
+  assert!(webapp["permissions"] && webapp["permissions"].include?("浏览器本地运行"), "#{tool_id} WebApplication permissions 必须包含本地运行隐私声明")
+  assert!(webapp["featureList"] && !webapp["featureList"].strip.empty?, "#{tool_id} WebApplication featureList 缺少功能特性清单")
+
+  breadcrumbs = graph.find { |node| node["@type"] == "BreadcrumbList" }
+  assert!(breadcrumbs, "#{tool_id} 缺少 BreadcrumbList 结构化数据")
+  assert!(breadcrumbs["@id"] == "#{canonical}#breadcrumb", "#{tool_id} BreadcrumbList @id 必须为 #{canonical}#breadcrumb")
+  crumbs = breadcrumbs["itemListElement"]
+  assert!(crumbs.is_a?(Array) && crumbs.size == 3, "#{tool_id} BreadcrumbList 必须恰好有 3 级导航")
+  assert!(crumbs[0]["position"] == 1 && crumbs[0]["name"] == "首页" && crumbs[0]["item"] == "https://shiliang.me/", "#{tool_id} 面包屑第 1 级（首页）不正确")
+  assert!(crumbs[1]["position"] == 2 && crumbs[1]["name"] == "工具" && crumbs[1]["item"] == "https://shiliang.me/tools/", "#{tool_id} 面包屑第 2 级（工具）不正确")
+  assert!(crumbs[2]["position"] == 3 && crumbs[2]["name"] == webapp["name"] && crumbs[2]["item"] == canonical, "#{tool_id} 面包屑第 3 级（具体工具）不正确")
+
   assert!(html.scan("googletagmanager.com/gtm.js").size == 1, "#{tool_id} GTM 缺失或重复")
   trackers = doc.css('script[src^="/assets/js/tool-analytics.js"]')
   assert!(trackers.size == 1 && trackers.first['data-tool-id'] == tool_id && trackers.first['data-measurement-id'] == 'G-MQH963M94G', "#{tool_id} 工具埋点配置不正确")
@@ -147,7 +186,8 @@ tool_ids.each do |tool_id|
   end
 end
 assert!(tool_titles.uniq.size == tool_ids.size && tool_descriptions.uniq.size == tool_ids.size, "工具 title/description 必须各自独立")
-puts "✓ 三个工具的唯一元数据、GTM、事件脚本、分享图、文章推荐、订阅与 sitemap 正常"
+puts "✓ 工具的唯一元数据、JSON-LD (WebApplication + BreadcrumbList)、GTM、事件脚本、分享图、文章推荐、订阅与 sitemap 正常"
+
 
 preflop_article_path = Dir.glob(File.join(build_dir, "posts", "**", "preflop-range-ev", "index.html")).first
 assert!(preflop_article_path && File.file?(preflop_article_path), "德州文章缺失")

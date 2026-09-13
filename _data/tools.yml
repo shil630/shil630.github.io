@@ -9,6 +9,8 @@ investment-checklist:
   desc_en: "EV · SIZE · EXIT — write down your reasons before you commit."
   cta_zh: "打开检查清单"
   cta_en: "Open checklist"
+  application_category: "FinanceApplication"
+  feature_list: "EV/SIZE/EXIT 三步决策记录、仓位与止损纪律、本地草稿保存、一键复制纯文本、打印排版优化、纯客户端运行保护隐私"
 
 preflop-range:
   id: "preflop-range"
@@ -21,6 +23,8 @@ preflop-range:
   desc_en: "View, edit and copy position-based opening ranges for a no-limped pot."
   cta_zh: "打开范围工具"
   cta_en: "Open tool"
+  application_category: "GameApplication"
+  feature_list: "8人桌全位置翻前范围矩阵、200BB+ 筹码深度开池策略、交互式范围自定与编辑、一键复制文本/矩阵、纯本地运行"
 
 wechat-formatter:
   id: "wechat-formatter"
@@ -33,3 +37,6 @@ wechat-formatter:
   desc_en: "Turn Markdown into themed rich text, preview it live, and copy it into WeChat."
   cta_zh: "打开排版器"
   cta_en: "Open tool"
+  application_category: "DesignApplication"
+  feature_list: "Markdown 实时解析、8套精选配色主题、自定义排版微调、一键复制公众号富文本、HTML 导出、纯本地离线处理"
+
