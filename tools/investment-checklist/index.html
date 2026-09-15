@@ -63,10 +63,25 @@ tool_id: investment-checklist
     textarea.compact { min-height:74px; }
     input:focus, textarea:focus, select:focus { border-color:var(--red); box-shadow:0 0 0 3px rgba(182,75,59,.08); }
     .five-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .three-pillars { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
     .numbered { position:relative; }
     .numbered b { position:absolute; left:10px; top:11px; color:var(--red); font:700 12px Georgia,serif; }
     .numbered textarea { padding-left:34px; }
     .numbered.wide { grid-column:1 / -1; }
+    .premortem-card { border-left:3px solid var(--red); background:rgba(182,75,59,.038); padding:18px 20px; border-radius:0 6px 6px 0; margin-bottom:8px; border-top:1px solid rgba(182,75,59,.12); border-right:1px solid rgba(182,75,59,.12); border-bottom:1px solid rgba(182,75,59,.12); }
+    .premortem-title { margin:0 0 6px; font-family:"Songti SC","STSong",serif; font-size:17px; color:var(--red); font-weight:700; display:flex; align-items:center; gap:6px; }
+    .premortem-note { margin:0 0 14px; font-size:12px; color:#6b5d52; line-height:1.65; }
+    .risk-hard-cap { display:grid; grid-template-columns:1fr 1.15fr 1.15fr; gap:14px; }
+    .samples-bar { display:flex; align-items:center; gap:12px; margin:22px 0 6px; padding:12px 16px; border:1px solid var(--sand); border-radius:7px; background:rgba(255,255,255,.45); }
+    .samples-label { color:var(--muted); font-size:12px; white-space:nowrap; letter-spacing:.04em; }
+    .samples-buttons { display:flex; gap:10px; flex-wrap:wrap; }
+    .sample-btn { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--sand); border-radius:5px; padding:7px 12px; background:#fffdf9; cursor:pointer; font-size:12px; text-align:left; transition:all .15s ease; color:var(--ink); }
+    .sample-btn:hover { border-color:var(--red); box-shadow:0 2px 6px rgba(30,29,27,.07); transform:translateY(-1px); }
+    .sample-btn strong { font-weight:650; color:var(--ink); font-size:13px; }
+    .sample-btn small { color:var(--muted); font-size:11px; margin-left:2px; }
+    .sample-badge { display:inline-block; border-radius:3px; padding:2px 6px; font-size:10px; font-weight:600; letter-spacing:.04em; }
+    .sample-badge.warn { background:#fae8e5; color:var(--red); }
+    .sample-badge.success { background:#e2ede5; color:#2d6a4f; }
     .plan { display:grid; gap:8px; }
     .plan-row { display:grid; grid-template-columns:110px 1.25fr 1.35fr .8fr; gap:8px; align-items:start; }
     .plan-row.head { color:var(--muted); font-size:11px; padding:0 4px 3px; }
@@ -87,11 +102,14 @@ tool_id: investment-checklist
       .mode-toggle { flex:0 0 auto; }
       .mode-button { min-width:74px; padding:7px 8px; font-size:12px; }
       .mode-button small { display:none; }
+      .samples-bar { flex-direction:column; align-items:flex-start; gap:9px; padding:12px 14px; }
+      .samples-buttons { width:100%; flex-direction:column; gap:8px; }
+      .sample-btn { width:100%; justify-content:flex-start; }
       .steps { gap:6px; }
       .step { padding:11px 9px; font-size:11px; }
       .step strong { font-size:13px; }
       .panel { padding:20px 15px; }
-      .fields, .five-grid { grid-template-columns:1fr; }
+      .fields, .five-grid, .three-pillars, .risk-hard-cap { grid-template-columns:1fr; }
       label.full, .numbered.wide { grid-column:auto; }
       .plan-row, .exit-row { grid-template-columns:1fr; padding:13px; border:1px solid #e7ded4; border-radius:5px; background:var(--soft); }
       .plan-row.head { display:none; }
@@ -149,7 +167,23 @@ tool_id: investment-checklist
       <h2 id="introTitle">在按下买入前，先留下三段不容易被情绪改写的话。</h2>
     </section>
 
-    <div class="steps"><div class="step"><strong>01 · EV</strong>理由、风险与估值</div><div class="step"><strong>02 · SIZE</strong>角色与分批仓位</div><div class="step"><strong>03 · EXIT</strong>止盈、止损与复核</div></div>
+    <div class="samples-bar" role="region" aria-label="实战范例载入">
+      <span class="samples-label">官方实战范例：</span>
+      <div class="samples-buttons">
+        <button type="button" class="sample-btn" id="loadPaypalSampleBtn" data-sample="paypal">
+          <span class="sample-badge warn">反面教材</span>
+          <strong>PayPal 价值陷阱</strong>
+          <small>便宜 ≠ 安全 · 缺乏 EXIT</small>
+        </button>
+        <button type="button" class="sample-btn" id="loadLiteSampleBtn" data-sample="lite">
+          <span class="sample-badge success">正面示范</span>
+          <strong>LITE 小仓试错</strong>
+          <small>FOMO 情绪下的仓位克制</small>
+        </button>
+      </div>
+    </div>
+
+    <div class="steps"><div class="step"><strong>01 · EV</strong>命题、支柱与事前验尸</div><div class="step"><strong>02 · SIZE</strong>角色、硬顶与亏损预算</div><div class="step"><strong>03 · EXIT</strong>失效出场、削峰与冷静</div></div>
 
     <form id="checklist">
       <div id="simpleChecklist">
@@ -158,41 +192,43 @@ tool_id: investment-checklist
           <p class="panel-note">留一点背景，避免以后只用结果改写记忆。</p>
           <div class="fields">
             <label>记录日期<input type="date" data-bind="context_date"></label>
-            <label>标的 / 机会<input data-bind="context_asset" placeholder="可以写代码，也可以写匿名名称"></label>
+            <label>标的 / 机会<input data-bind="context_asset" placeholder="代码或名称，例如：NVDA / 腾讯"></label>
           </div>
         </section>
 
         <section class="panel">
-          <div class="panel-head"><span class="panel-num">01 / EV</span><h3>为什么值得参与？</h3></div>
-          <p class="panel-note">先写判断、证据和可能推翻它的事实。愿望不算证据。</p>
+          <div class="panel-head"><span class="panel-num">01 / EV</span><h3>核心命题与事前验尸</h3></div>
+          <p class="panel-note">反过来想，总是反过来想。写可以被推翻的命题，愿望不算论据。</p>
           <div class="fields">
-            <label class="full">我的一句话判断<textarea data-bind="ev_judgement" placeholder="写成可以被未来证据推翻的一句话，不写“长期看好”。"></textarea></label>
-            <label>支持这个判断的一条关键证据<textarea data-bind="reason_1" placeholder="事实、数据或可跟踪的变化。"></textarea></label>
-            <label>什么变化会让我更新判断？<textarea data-bind="exit_invalidated" placeholder="写业务或行业事实，不只写跌幅。"></textarea></label>
+            <label class="full">我的一句话核心命题<textarea data-bind="ev_judgement" placeholder="写成可以被未来证据推翻的一句话，不写“长期看好”。"></textarea></label>
+            <div class="premortem-card full" style="grid-column:1/-1;">
+              <h4 class="premortem-title">🔥 Pre-mortem 事前验尸（致命排雷）</h4>
+              <p class="premortem-note">假设 1 年后这笔投资暴跌 50%，最致命、最可能的原因是什么？</p>
+              <textarea data-bind="ev_premortem" placeholder="写清哪项核心假设破灭、竞争恶化或不可逆逆风会杀死这笔投资。"></textarea>
+            </div>
           </div>
         </section>
 
         <section class="panel">
-          <div class="panel-head"><span class="panel-num">02 / SIZE</span><h3>为什么是这个尺度？</h3></div>
-          <p class="panel-note">看好不等于重仓。先找角色，再承认这笔投入的边界。</p>
-          <div class="fields">
-            <label>仓位角色<input data-bind="size_role" list="role-options" placeholder="例如：核心 / 防守 / 进攻 / 小仓试错"></label>
-            <label>投入尺度的理由<textarea data-bind="size_not_more" placeholder="哪些不确定性让我不该投得更多？"></textarea></label>
-            <label class="full">最坏情况下，我需要承受什么？<textarea data-bind="size_downside" placeholder="资金、流动性、注意力和心理状态会受什么影响？"></textarea></label>
+          <div class="panel-head"><span class="panel-num">02 / SIZE</span><h3>仓位硬顶与最大容忍亏损</h3></div>
+          <p class="panel-note">看好不等于重仓。先锁定亏损上限，再谈盈利可能。</p>
+          <div class="fields risk-hard-cap">
+            <label>仓位角色<input data-bind="size_role" list="role-options" placeholder="例如：核心 / 进攻 / 试错 / 防守"></label>
+            <label>仓位硬顶上限 (Hard Cap)<input data-bind="size_hard_cap" placeholder="例如：总资金严卡 5% 上限"></label>
+            <label>最大容忍亏损 (Max Pain)<input data-bind="size_max_pain" placeholder="例如：跌超 15% 或亏损达 ¥20,000"></label>
           </div>
         </section>
 
         <section class="panel">
-          <div class="panel-head"><span class="panel-num">03 / EXIT</span><h3>什么会让我行动？</h3></div>
-          <p class="panel-note">退出不是只在下跌时才想。提前写下来，情绪上来时才有东西可以照着看。</p>
+          <div class="panel-head"><span class="panel-num">03 / EXIT</span><h3>逻辑失效与出场约束</h3></div>
+          <p class="panel-note">退出由逻辑和纪律决定，不由肉体痛感决定。</p>
           <div class="fields">
-            <label>复核时间<input data-bind="exit_review" placeholder="例如：下次财报后 / 每季度 / 某个日期"></label>
-            <label>逻辑不成立时的动作<textarea data-bind="exit_logic_action" placeholder="暂停新增 / 降级为观察仓 / 减仓 / 退出"></textarea></label>
-            <label class="full">我不想被什么情绪牵着走？<textarea data-bind="exit_emotion" placeholder="卖飞、不甘心、怕错过、急于回本……"></textarea></label>
+            <label class="full">出现什么反向信号，我必须立即离场？<textarea data-bind="exit_invalidated" placeholder="写业务/财务恶化的客观事实，不只写跌幅。出现时坚决认错出场。"></textarea></label>
+            <label class="full">我不想被什么情绪牵着走？<textarea data-bind="exit_emotion" placeholder="怕错过主线（FOMO）、不甘心认错、急于回本、越跌越补……"></textarea></label>
           </div>
         </section>
 
-        <p class="simple-upgrade"><strong>什么时候切到完整版？</strong>当你已经决定进一步研究，想把 5 个理由、5 个风险、估值、分批仓位和削峰计划写完整时，再切过去。</p>
+        <p class="simple-upgrade"><strong>什么时候切到完整版？</strong>当你打算正式建仓或做深入研究，想把 3 大支柱事实、估值透支核对、两段式建仓加仓纪律与削峰规则写完整时，再切过去。</p>
       </div>
 
       <div id="fullChecklist">
@@ -203,132 +239,117 @@ tool_id: investment-checklist
           <label>记录日期<input type="date" name="context_date"></label>
           <label>标的 / 机会<input name="context_asset" placeholder="可以写代码，也可以写匿名名称"></label>
           <label>计划持有周期<input name="context_horizon" placeholder="例如：事件观察 / 中期趋势 / 长期核心"></label>
-          <label>当时的市场情景<input name="context_market" placeholder="例如：板块火热，我担心错过主线"></label>
+          <label>当时的市场情景与自身情绪<input name="context_market" placeholder="例如：板块火热怕踏空，或暴跌后觉得便宜想抄底"></label>
         </div>
       </section>
 
       <section class="panel">
-        <div class="panel-head"><span class="panel-num">01 / EV</span><h3>这件事为什么值得参与？</h3></div>
-        <p class="panel-note">理由、风险和估值缺一块，都不代表不能参与；但需要让仓位承认这种不完整。</p>
+        <div class="panel-head"><span class="panel-num">01 / EV</span><h3>这件事为什么值得参与？（证伪与排雷）</h3></div>
+        <p class="panel-note">核心命题、支柱事实与逆向事前验尸缺一不可。愿望不算论据，反思才能保命。</p>
 
         <div class="subsection">
-          <h4 class="subhead"><span>A</span>一句话判断</h4>
+          <h4 class="subhead"><span>A</span>一句话核心命题与预期差</h4>
           <div class="fields">
             <label class="full">如果只能留一句话，我在判断什么？<textarea name="ev_judgement" placeholder="写成可以被未来证据推翻的一句话，不写“长期看好”。"></textarea></label>
-            <label>市场可能已经知道什么？<textarea name="ev_market_knows" placeholder="价格为什么会处在这里？市场在担心或期待什么？"></textarea></label>
-            <label>我的差异判断是什么？<textarea name="ev_difference" placeholder="我与当前市场隐含判断真正不同的地方在哪里？"></textarea></label>
+            <label>市场当前已经知道了什么？<textarea name="ev_market_knows" placeholder="价格为什么处在当前位置？市场在担心或期待什么？"></textarea></label>
+            <label>我的差异判断是什么？<textarea name="ev_difference" placeholder="我与当前市场共识真正不同的地方在哪里？为什么市场可能看错？"></textarea></label>
           </div>
         </div>
 
         <div class="subsection">
-          <h4 class="subhead"><span>B</span>5 点投资理由</h4>
-          <p class="hint">优先写事实、数据或可跟踪的变化。五项不必凑满，重复的理由只算一项。</p>
-          <div class="five-grid reason-fields">
-            <label class="numbered"><b>01</b><textarea class="compact" name="reason_1" placeholder="行业需求 / 长期方向"></textarea></label>
-            <label class="numbered"><b>02</b><textarea class="compact" name="reason_2" placeholder="公司地位 / 竞争优势"></textarea></label>
-            <label class="numbered"><b>03</b><textarea class="compact" name="reason_3" placeholder="业绩 / 订单 / 经营兑现"></textarea></label>
-            <label class="numbered"><b>04</b><textarea class="compact" name="reason_4" placeholder="利润率 / 现金流 / 经营改善"></textarea></label>
-            <label class="numbered wide"><b>05</b><textarea class="compact" name="reason_5" placeholder="稀缺性 / 催化 / 其他关键理由"></textarea></label>
+          <h4 class="subhead"><span>B</span>3 条不可替代的支柱事实</h4>
+          <p class="hint">优先写硬核事实、数据与订单验证。多于 3 条大多是在换皮重复同一论据。</p>
+          <div class="three-pillars reason-fields">
+            <label class="numbered"><b>01</b><textarea class="compact" name="reason_1" placeholder="支柱一：需求扩张 / 产业周期硬事实"></textarea></label>
+            <label class="numbered"><b>02</b><textarea class="compact" name="reason_2" placeholder="支柱二：竞争壁垒 / 不可替代性证据"></textarea></label>
+            <label class="numbered"><b>03</b><textarea class="compact" name="reason_3" placeholder="支柱三：财务真实兑现 / 自由现金流支撑"></textarea></label>
           </div>
         </div>
 
         <div class="subsection">
-          <h4 class="subhead"><span>C</span>5 个核心风险</h4>
-          <p class="hint">不要只写“市场波动”。尽量写清风险通过什么路径伤害收入、利润、现金流或估值。</p>
-          <div class="five-grid risk-fields">
-            <label class="numbered"><b>01</b><textarea class="compact" name="risk_1" placeholder="估值风险"></textarea></label>
-            <label class="numbered"><b>02</b><textarea class="compact" name="risk_2" placeholder="客户 / 供应链集中风险"></textarea></label>
-            <label class="numbered"><b>03</b><textarea class="compact" name="risk_3" placeholder="行业周期 / 资本开支风险"></textarea></label>
-            <label class="numbered"><b>04</b><textarea class="compact" name="risk_4" placeholder="竞争 / 技术替代风险"></textarea></label>
-            <label class="numbered wide"><b>05</b><textarea class="compact" name="risk_5" placeholder="现金流 / 执行 / 其他关键风险"></textarea></label>
+          <div class="premortem-card">
+            <h4 class="premortem-title">🔥 Pre-mortem 事前验尸（致命隐患排雷）</h4>
+            <p class="premortem-note">反过来想，总是反过来想：<strong>假设 1 年后这笔投资暴跌 50%，最致命、最可能的原因是什么？</strong>提前把最坏的死因摆在桌面上。</p>
+            <div class="fields">
+              <label class="full">最致命的排雷点与崩盘隐患<textarea name="ev_premortem" placeholder="写清哪项核心假设破灭、竞争替代、大客户流失或利润率崩塌会杀死这笔投资。"></textarea></label>
+              <label class="full">终局止损信号（Kill Switch）<input name="ev_kill_switch" placeholder="哪一个确凿的恶化信号出现时，宣告核心命题被彻底击穿，必须立刻无条件出场？"></label>
+            </div>
           </div>
         </div>
 
         <div class="subsection">
-          <h4 class="subhead"><span>D</span>估值评估</h4>
-          <p class="hint">估值不是精确目标价。这里记录价格已经透支了多少预期，以及什么兑现才能支撑它。</p>
+          <h4 class="subhead"><span>C</span>估值透支与安全边际核对</h4>
+          <p class="hint">估值不是精确目标价。记录价格透支了多少乐观预期，以及怎样的经营逆风会击穿底线。</p>
           <div class="fields">
             <label>当前估值体感<select name="valuation_level"><option value="">请选择</option><option>明显偏贵</option><option>中性偏贵</option><option>大致合理</option><option>中性偏低</option><option>明显偏低</option><option>暂时无法判断</option></select></label>
-            <label>参考指标<input name="valuation_metrics" placeholder="例如：PE / PS / P-FCF / FCF yield / 同业比较"></label>
-            <label>当前价格大概计入了什么？<textarea name="valuation_priced_in" placeholder="市场已经提前计入了几年增长、怎样的利润率或行业份额？"></textarea></label>
-            <label>什么兑现才能支撑当前估值？<textarea name="valuation_support" placeholder="写经营条件，不只写“股价继续涨”。"></textarea></label>
+            <label>参考估值指标<input name="valuation_metrics" placeholder="例如：PE / PS / P-FCF / FCF yield / EV-EBITDA / 同业对比"></label>
+            <label>当前价格大概透支了什么超级预期？<textarea name="valuation_priced_in" placeholder="市场已经提前计入了几年翻倍增长、怎样的利润率提升或垄断份额？"></textarea></label>
+            <label>什么样的经营逆风会击穿安全边际？<textarea name="valuation_support" placeholder="写具体经营底线条件，不只写“股价不能跌”。"></textarea></label>
           </div>
         </div>
       </section>
 
       <section class="panel">
-        <div class="panel-head"><span class="panel-num">02 / SIZE</span><h3>它在组合里负责什么？</h3></div>
-        <p class="panel-note">分批计划不是越跌越买。每一笔新增都需要价格条件和证据条件同时成立。</p>
-        <div class="fields">
-          <label>仓位角色<input name="size_role" list="role-options" placeholder="例如：核心 / 防守 / 进攻 / 小仓试错"></label>
-          <label>最大参与边界<input name="size_limit" placeholder="由自己定义；可以写模糊范围，不要求具体比例"></label>
-          <label>为什么不是更多？<textarea name="size_not_more" placeholder="哪些不确定性限制了仓位？"></textarea></label>
-          <label>为什么不是更少或不参与？<textarea name="size_not_less" placeholder="为什么值得保留一点参与权？"></textarea></label>
-          <label class="full">最坏情况下，我需要承受什么？<textarea name="size_downside" placeholder="资金、流动性、注意力、相关仓位和心理状态分别会受到什么影响？"></textarea></label>
+        <div class="panel-head"><span class="panel-num">02 / SIZE</span><h3>组合角色与硬纪律边界</h3></div>
+        <p class="panel-note">看好不等于重仓。用硬顶上限（Hard Cap）和最大容忍亏损约束贪婪，严禁越跌越买。</p>
+        <div class="fields risk-hard-cap">
+          <label>仓位角色<input name="size_role" list="role-options" placeholder="核心底仓 / 战术进攻 / 观察试错 / 防守对冲"></label>
+          <label>仓位硬顶上限 (Hard Cap)<input name="size_hard_cap" placeholder="例如：无论多看好，总仓位严卡 5% 上限"></label>
+          <label>最大容忍亏损 (Max Pain)<input name="size_max_pain" placeholder="例如：跌超 18% 或亏损达 ¥20,000 触发终局止损"></label>
+        </div>
+        <div class="fields" style="margin-top:14px;">
+          <label>为什么不是更多？<textarea name="size_not_more" placeholder="哪些不可控的不确定性或行业周期限制了仓位？"></textarea></label>
+          <label>为什么不是更少或不参与？<textarea name="size_not_less" placeholder="为什么值得保留一定比例的参与权与跟踪权？"></textarea></label>
+          <label class="full">最坏情况下，我需要承受什么？<textarea name="size_downside" placeholder="资金回撤、流动性冻结、心理压力以及对其他持仓的影响分别是什么？"></textarea></label>
         </div>
 
         <div class="subsection">
-          <h4 class="subhead"><span>A</span>分批建仓计划</h4>
-          <p class="hint">“价格到了”不等于“自动加仓”。证据没有改善时，可以选择不动。</p>
+          <h4 class="subhead"><span>A</span>务实的两段式建仓与加仓纪律</h4>
+          <p class="hint">严禁纯因“股价下跌”而盲目加仓补仓。加仓必须满足：有新证据进一步强化逻辑，且加仓后绝不突破 Hard Cap。</p>
           <div class="plan">
-            <div class="plan-row head"><span>阶段</span><span>价格 / 事件条件</span><span>证据条件与动作</span><span>阶段后仓位</span></div>
-            <div class="plan-row"><input name="stage_1_name" value="第一笔试探" aria-label="第一阶段名称"><input name="stage_1_trigger" placeholder="价格或事件条件" aria-label="第一阶段触发条件"><input name="stage_1_action" placeholder="需要什么证据，做什么动作" aria-label="第一阶段动作"><input name="stage_1_size" placeholder="仓位" aria-label="第一阶段后仓位"></div>
-            <div class="plan-row"><input name="stage_2_name" value="第二笔加仓" aria-label="第二阶段名称"><input name="stage_2_trigger" placeholder="价格或事件条件" aria-label="第二阶段触发条件"><input name="stage_2_action" placeholder="需要什么证据，做什么动作" aria-label="第二阶段动作"><input name="stage_2_size" placeholder="仓位" aria-label="第二阶段后仓位"></div>
-            <div class="plan-row"><input name="stage_3_name" value="第三笔核心买入" aria-label="第三阶段名称"><input name="stage_3_trigger" placeholder="价格或事件条件" aria-label="第三阶段触发条件"><input name="stage_3_action" placeholder="需要什么证据，做什么动作" aria-label="第三阶段动作"><input name="stage_3_size" placeholder="仓位" aria-label="第三阶段后仓位"></div>
-            <div class="plan-row"><input name="stage_4_name" value="深度机会" aria-label="第四阶段名称"><input name="stage_4_trigger" placeholder="价格或事件条件" aria-label="第四阶段触发条件"><input name="stage_4_action" placeholder="需要什么证据，做什么动作" aria-label="第四阶段动作"><input name="stage_4_size" placeholder="仓位" aria-label="第四阶段后仓位"></div>
-            <div class="plan-row"><input name="stage_5_name" value="不参与区" aria-label="不参与阶段名称"><input name="stage_5_trigger" placeholder="什么情况下不追 / 不新增" aria-label="不参与阶段触发条件"><input name="stage_5_action" placeholder="等待什么新证据" aria-label="不参与阶段动作"><input name="stage_5_size" value="0" aria-label="不参与阶段仓位"></div>
+            <div class="plan-row head"><span>阶段</span><span>价格 / 事件触发条件</span><span>必须验证的基本面事实与动作</span><span>阶段后仓位 (≤ Hard Cap)</span></div>
+            <div class="plan-row"><input name="entry_1_name" value="首笔试探" aria-label="首笔阶段名称"><input name="entry_1_trigger" placeholder="触发条件（如：公告落地 / 回调到合理估值）" aria-label="首笔触发条件"><input name="entry_1_action" placeholder="轻仓介入，核对财报与关键数据" aria-label="首笔动作"><input name="entry_1_size" placeholder="目标仓位（如 2%）" aria-label="首笔后仓位"></div>
+            <div class="plan-row"><input name="entry_2_name" value="强化追加" aria-label="追加阶段名称"><input name="entry_2_trigger" placeholder="新证据强化条件（严禁纯因下跌而补）" aria-label="追加触发条件"><input name="entry_2_action" placeholder="逻辑被新数据验证后，补齐至上限，锁死不再加" aria-label="追加动作"><input name="entry_2_size" placeholder="上限仓位（如 5%）" aria-label="追加后仓位"></div>
           </div>
         </div>
       </section>
 
       <section class="panel">
-        <div class="panel-head"><span class="panel-num">03 / EXIT</span><h3>什么新证据会让我行动？</h3></div>
-        <p class="panel-note">把止盈、价格提醒和逻辑退出分开。价格触发复核，基本面决定动作。</p>
+        <div class="panel-head"><span class="panel-num">03 / EXIT</span><h3>什么新证据会让我行动？（出场与冷静）</h3></div>
+        <p class="panel-note">把逻辑退出、削峰再平衡和情绪预警分开。价格触发复核，基本面决定动作。</p>
 
         <div class="subsection">
-          <h4 class="subhead"><span>A</span>复核与逻辑退出</h4>
+          <h4 class="subhead"><span>A</span>复核与逻辑退出（止损底线）</h4>
           <div class="fields">
-            <label>固定复核时间<input name="exit_review" placeholder="例如：每季度 / 下次财报后 / 某个日期"></label>
-            <label>关键复核事件<input name="exit_event" placeholder="例如：订单、指引、产品节点、行业资本开支"></label>
-            <label>什么证据说明逻辑不成立？<textarea name="exit_invalidated" placeholder="写业务或行业事实，不只写跌幅。"></textarea></label>
-            <label>逻辑不成立时的动作<textarea name="exit_logic_action" placeholder="暂停新增 / 降级为观察仓 / 减仓 / 退出"></textarea></label>
+            <label>固定复核时间点<input name="exit_review" placeholder="例如：每季度财报后 / 客户开发者大会后 / 某个固定日期"></label>
+            <label>关键复核事件<input name="exit_event" placeholder="例如：订单指引更新、产品交付节点、毛利率变动"></label>
+            <label class="full">什么证据说明原核心命题已不成立？<textarea name="exit_invalidated" placeholder="写客观业务事实或数据反转，不只写跌幅。"></textarea></label>
+            <label class="full">逻辑不成立时的果断动作<textarea name="exit_logic_action" placeholder="果断清仓认错 / 降级为观察仓 / 绝不补仓找借口"></textarea></label>
           </div>
         </div>
 
         <div class="subsection">
-          <h4 class="subhead"><span>B</span>止盈 / 削峰计划</h4>
-          <p class="hint">止盈不等于猜顶部。可以是估值透支、仓位超限或上涨但基本面没有同步上修。</p>
-          <div class="plan">
-            <div class="plan-row head"><span>阶段</span><span>价格 / 估值条件</span><span>基本面条件与动作</span><span>预计保留</span></div>
-            <div class="plan-row"><input name="profit_1_name" value="第一目标区" aria-label="第一止盈阶段名称"><input name="profit_1_trigger" placeholder="价格或估值条件" aria-label="第一止盈阶段触发条件"><input name="profit_1_action" placeholder="基本面未上修时如何削峰" aria-label="第一止盈阶段动作"><input name="profit_1_keep" placeholder="保留仓位" aria-label="第一止盈阶段保留仓位"></div>
-            <div class="plan-row"><input name="profit_2_name" value="第二目标区" aria-label="第二止盈阶段名称"><input name="profit_2_trigger" placeholder="价格或估值条件" aria-label="第二止盈阶段触发条件"><input name="profit_2_action" placeholder="到达后如何处理" aria-label="第二止盈阶段动作"><input name="profit_2_keep" placeholder="保留仓位" aria-label="第二止盈阶段保留仓位"></div>
-            <div class="plan-row"><input name="profit_3_name" value="长期持有条件" aria-label="长期持有阶段名称"><input name="profit_3_trigger" placeholder="需要持续满足的经营条件" aria-label="长期持有阶段触发条件"><input name="profit_3_action" placeholder="满足 / 不满足时分别怎么做" aria-label="长期持有阶段动作"><input name="profit_3_keep" placeholder="角色或仓位" aria-label="长期持有阶段保留仓位"></div>
+          <h4 class="subhead"><span>B</span>止盈 / 削峰再平衡纪律</h4>
+          <p class="hint">止盈不等于猜顶部。当估值严重透支，或暴涨导致持仓市值被动突破 Hard Cap 时，按规则削峰。</p>
+          <div class="fields">
+            <label>估值透支削峰规则<textarea name="profit_rule_1" placeholder="例如：估值涨至 35x PE 以上削峰 1/2，收回全部本金，剩余利润奔跑。"></textarea></label>
+            <label>仓位超限削峰规则<textarea name="profit_rule_2" placeholder="例如：单标的因暴涨市值占比突破 8% 时，被动削减至 5% 上限，再平衡至防守资产。"></textarea></label>
           </div>
         </div>
 
         <div class="subsection">
-          <h4 class="subhead"><span>C</span>价格提醒与情绪</h4>
-          <div class="exit-row">
-            <input name="price_alert_1" placeholder="价格情况 1" aria-label="第一价格提醒情况">
-            <input name="price_action_1" placeholder="先复核什么，再做什么" aria-label="第一价格提醒动作">
-            <input name="price_role_1" placeholder="仓位动作" aria-label="第一价格提醒仓位动作">
-          </div>
-          <div class="exit-row" style="margin-top:8px">
-            <input name="price_alert_2" placeholder="价格情况 2" aria-label="第二价格提醒情况">
-            <input name="price_action_2" placeholder="先复核什么，再做什么" aria-label="第二价格提醒动作">
-            <input name="price_role_2" placeholder="仓位动作" aria-label="第二价格提醒仓位动作">
-          </div>
-          <div class="fields" style="margin-top:15px">
-            <label class="full">我最容易被什么情绪牵着走？<textarea name="exit_emotion" placeholder="怕错过主线、卖飞、不甘心、急于回本、想证明自己……"></textarea></label>
+          <h4 class="subhead"><span>C</span>情绪自省与物理降温</h4>
+          <div class="fields">
+            <label class="full">买入前强制自问：我最容易被什么冲动情绪牵着走？<textarea name="exit_emotion" placeholder="怕错过主线（FOMO）、跌了不甘心想摊薄成本、急于回本、想证明自己比市场聪明……"></textarea></label>
           </div>
         </div>
 
         <div class="check-row">
-          <label class="check"><input type="checkbox" name="done_reasons"> 我没有把行业热度当成唯一理由</label>
-          <label class="check"><input type="checkbox" name="done_risks"> 我写了与理由同等具体的风险</label>
-          <label class="check"><input type="checkbox" name="done_valuation"> 我考虑了价格已经计入的预期</label>
-          <label class="check"><input type="checkbox" name="done_scale"> 每次加仓都有价格与证据条件</label>
-          <label class="check"><input type="checkbox" name="done_exit"> 我写清了什么会改变判断</label>
+          <label class="check"><input type="checkbox" name="done_hypothesis"> 我写出了可被证伪的核心命题，而非空洞“长期看好”</label>
+          <label class="check"><input type="checkbox" name="done_premortem"> 我完成了 Pre-mortem 事前验尸，正视了亏损 50% 的死因</label>
+          <label class="check"><input type="checkbox" name="done_hard_cap"> 我锁死了仓位硬顶上限（Hard Cap）与最大容忍亏损</label>
+          <label class="check"><input type="checkbox" name="done_no_averaging_down"> 我确立了加仓纪律，绝不纯因股价下跌而盲目补仓</label>
+          <label class="check"><input type="checkbox" name="done_exit"> 我写清了退出条件，给未来的情绪冲动立下了硬规矩</label>
         </div>
       </section>
       </div>
@@ -390,8 +411,9 @@ tool_id: investment-checklist
     const state = document.querySelector('#savedState');
     const introTitle = document.querySelector('#introTitle');
     const modeButtons = [...document.querySelectorAll('.mode-button')];
-    const KEY = 'positive-ev-investment-checklist-v3';
+    const KEY = 'positive-ev-investment-checklist-v4';
     const MODE_KEY = 'positive-ev-investment-checklist-mode';
+    const LEGACY_V3_KEY = 'positive-ev-investment-checklist-v3';
     const LEGACY_V2_KEY = 'positive-ev-investment-checklist-v2';
     const LEGACY_V1_KEY = 'positive-ev-investment-checklist-v1';
     let mode = localStorage.getItem(MODE_KEY) === 'full' ? 'full' : 'simple';
@@ -438,19 +460,169 @@ tool_id: investment-checklist
       syncSimpleFromFull();
       if (savePreference) localStorage.setItem(MODE_KEY, mode);
     };
+
+    const SAMPLES = {
+      paypal: {
+        __title: 'PayPal 价值陷阱（反面教材）',
+        context_date: '2026-07-15',
+        context_asset: 'PayPal (PYPL)',
+        context_horizon: '中期价值修复（预设）',
+        context_market: '股价较历史高点回撤超 70%，市场极度悲观甚至出现 dead company 叙事；我觉得估值总该修复。',
+        ev_judgement: '【反思教训】当时仅凭“都跌成这样了还能差到哪儿去”买入，把低估值误当成安全边际，缺乏真正的证伪意识。',
+        ev_market_knows: 'Apple Pay 等快捷结账持续侵蚀市场份额；Braintree 非品牌处理量占比高但费率极低；活跃用户增速停滞。',
+        ev_difference: '【误判点】当时误以为品牌双边网络与 4 亿活跃账户具有永久护城河，低估了移动端无感结账对独立按钮的替代速度。',
+        reason_1: '全球双边网络，活跃账户数超 4 亿，海外独立站与商户覆盖深度仍处头部。',
+        reason_2: '年产生 40-50 亿美元真实自由现金流，账面现金充裕，管理层持续进行大额回购。',
+        reason_3: 'P/E 与 P/FCF 估值落入历史最低 5% 分位数，看似赔率极佳。',
+        ev_premortem: '【致命隐患】品牌结账按钮在移动端被 Apple Pay/Shop Pay 彻底边缘化；商户因结账转化率差距放弃主推；自由现金流被低毛利业务稀释导致估值锚永久下移。',
+        ev_kill_switch: '核心品牌结账量连续两个季度负增长，或交易毛利率跌破 45%。',
+        valuation_level: '明显偏低',
+        valuation_metrics: 'P/FCF < 12x, EV/EBITDA < 9x',
+        valuation_priced_in: '计入了零增长、长期份额流失与利润率永久受损。',
+        valuation_support: '必须有扎实证据表明核心品牌结账量企稳且交易净费率停止恶化。',
+        size_role: '核心底仓（错误配置）',
+        size_hard_cap: '当时未设硬顶，越跌越买加至 15%+（正确做法：严卡 5% 上限）',
+        size_max_pain: '当时无止损预算，最终承受 >40% 痛苦浮亏（正确做法：设 15% 终局止损）',
+        size_not_more: '当时完全被低估值冲昏头脑，未把竞争格局的动态演化当成限制仓位的边界。',
+        size_not_less: '觉得太便宜，舍不得少买，误把贪婪当成贪便宜。',
+        size_downside: '不仅承受大幅本金亏损，还长期套牢流动性，导致错失其他优质机会，心态彻底失衡。',
+        entry_1_name: '首笔试探',
+        entry_1_trigger: '$70-$75 区间草率建仓',
+        entry_1_action: '在未确认竞争止血的前提下，凭借“便宜”即大仓位进场',
+        entry_1_size: '初始即达 8%（严重超标）',
+        entry_2_name: '错误补仓',
+        entry_2_trigger: '股价跌至 $60, $55 时越跌越买',
+        entry_2_action: '每跌一段就给自己的错误找借口：品牌还在、总会反弹',
+        entry_2_size: '被动加仓至 15%+',
+        exit_review: '当时未设定固定复核周期，完全由账户肉体痛感驱动',
+        exit_event: '季度财报中品牌结账量与毛利率变动',
+        exit_invalidated: '核心品牌结账份额加速流失，商业模式遭遇不可逆侵蚀',
+        exit_logic_action: '最终在情绪扛不住时痛感割肉（教训：本应在证据转坏时坚决出场）',
+        profit_rule_1: '当时只幻想估值修复至历史中枢，未制定任何削峰锁定本金计划',
+        profit_rule_2: '无',
+        exit_emotion: '【贪婪与不甘】把便宜当安全；深套后心存侥幸不肯认错；总想靠加仓拉低成本迅速回本。',
+        done_hypothesis: false,
+        done_premortem: false,
+        done_hard_cap: false,
+        done_no_averaging_down: false,
+        done_exit: false
+      },
+      lite: {
+        __title: 'LITE 小仓试错（正面示范）',
+        context_date: '2026-07-15',
+        context_asset: 'Lumentum (LITE)',
+        context_horizon: '中期趋势观察 / 小仓试错',
+        context_market: 'AI 光通信板块极其火热，自身出现明显 FOMO（害怕错过主线）情绪。',
+        ev_judgement: 'Lumentum 受益于 800G/1.6T 光互连需求放量，NVIDIA 战略协议将锁定未来 4-6 季度业绩高增长。',
+        ev_market_knows: 'AI 数据中心光互连需求爆发已获市场充分共识，股价短期自低位翻倍，估值已透支乐观预期。',
+        ev_difference: '市场担忧非英伟达客户资本开支波动，但我认为战略合作中的联合投资与产能绑定具备极高的业绩确定性。',
+        reason_1: '产业合作硬事实：NVIDIA 与 Lumentum 宣布多年战略合作，包含明确的采购承诺与联合投资安排。',
+        reason_2: '真实财务兑现：FY2026 Q3 收入达 8.084 亿美元（同比 +90.1%），Non-GAAP 营业利润率达 32.2%，高增长在报表中兑现。',
+        reason_3: '核心器件壁垒：在高端 EML / CW 光源芯片领域具备稀缺产能与工艺护城河。',
+        ev_premortem: '【事前验尸】下游云厂商 AI 资本开支周期性收缩，或 NVIDIA 扶持二供、三供导致光器件陷入价格战，利润率从 32% 骤降至 15% 以下。',
+        ev_kill_switch: '单季度出货量环比下滑超 20%，或核心客户宣布引入其他排他性替代方案。',
+        valuation_level: '中性偏贵',
+        valuation_metrics: '动态 PE > 28x, PS > 6x',
+        valuation_priced_in: '已提前透支未来 1 年产能拉满、单价坚挺的最乐观场景。',
+        valuation_support: '季度收入必须保持环比增长且营业利润率维持在 30% 以上。',
+        size_role: '观察试错仓（Test Position）',
+        size_hard_cap: '总资金严卡 3% 上限（绝不因 FOMO 或短期暴涨加成重仓）',
+        size_max_pain: '最大容忍浮亏 18% 或绝对金额不超过 ¥15,000，触及无条件止损',
+        size_not_more: '估值偏高、客户集中度高、周期波动大，任何经营微瑕都会引发剧烈杀估值。',
+        size_not_less: '具备硬事实与真实业绩兑现的主线机会，值得保留少量筹码保持敏感度。',
+        size_downside: '即便遭遇 20% 极端跌幅，对总账户净值影响仅约 0.5%，完全不伤筋骨，心态平和。',
+        entry_1_name: '首笔试探',
+        entry_1_trigger: '约 $900 附近（战略合作公告发布后）',
+        entry_1_action: '轻仓试探介入，建立跟踪链接，等待 Q3 真实财报验证',
+        entry_1_size: '1.5%',
+        entry_2_name: '强化追加',
+        entry_2_trigger: '价格回调至约 $800，且 Q3 财报确认利润率超预期达 32.2%',
+        entry_2_action: '业绩兑现得到新数据验证后，小幅补齐至上限，随后锁死不再加仓',
+        entry_2_size: '3.0%（已达 Hard Cap）',
+        exit_review: '每季度财报后及主要客户重大发布会节点',
+        exit_event: '季度出货指引及光芯片综合毛利率变动',
+        exit_invalidated: '毛利率跌破 25% 或战略采购协议执行出现松动',
+        exit_logic_action: '果断清仓离场，绝不以“AI 长期前景好”为借口死扛',
+        profit_rule_1: '若股价短期再涨 40% 导致动态 PE > 40x，削峰减持 1/2 收回本金',
+        profit_rule_2: '若单标的因暴涨市值占比突破 4.5%，被动削减至 3% 试错上限，再平衡至现金',
+        exit_emotion: '【FOMO 与自满】警惕在行业最火热时把试探仓擅自加成重仓；警惕涨起来后误以为自己懂光芯片。',
+        done_hypothesis: true,
+        done_premortem: true,
+        done_hard_cap: true,
+        done_no_averaging_down: true,
+        done_exit: true
+      }
+    };
+
+    const migrateData = data => {
+      if (!data) return {};
+      if (data.__version === 4) return data;
+      const migrated = { ...data, __version: 4 };
+      if (!migrated.ev_premortem && (data.risk_1 || data.size_downside)) {
+        migrated.ev_premortem = [data.risk_1, data.risk_2].filter(Boolean).join('；') || data.size_downside || '';
+      }
+      if (!migrated.size_hard_cap && data.size_limit) {
+        migrated.size_hard_cap = data.size_limit;
+      }
+      if (!migrated.entry_1_trigger && data.stage_1_trigger) {
+        migrated.entry_1_name = data.stage_1_name || '首笔试探';
+        migrated.entry_1_trigger = data.stage_1_trigger;
+        migrated.entry_1_action = data.stage_1_action;
+        migrated.entry_1_size = data.stage_1_size;
+      }
+      if (!migrated.entry_2_trigger && data.stage_2_trigger) {
+        migrated.entry_2_name = data.stage_2_name || '强化追加';
+        migrated.entry_2_trigger = data.stage_2_trigger;
+        migrated.entry_2_action = data.stage_2_action;
+        migrated.entry_2_size = data.stage_2_size;
+      }
+      if (!migrated.profit_rule_1 && data.profit_1_trigger) {
+        migrated.profit_rule_1 = `${data.profit_1_trigger || ''} ｜ 动作：${data.profit_1_action || ''} ｜ 保留：${data.profit_1_keep || ''}`.trim();
+      }
+      return migrated;
+    };
+
+    const isDirty = () => {
+      const f = fields();
+      return Object.entries(f).some(([k, v]) => {
+        if (k === 'context_date') return false;
+        if (typeof v === 'boolean') return v;
+        return String(v).trim().length > 0;
+      });
+    };
+
+    const loadSample = (sampleKey) => {
+      const sample = SAMPLES[sampleKey];
+      if (!sample) return;
+      if (isDirty()) {
+        if (!confirm(`载入【${sample.__title}】将覆盖当前正在编辑的内容，是否继续？`)) return;
+      }
+      window.toolAnalytics?.action('load_sample');
+      trackToolStart();
+      restoreData(sample);
+      ensureCurrentDate();
+      syncSimpleFromFull();
+      state.textContent = `已载入：${sample.__title}`;
+      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2500);
+    };
+
     const restore = () => {
       const current = readStorage(KEY);
       if (current) {
         restoreData(current);
         if (!current.__cleared) state.textContent = '已恢复上次草稿';
       } else {
+        const v3 = readStorage(LEGACY_V3_KEY);
         const v2 = readStorage(LEGACY_V2_KEY);
         const v1 = readStorage(LEGACY_V1_KEY);
-        if (v2) {
-          restoreData(v2);
-          state.textContent = '已导入完整版旧草稿，请保存到合并版';
+        if (v3) {
+          restoreData(migrateData(v3));
+          state.textContent = '已自动升级 v3 草稿';
+        } else if (v2) {
+          restoreData(migrateData(v2));
+          state.textContent = '已导入旧版草稿';
         } else if (v1) {
-          restoreData({
+          restoreData(migrateData({
             context_date: v1.context_date || '',
             context_asset: v1.context_asset || '',
             ev_judgement: v1.ev_judgement || '',
@@ -461,90 +633,90 @@ tool_id: investment-checklist
             size_downside: v1.size_downside || '',
             exit_review: v1.exit_review || '',
             exit_logic_action: v1.exit_logic || '',
-            exit_emotion: v1.exit_emotion || '',
-            done_scale: !!v1.done_scale,
-            done_exit: !!v1.done_evidence
-          });
-          state.textContent = '已导入简单版旧草稿，请保存到合并版';
+            exit_emotion: v1.exit_emotion || ''
+          }));
+          state.textContent = '已导入极简版旧草稿';
         }
       }
       ensureCurrentDate();
       syncSimpleFromFull();
       setMode(mode, false);
     };
+
     const save = () => {
       window.toolAnalytics?.action('save');
-      localStorage.setItem(KEY, JSON.stringify({__version:3, ...fields()}));
+      localStorage.setItem(KEY, JSON.stringify({__version:4, ...fields()}));
       window.toolAnalytics?.complete('save');
       state.textContent = '已保存 · 仅在本机';
       setTimeout(() => state.textContent = '仅保存在当前浏览器', 2200);
     };
-    const numbered = (data, prefix, total) => Array.from({length:total}, (_,i) => `${i+1}. ${value(data, `${prefix}_${i+1}`) || '（未填写）'}`);
-    const planLines = (data, prefix, total, lastKey) => Array.from({length:total}, (_,i) => {
-      const n=i+1;
-      return `${value(data, `${prefix}_${n}_name`) || `阶段 ${n}`}｜条件：${value(data, `${prefix}_${n}_trigger`) || '（未填写）'}｜动作：${value(data, `${prefix}_${n}_action`) || '（未填写）'}｜${lastKey === 'size' ? '阶段后仓位' : '预计保留'}：${value(data, `${prefix}_${n}_${lastKey}`) || '（未填写）'}`;
-    });
+
     const buildFullText = () => {
-      const d=fields();
+      const d = fields();
       return [
-        '投资决策检查清单｜完整版','',
+        '投资决策检查清单｜完整研究版', '',
         '00 / CONTEXT｜决策背景',
-        `记录日期：${value(d,'context_date')||'（未填写）'}`,
-        `标的 / 机会：${value(d,'context_asset')||'（未填写）'}`,
-        `计划持有周期：${value(d,'context_horizon')||'（未填写）'}`,
-        `市场情景：${value(d,'context_market')||'（未填写）'}`,'',
-        '01 / EV｜理由、风险与估值',
-        `一句话判断：${value(d,'ev_judgement')||'（未填写）'}`,
-        `市场已知：${value(d,'ev_market_knows')||'（未填写）'}`,
-        `差异判断：${value(d,'ev_difference')||'（未填写）'}`,'',
-        '5 点投资理由',...numbered(d,'reason',5),'',
-        '5 个核心风险',...numbered(d,'risk',5),'',
-        `估值体感：${value(d,'valuation_level')||'（未填写）'}`,
-        `参考指标：${value(d,'valuation_metrics')||'（未填写）'}`,
-        `价格已计入：${value(d,'valuation_priced_in')||'（未填写）'}`,
-        `估值支撑条件：${value(d,'valuation_support')||'（未填写）'}`,'',
-        '02 / SIZE｜角色与分批仓位',
-        `仓位角色：${value(d,'size_role')||'（未填写）'}`,
-        `最大参与边界：${value(d,'size_limit')||'（未填写）'}`,
-        `为什么不是更多：${value(d,'size_not_more')||'（未填写）'}`,
-        `为什么不是更少：${value(d,'size_not_less')||'（未填写）'}`,
-        `最坏情况：${value(d,'size_downside')||'（未填写）'}`,'',
-        '分批建仓计划',...planLines(d,'stage',5,'size'),'',
-        '03 / EXIT｜止盈、止损与复核',
-        `固定复核时间：${value(d,'exit_review')||'（未填写）'}`,
-        `关键复核事件：${value(d,'exit_event')||'（未填写）'}`,
-        `逻辑失效证据：${value(d,'exit_invalidated')||'（未填写）'}`,
-        `逻辑失效动作：${value(d,'exit_logic_action')||'（未填写）'}`,'',
-        '止盈 / 削峰计划',...planLines(d,'profit',3,'keep'),'',
-        `价格提醒 1：${value(d,'price_alert_1')||'（未填写）'}｜${value(d,'price_action_1')||'（未填写）'}｜${value(d,'price_role_1')||'（未填写）'}`,
-        `价格提醒 2：${value(d,'price_alert_2')||'（未填写）'}｜${value(d,'price_action_2')||'（未填写）'}｜${value(d,'price_role_2')||'（未填写）'}`,
-        `情绪提醒：${value(d,'exit_emotion')||'（未填写）'}`,'',
+        `记录日期：${value(d, 'context_date') || '（未填写）'}`,
+        `标的 / 机会：${value(d, 'context_asset') || '（未填写）'}`,
+        `计划持有周期：${value(d, 'context_horizon') || '（未填写）'}`,
+        `市场情景与自身情绪：${value(d, 'context_market') || '（未填写）'}`, '',
+        '01 / EV｜核心命题与逆向排雷',
+        `一句话核心命题：${value(d, 'ev_judgement') || '（未填写）'}`,
+        `市场已知：${value(d, 'ev_market_knows') || '（未填写）'}`,
+        `差异判断：${value(d, 'ev_difference') || '（未填写）'}`,
+        `支柱一（需求扩张/周期）：${value(d, 'reason_1') || '（未填写）'}`,
+        `支柱二（竞争壁垒/护城河）：${value(d, 'reason_2') || '（未填写）'}`,
+        `支柱三（真实兑现/现金流）：${value(d, 'reason_3') || '（未填写）'}`,
+        `🔥 事前验尸（致命隐患）：${value(d, 'ev_premortem') || '（未填写）'}`,
+        `终局止损信号 (Kill Switch)：${value(d, 'ev_kill_switch') || '（未填写）'}`,
+        `估值体感：${value(d, 'valuation_level') || '（未填写）'}`,
+        `参考指标：${value(d, 'valuation_metrics') || '（未填写）'}`,
+        `价格已计入预期：${value(d, 'valuation_priced_in') || '（未填写）'}`,
+        `击穿安全边际逆风：${value(d, 'valuation_support') || '（未填写）'}`, '',
+        '02 / SIZE｜组合角色与硬纪律边界',
+        `仓位角色：${value(d, 'size_role') || '（未填写）'}`,
+        `🔥 仓位硬顶上限 (Hard Cap)：${value(d, 'size_hard_cap') || '（未填写）'}`,
+        `🔥 最大容忍亏损 (Max Pain)：${value(d, 'size_max_pain') || '（未填写）'}`,
+        `为什么不是更多：${value(d, 'size_not_more') || '（未填写）'}`,
+        `为什么不是更少或不买：${value(d, 'size_not_less') || '（未填写）'}`,
+        `最坏情况下承受：${value(d, 'size_downside') || '（未填写）'}`,
+        `建仓 1（${value(d, 'entry_1_name') || '首笔试探'}）：条件：${value(d, 'entry_1_trigger') || '-'}｜动作：${value(d, 'entry_1_action') || '-'}｜仓位：${value(d, 'entry_1_size') || '-'}`,
+        `加仓 2（${value(d, 'entry_2_name') || '强化追加'}）：条件：${value(d, 'entry_2_trigger') || '-'}｜动作：${value(d, 'entry_2_action') || '-'}｜仓位：${value(d, 'entry_2_size') || '-'}`, '',
+        '03 / EXIT｜出场、削峰与冷静纪律',
+        `固定复核时间：${value(d, 'exit_review') || '（未填写）'}`,
+        `关键复核事件：${value(d, 'exit_event') || '（未填写）'}`,
+        `核心命题失效证据：${value(d, 'exit_invalidated') || '（未填写）'}`,
+        `逻辑失效动作：${value(d, 'exit_logic_action') || '（未填写）'}`,
+        `估值透支削峰规则：${value(d, 'profit_rule_1') || '（未填写）'}`,
+        `仓位超限削峰规则：${value(d, 'profit_rule_2') || '（未填写）'}`,
+        `买入前冲动情绪警惕：${value(d, 'exit_emotion') || '（未填写）'}`, '',
         '本文工具仅为个人学习记录与决策练习，不构成投资建议。'
       ].join('\n');
     };
+
     const buildSimpleText = () => {
       const d = fields();
       return [
-        '投资决策检查清单｜简单版', '',
+        '投资决策检查清单｜60 秒极速防冲动版', '',
         '00 / CONTEXT｜决策背景',
-        `记录日期：${value(d,'context_date') || '（未填写）'}`,
-        `标的 / 机会：${value(d,'context_asset') || '（未填写）'}`, '',
-        '01 / EV｜为什么值得参与？',
-        `一句话判断：${value(d,'ev_judgement') || '（未填写）'}`,
-        `关键证据：${value(d,'reason_1') || '（未填写）'}`,
-        `什么会改变判断：${value(d,'exit_invalidated') || '（未填写）'}`, '',
-        '02 / SIZE｜为什么是这个尺度？',
-        `仓位角色：${value(d,'size_role') || '（未填写）'}`,
-        `投入尺度的理由：${value(d,'size_not_more') || '（未填写）'}`,
-        `最坏情况：${value(d,'size_downside') || '（未填写）'}`, '',
-        '03 / EXIT｜什么会让我行动？',
-        `复核时间：${value(d,'exit_review') || '（未填写）'}`,
-        `逻辑不成立时的动作：${value(d,'exit_logic_action') || '（未填写）'}`,
-        `情绪提醒：${value(d,'exit_emotion') || '（未填写）'}`, '',
+        `记录日期：${value(d, 'context_date') || '（未填写）'}`,
+        `标的 / 机会：${value(d, 'context_asset') || '（未填写）'}`, '',
+        '01 / EV｜核心命题与事前验尸',
+        `一句话核心命题：${value(d, 'ev_judgement') || '（未填写）'}`,
+        `🔥 事前验尸（若亏 50% 死因）：${value(d, 'ev_premortem') || '（未填写）'}`, '',
+        '02 / SIZE｜仓位硬顶与最大容忍亏损',
+        `仓位角色：${value(d, 'size_role') || '（未填写）'}`,
+        `🔥 仓位硬顶上限 (Hard Cap)：${value(d, 'size_hard_cap') || '（未填写）'}`,
+        `🔥 最大容忍亏损 (Max Pain)：${value(d, 'size_max_pain') || '（未填写）'}`, '',
+        '03 / EXIT｜出场约束与情绪冷静',
+        `逻辑失效出场信号：${value(d, 'exit_invalidated') || '（未填写）'}`,
+        `不想被什么情绪牵着走：${value(d, 'exit_emotion') || '（未填写）'}`, '',
         '本文工具仅为个人学习记录与决策练习，不构成投资建议。'
       ].join('\n');
     };
+
     const buildText = () => mode === 'simple' ? buildSimpleText() : buildFullText();
+
     const copy = async () => {
       window.toolAnalytics?.action('copy_text');
       const text = buildText();
@@ -552,24 +724,28 @@ tool_id: investment-checklist
       try {
         await navigator.clipboard.writeText(text);
         copied = true;
-        state.textContent='已复制为文字';
+        state.textContent = '已复制为文字';
       } catch {
-        const helper=document.createElement('textarea');
-        helper.value=text; helper.style.position='fixed'; helper.style.opacity='0';
+        const helper = document.createElement('textarea');
+        helper.value = text; helper.style.position = 'fixed'; helper.style.opacity = '0';
         document.body.appendChild(helper); helper.select();
-        const ok=document.execCommand('copy'); helper.remove();
+        const ok = document.execCommand('copy'); helper.remove();
         copied = ok;
-        state.textContent=ok ? '已复制为文字' : '复制失败，请手动选择';
+        state.textContent = ok ? '已复制为文字' : '复制失败，请手动选择';
       }
       if (copied) window.toolAnalytics?.complete('copy_text');
-      setTimeout(()=>state.textContent='仅保存在当前浏览器',2200);
+      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2200);
     };
+
     const buildFullMarkdown = () => {
       const d = fields();
       const asset = value(d, 'context_asset');
       const date = value(d, 'context_date') || today();
       const horizon = value(d, 'context_horizon');
       const role = value(d, 'size_role');
+      const hardCap = value(d, 'size_hard_cap');
+      const maxPain = value(d, 'size_max_pain');
+      const preMortem = value(d, 'ev_premortem');
       const title = asset ? `投资决策检查清单 - ${asset}` : '投资决策检查清单';
 
       const frontMatter = [
@@ -579,6 +755,9 @@ tool_id: investment-checklist
         `asset: "${asset.replace(/"/g, '\\"')}"`,
         `horizon: "${horizon.replace(/"/g, '\\"')}"`,
         `role: "${role.replace(/"/g, '\\"')}"`,
+        `hard_cap: "${hardCap.replace(/"/g, '\\"')}"`,
+        `max_pain: "${maxPain.replace(/"/g, '\\"')}"`,
+        `pre_mortem: "${preMortem.replace(/"/g, '\\"')}"`,
         'type: "investment-checklist"',
         'mode: "full"',
         'source: "https://shiliang.me/tools/investment-checklist/"',
@@ -587,72 +766,61 @@ tool_id: investment-checklist
       ].join('\n');
 
       const body = [
-        `# ${title}（完整版）`, '',
+        `# ${title}（完整研究版）`, '',
         '> 在按下买入前，先留下不容易被情绪改写的逻辑、尺度与退出条件。', '',
         '## 00 / CONTEXT 决策背景',
         `- **记录日期**：${date}`,
         `- **标的 / 机会**：${asset || '（未填写）'}`,
         `- **计划持有周期**：${horizon || '（未填写）'}`,
-        `- **当时的市场情景**：${value(d, 'context_market') || '（未填写）'}`, '',
-        '## 01 / EV 理由、风险与估值',
-        '### 一句话判断',
+        `- **当时市场情景与自身情绪**：${value(d, 'context_market') || '（未填写）'}`, '',
+        '## 01 / EV 核心命题与逆向排雷',
+        '### 一句话核心命题',
         `> ${value(d, 'ev_judgement') || '（未填写核心判断）'}`, '',
-        '### 认知与差异',
-        `- **市场可能已经知道什么**：${value(d, 'ev_market_knows') || '（未填写）'}`,
+        '### 认知与预期差',
+        `- **市场当前已经知道了什么**：${value(d, 'ev_market_knows') || '（未填写）'}`,
         `- **我的差异判断是什么**：${value(d, 'ev_difference') || '（未填写）'}`, '',
-        '### 5 点投资理由',
-        `1. **行业需求 / 长期方向**：${value(d, 'reason_1') || '（未填写）'}`,
-        `2. **公司地位 / 竞争优势**：${value(d, 'reason_2') || '（未填写）'}`,
-        `3. **业绩 / 订单 / 经营兑现**：${value(d, 'reason_3') || '（未填写）'}`,
-        `4. **利润率 / 现金流 / 经营改善**：${value(d, 'reason_4') || '（未填写）'}`,
-        `5. **稀缺性 / 催化 / 其他关键理由**：${value(d, 'reason_5') || '（未填写）'}`, '',
-        '### 5 个核心风险（排雷核对）',
-        `1. **估值风险**：${value(d, 'risk_1') || '（未填写）'}`,
-        `2. **客户 / 供应链集中风险**：${value(d, 'risk_2') || '（未填写）'}`,
-        `3. **行业周期 / 资本开支风险**：${value(d, 'risk_3') || '（未填写）'}`,
-        `4. **竞争 / 技术替代风险**：${value(d, 'risk_4') || '（未填写）'}`,
-        `5. **现金流 / 执行 / 其他关键风险**：${value(d, 'risk_5') || '（未填写）'}`, '',
-        '### 估值评估',
+        '### 3 条不可替代的支柱事实',
+        `1. **需求扩张 / 产业周期硬事实**：${value(d, 'reason_1') || '（未填写）'}`,
+        `2. **竞争壁垒 / 不可替代性证据**：${value(d, 'reason_2') || '（未填写）'}`,
+        `3. **财务真实兑现 / 现金流支撑**：${value(d, 'reason_3') || '（未填写）'}`, '',
+        '### 🔥 Pre-mortem 事前验尸（致命排雷）',
+        `> **假设 1 年后这笔投资暴跌 50%，最致命、最可能的原因是什么？**`,
+        `> ${preMortem || '（未正视致命排雷隐患）'}`, '',
+        `- **终局止损信号 (Kill Switch)**：${value(d, 'ev_kill_switch') || '（未填写）'}`, '',
+        '### 估值透支与安全边际核对',
         `- **当前估值体感**：${value(d, 'valuation_level') || '（未选择）'}`,
-        `- **参考指标**：${value(d, 'valuation_metrics') || '（未填写）'}`,
-        `- **当前价格大概计入了什么**：${value(d, 'valuation_priced_in') || '（未填写）'}`,
-        `- **什么兑现才能支撑当前估值**：${value(d, 'valuation_support') || '（未填写）'}`, '',
-        '## 02 / SIZE 组合角色与分批仓位',
+        `- **参考估值指标**：${value(d, 'valuation_metrics') || '（未填写）'}`,
+        `- **当前价格大概透支了什么超级预期**：${value(d, 'valuation_priced_in') || '（未填写）'}`,
+        `- **什么样的经营逆风会击穿安全边际**：${value(d, 'valuation_support') || '（未填写）'}`, '',
+        '## 02 / SIZE 组合角色与硬纪律边界',
         `- **仓位角色**：${role || '（未填写）'}`,
-        `- **最大参与边界**：${value(d, 'size_limit') || '（未填写）'}`,
+        `- **🔥 仓位硬顶上限 (Hard Cap)**：${hardCap || '（未设定硬顶，存在爆仓风险）'}`,
+        `- **🔥 最大容忍亏损 (Max Pain)**：${maxPain || '（未设定最大容忍额）'}`,
         `- **为什么不是更多（不确定性约束）**：${value(d, 'size_not_more') || '（未填写）'}`,
-        `- **为什么不是更少或不参与**：${value(d, 'size_not_less') || '（未填写）'}`,
+        `- **为什么不是更少或不买**：${value(d, 'size_not_less') || '（未填写）'}`,
         `- **最坏情况下，我需要承受什么**：${value(d, 'size_downside') || '（未填写）'}`, '',
-        '### 分批建仓计划',
-        '| 阶段 | 价格 / 事件条件 | 证据条件与动作 | 阶段后目标仓位 |',
+        '### 务实的两段式建仓与加仓纪律',
+        '| 阶段 | 触发条件 | 必须验证的基本面事实与动作 | 阶段后仓位 (≤ Hard Cap) |',
         '|---|---|---|---|',
-        `| ${value(d, 'stage_1_name') || '第一笔试探'} | ${value(d, 'stage_1_trigger') || '-'} | ${value(d, 'stage_1_action') || '-'} | ${value(d, 'stage_1_size') || '-'} |`,
-        `| ${value(d, 'stage_2_name') || '第二笔加仓'} | ${value(d, 'stage_2_trigger') || '-'} | ${value(d, 'stage_2_action') || '-'} | ${value(d, 'stage_2_size') || '-'} |`,
-        `| ${value(d, 'stage_3_name') || '第三笔核心买入'} | ${value(d, 'stage_3_trigger') || '-'} | ${value(d, 'stage_3_action') || '-'} | ${value(d, 'stage_3_size') || '-'} |`,
-        `| ${value(d, 'stage_4_name') || '深度机会'} | ${value(d, 'stage_4_trigger') || '-'} | ${value(d, 'stage_4_action') || '-'} | ${value(d, 'stage_4_size') || '-'} |`,
-        `| ${value(d, 'stage_5_name') || '不参与区'} | ${value(d, 'stage_5_trigger') || '-'} | ${value(d, 'stage_5_action') || '-'} | ${value(d, 'stage_5_size') || '0'} |`, '',
-        '## 03 / EXIT 止盈、止损与复核',
+        `| ${value(d, 'entry_1_name') || '首笔试探'} | ${value(d, 'entry_1_trigger') || '-'} | ${value(d, 'entry_1_action') || '-'} | ${value(d, 'entry_1_size') || '-'} |`,
+        `| ${value(d, 'entry_2_name') || '强化追加'} | ${value(d, 'entry_2_trigger') || '-'} | ${value(d, 'entry_2_action') || '-'} | ${value(d, 'entry_2_size') || '-'} |`, '',
+        '## 03 / EXIT 出场、削峰与冷静纪律',
         '### 复核与逻辑退出（止损底线）',
-        `- **固定复核时间**：${value(d, 'exit_review') || '（未填写）'}`,
+        `- **固定复核时间点**：${value(d, 'exit_review') || '（未填写）'}`,
         `- **关键复核事件**：${value(d, 'exit_event') || '（未填写）'}`,
-        `- **什么证据说明逻辑不成立**：${value(d, 'exit_invalidated') || '（未填写）'}`,
-        `- **逻辑不成立时的动作**：${value(d, 'exit_logic_action') || '（未填写）'}`, '',
-        '### 止盈 / 削峰计划',
-        '| 阶段 | 价格 / 估值条件 | 基本面条件与动作 | 预计保留 |',
-        '|---|---|---|---|',
-        `| ${value(d, 'profit_1_name') || '第一目标区'} | ${value(d, 'profit_1_trigger') || '-'} | ${value(d, 'profit_1_action') || '-'} | ${value(d, 'profit_1_keep') || '-'} |`,
-        `| ${value(d, 'profit_2_name') || '第二目标区'} | ${value(d, 'profit_2_trigger') || '-'} | ${value(d, 'profit_2_action') || '-'} | ${value(d, 'profit_2_keep') || '-'} |`,
-        `| ${value(d, 'profit_3_name') || '长期持有条件'} | ${value(d, 'profit_3_trigger') || '-'} | ${value(d, 'profit_3_action') || '-'} | ${value(d, 'profit_3_keep') || '-'} |`, '',
-        '### 价格提醒与情绪纪律',
-        `- **价格情况 1**：${value(d, 'price_alert_1') || '-'} ｜ 动作：${value(d, 'price_action_1') || '-'} ｜ 仓位：${value(d, 'price_role_1') || '-'}`,
-        `- **价格情况 2**：${value(d, 'price_alert_2') || '-'} ｜ 动作：${value(d, 'price_action_2') || '-'} ｜ 仓位：${value(d, 'price_role_2') || '-'}`,
-        `- **我最容易被什么情绪牵着走**：${value(d, 'exit_emotion') || '（未填写）'}`, '',
-        '### 买入前底线检查项',
-        `- [${d.done_reasons ? 'x' : ' '}] 我没有把行业热度当成唯一理由`,
-        `- [${d.done_risks ? 'x' : ' '}] 我写了与理由同等具体的风险`,
-        `- [${d.done_valuation ? 'x' : ' '}] 我考虑了价格已经计入的预期`,
-        `- [${d.done_scale ? 'x' : ' '}] 每次加仓都有价格与证据条件`,
-        `- [${d.done_exit ? 'x' : ' '}] 我写清了什么会改变判断`, '',
+        `- **核心命题失效证据**：${value(d, 'exit_invalidated') || '（未填写）'}`,
+        `- **逻辑失效时的果断动作**：${value(d, 'exit_logic_action') || '（未填写）'}`, '',
+        '### 止盈 / 削峰再平衡纪律',
+        `- **估值透支削峰规则**：${value(d, 'profit_rule_1') || '（未填写）'}`,
+        `- **仓位超限削峰规则**：${value(d, 'profit_rule_2') || '（未填写）'}`, '',
+        '### 情绪自省与物理降温',
+        `- **买入前情绪警惕**：${value(d, 'exit_emotion') || '（未填写）'}`, '',
+        '### 买入前底线核对项',
+        `- [${d.done_hypothesis ? 'x' : ' '}] 我写出了可被证伪的核心命题，而非空洞“长期看好”`,
+        `- [${d.done_premortem ? 'x' : ' '}] 我完成了 Pre-mortem 事前验尸，正视了亏损 50% 的死因`,
+        `- [${d.done_hard_cap ? 'x' : ' '}] 我锁死了仓位硬顶上限（Hard Cap）与最大容忍亏损`,
+        `- [${d.done_no_averaging_down ? 'x' : ' '}] 我确立了加仓纪律，绝不纯因股价下跌而盲目补仓`,
+        `- [${d.done_exit ? 'x' : ' '}] 我写清了退出条件，给未来的情绪冲动立下了硬规矩`, '',
         '---',
         '*声明：本文工具仅为个人学习记录与决策练习，不构成任何投资建议。投资有风险，决策需独立。*'
       ].join('\n');
@@ -665,6 +833,9 @@ tool_id: investment-checklist
       const asset = value(d, 'context_asset');
       const date = value(d, 'context_date') || today();
       const role = value(d, 'size_role');
+      const hardCap = value(d, 'size_hard_cap');
+      const maxPain = value(d, 'size_max_pain');
+      const preMortem = value(d, 'ev_premortem');
       const title = asset ? `投资决策检查清单 - ${asset}` : '投资决策检查清单';
 
       const frontMatter = [
@@ -673,6 +844,9 @@ tool_id: investment-checklist
         `date: "${date}"`,
         `asset: "${asset.replace(/"/g, '\\"')}"`,
         `role: "${role.replace(/"/g, '\\"')}"`,
+        `hard_cap: "${hardCap.replace(/"/g, '\\"')}"`,
+        `max_pain: "${maxPain.replace(/"/g, '\\"')}"`,
+        `pre_mortem: "${preMortem.replace(/"/g, '\\"')}"`,
         'type: "investment-checklist"',
         'mode: "simple"',
         'source: "https://shiliang.me/tools/investment-checklist/"',
@@ -681,24 +855,24 @@ tool_id: investment-checklist
       ].join('\n');
 
       const body = [
-        `# ${title}（极简版）`, '',
+        `# ${title}（极简防冲动版）`, '',
         '> 在按下买入前，先留下三段不容易被情绪改写的话。', '',
         '## 00 / CONTEXT 决策背景',
         `- **记录日期**：${date}`,
         `- **标的 / 机会**：${asset || '（未填写）'}`, '',
-        '## 01 / EV 为什么值得参与？',
-        '### 一句话判断',
+        '## 01 / EV 核心命题与事前验尸',
+        '### 一句话核心命题',
         `> ${value(d, 'ev_judgement') || '（未填写核心判断）'}`, '',
-        `- **支持这个判断的关键证据**：${value(d, 'reason_1') || '（未填写）'}`,
-        `- **什么变化会让我更新判断（逻辑失效底线）**：${value(d, 'exit_invalidated') || '（未填写）'}`, '',
-        '## 02 / SIZE 为什么是这个尺度？',
+        '### 🔥 Pre-mortem 事前验尸（致命排雷）',
+        `> **假设 1 年后这笔投资暴跌 50%，最致命、最可能的原因是什么？**`,
+        `> ${preMortem || '（未填写）'}`, '',
+        '## 02 / SIZE 仓位硬顶与最大容忍亏损',
         `- **仓位角色**：${role || '（未填写）'}`,
-        `- **投入尺度的理由（哪些不确定性让我不该投更多）**：${value(d, 'size_not_more') || '（未填写）'}`,
-        `- **最坏情况下，我需要承受什么**：${value(d, 'size_downside') || '（未填写）'}`, '',
-        '## 03 / EXIT 什么会让我行动？',
-        `- **复核时间**：${value(d, 'exit_review') || '（未填写）'}`,
-        `- **逻辑不成立时的动作**：${value(d, 'exit_logic_action') || '（未填写）'}`,
-        `- **我不想被什么情绪牵着走**：${value(d, 'exit_emotion') || '（未填写）'}`, '',
+        `- **🔥 仓位硬顶上限 (Hard Cap)**：${hardCap || '（未设定）'}`,
+        `- **🔥 最大容忍亏损 (Max Pain)**：${maxPain || '（未设定）'}`, '',
+        '## 03 / EXIT 逻辑失效与出场约束',
+        `- **逻辑失效出场信号**：${value(d, 'exit_invalidated') || '（未填写）'}`,
+        `- **我不想被什么冲动情绪牵着走**：${value(d, 'exit_emotion') || '（未填写）'}`, '',
         '---',
         '*声明：本文工具仅为个人学习记录与决策练习，不构成任何投资建议。投资有风险，决策需独立。*'
       ].join('\n');
@@ -771,21 +945,23 @@ tool_id: investment-checklist
       }
     });
     modeButtons.forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
+    document.querySelector('#loadPaypalSampleBtn')?.addEventListener('click', () => loadSample('paypal'));
+    document.querySelector('#loadLiteSampleBtn')?.addEventListener('click', () => loadSample('lite'));
     document.querySelector('#saveBtn').addEventListener('click', save);
     document.querySelector('#copyMdBtn').addEventListener('click', copyMarkdown);
     document.querySelector('#downloadMdBtn').addEventListener('click', downloadMarkdown);
     document.querySelector('#copyBtn').addEventListener('click', copy);
-    document.querySelector('#printBtn').addEventListener('click', ()=>{
+    document.querySelector('#printBtn').addEventListener('click', () => {
       window.toolAnalytics?.action('print');
       window.print();
     });
-    document.querySelector('#resetBtn').addEventListener('click', ()=>{
+    document.querySelector('#resetBtn').addEventListener('click', () => {
       if (!confirm('确认清空这次检查吗？')) return;
       form.reset();
       ensureCurrentDate();
-      localStorage.setItem(KEY, JSON.stringify({__version:3, __cleared:true}));
+      localStorage.setItem(KEY, JSON.stringify({__version:4, __cleared:true}));
       syncSimpleFromFull();
-      state.textContent='已清空';
+      state.textContent = '已清空';
     });
     restore();
   </script>

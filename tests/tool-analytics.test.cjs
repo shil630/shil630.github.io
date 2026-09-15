@@ -79,4 +79,11 @@ test('investment-checklist correctly records copy_markdown and download_markdown
   assert.deepEqual(actionNames, ['copy_markdown', 'download_markdown']);
 });
 
+test('investment-checklist correctly records load_sample action', () => {
+  const w = boot('investment-checklist');
+  w.toolAnalytics.action('load_sample');
+  const actionNames = events(w).filter(e => e[1] === 'tool_action').map(e => e[2].action);
+  assert.ok(actionNames.includes('load_sample'));
+});
+
 

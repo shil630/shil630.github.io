@@ -6,7 +6,7 @@
   var toolId = script && script.getAttribute("data-tool-id");
   var measurementId = script && script.getAttribute("data-measurement-id");
   var actions = {
-    "investment-checklist": ["edit", "save", "copy_text", "copy_markdown", "download_markdown", "print"],
+    "investment-checklist": ["edit", "save", "copy_text", "copy_markdown", "download_markdown", "print", "load_sample"],
     "wechat-formatter": ["edit", "insert", "theme", "copy_rich", "copy_text", "download_html"],
     "preflop-range": ["select_position", "edit_range", "clear_range", "restore_range", "copy_range"]
   };

@@ -181,6 +181,10 @@ tool_ids.each do |tool_id|
   if tool_id == "investment-checklist"
     assert!(doc.css('#copyMdBtn').size == 1, "investment-checklist 缺少复制 Markdown 按钮")
     assert!(doc.css('#downloadMdBtn').size == 1, "investment-checklist 缺少下载 Markdown 按钮")
+    assert!(doc.css('#loadPaypalSampleBtn').size == 1, "investment-checklist 缺少载入 PayPal 案例按钮")
+    assert!(doc.css('#loadLiteSampleBtn').size == 1, "investment-checklist 缺少载入 LITE 案例按钮")
+    assert!(doc.css('input[name="size_hard_cap"]').size == 1, "investment-checklist 缺少仓位硬顶上限输入框")
+    assert!(doc.css('textarea[name="ev_premortem"]').size == 1, "investment-checklist 缺少 Pre-mortem 事前验尸输入框")
   end
   if tool_id == "wechat-formatter"
     assert!(doc.css('.mobile-header').size == 1, "wechat-formatter 缺少移动端导航条")
