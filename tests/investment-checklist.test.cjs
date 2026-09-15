@@ -15,8 +15,9 @@ test('investment-checklist DOM contains required action buttons, samples and ris
   assert.ok(html.includes('id="resetBtn"'), 'Must contain resetBtn');
   assert.ok(html.includes('id="loadPaypalSampleBtn"'), 'Must contain loadPaypalSampleBtn');
   assert.ok(html.includes('id="loadLiteSampleBtn"'), 'Must contain loadLiteSampleBtn');
-  assert.ok(html.includes('name="ev_premortem"'), 'Must contain ev_premortem in full checklist');
-  assert.ok(html.includes('data-bind="ev_premortem"'), 'Must contain ev_premortem in simple checklist');
+  assert.ok(!html.includes('name="ev_premortem"'), 'Must NOT contain ev_premortem in full checklist');
+  assert.ok(!html.includes('data-bind="ev_premortem"'), 'Must NOT contain ev_premortem in simple checklist');
+  assert.ok(!html.includes('事前验尸'), 'Must NOT contain 事前验尸 text anywhere');
   assert.ok(html.includes('name="size_hard_cap"'), 'Must contain size_hard_cap in full checklist');
   assert.ok(html.includes('data-bind="size_hard_cap"'), 'Must contain size_hard_cap in simple checklist');
   assert.ok(html.includes('name="size_max_pain"'), 'Must contain size_max_pain in full checklist');
@@ -38,8 +39,6 @@ function createChecklistEnv(initialData = {}, initialMode = 'full') {
     reason_1: '产业合作硬事实：NVIDIA 与 Lumentum 宣布多年战略合作',
     reason_2: '真实财务兑现：FY2026 Q3 收入达 8.084 亿美元（同比 +90.1%）',
     reason_3: '核心器件壁垒：高端 EML / CW 光源芯片领域具备稀缺产能',
-    ev_premortem: '下游云厂商 AI 资本开支周期性收缩，或英伟达扶持二供引发价格战',
-    ev_kill_switch: '单季度出货量环比下滑超 20%，或核心客户宣布引入其他替代方案',
     valuation_level: '中性偏贵',
     valuation_metrics: '动态 PE > 28x',
     valuation_priced_in: '已提前透支未来 1 年产能拉满的最乐观场景',
@@ -66,7 +65,6 @@ function createChecklistEnv(initialData = {}, initialMode = 'full') {
     profit_rule_2: '若单标的因暴涨市值占比突破 4.5%，被动削减至 3% 试错上限',
     exit_emotion: '警惕在行业最火热时把试探仓擅自加成重仓',
     done_hypothesis: true,
-    done_premortem: true,
     done_hard_cap: true,
     done_no_averaging_down: true,
     done_exit: true,
@@ -132,14 +130,14 @@ test('SAMPLES contains authentic paypal and lite cases from blog essays', () => 
   assert.ok(exports.SAMPLES.paypal, 'Must contain paypal sample');
   assert.ok(exports.SAMPLES.lite, 'Must contain lite sample');
   assert.equal(exports.SAMPLES.paypal.context_asset, 'PayPal (PYPL)');
-  assert.ok(exports.SAMPLES.paypal.ev_premortem.includes('致命隐患'));
+  assert.ok(exports.SAMPLES.paypal.reason_1.includes('全球双边网络'));
   assert.ok(exports.SAMPLES.paypal.size_hard_cap.includes('5%'));
   assert.equal(exports.SAMPLES.lite.context_asset, 'Lumentum (LITE)');
   assert.ok(exports.SAMPLES.lite.reason_2.includes('8.084 亿美元'));
   assert.ok(exports.SAMPLES.lite.size_hard_cap.includes('3%'));
 });
 
-test('buildFullMarkdown generates valid Front Matter, Pre-mortem, Hard Cap and GFM table structure', () => {
+test('buildFullMarkdown generates valid Front Matter, Hard Cap and GFM table structure', () => {
   const { context, exports, mockData } = createChecklistEnv();
   vm.runInContext(`fields = () => (${JSON.stringify(mockData)}); mode = 'full';`, context);
 
@@ -152,7 +150,7 @@ test('buildFullMarkdown generates valid Front Matter, Pre-mortem, Hard Cap and G
   assert.ok(md.includes('role: "观察试错仓"'), 'Front Matter role must match');
   assert.ok(md.includes('hard_cap: "总资金严卡 3% 上限"'), 'Front Matter hard_cap must match');
   assert.ok(md.includes('max_pain: "最大容忍浮亏 18% 或绝对金额不超过 ¥15,000"'), 'Front Matter max_pain must match');
-  assert.ok(md.includes('pre_mortem: "下游云厂商 AI 资本开支周期性收缩，或英伟达扶持二供引发价格战"'), 'Front Matter pre_mortem must match');
+  assert.ok(!md.includes('pre_mortem:'), 'Front Matter must NOT contain pre_mortem');
   assert.ok(md.includes('type: "investment-checklist"'), 'Front Matter type must match');
   assert.ok(md.includes('mode: "full"'), 'Front Matter mode must match');
   assert.ok(md.includes('source: "https://shiliang.me/tools/investment-checklist/"'), 'Front Matter source must match');
@@ -160,9 +158,8 @@ test('buildFullMarkdown generates valid Front Matter, Pre-mortem, Hard Cap and G
   // Verify Headers and Quotes
   assert.ok(md.includes('# 投资决策检查清单 - Lumentum (LITE)（完整研究版）'), 'H1 heading must match');
   assert.ok(md.includes('## 00 / CONTEXT 决策背景'), 'H2 CONTEXT must exist');
-  assert.ok(md.includes('## 01 / EV 核心命题与逆向排雷'), 'H2 EV must exist');
-  assert.ok(md.includes('### 🔥 Pre-mortem 事前验尸（致命排雷）'), 'Pre-mortem heading must exist');
-  assert.ok(md.includes('下游云厂商 AI 资本开支周期性收缩'), 'Pre-mortem text must be present');
+  assert.ok(md.includes('## 01 / EV 核心命题与三大支柱'), 'H2 EV must exist');
+  assert.ok(!md.includes('事前验尸'), 'Pre-mortem must NOT exist in Full Markdown');
   assert.ok(md.includes('## 02 / SIZE 组合角色与硬纪律边界'), 'H2 SIZE must exist');
   assert.ok(md.includes('🔥 仓位硬顶上限 (Hard Cap)'), 'Hard Cap must be present');
   assert.ok(md.includes('🔥 最大容忍亏损 (Max Pain)'), 'Max Pain must be present');
@@ -174,7 +171,6 @@ test('buildFullMarkdown generates valid Front Matter, Pre-mortem, Hard Cap and G
   assert.ok(md.includes('| 首笔试探 | 约 $900 附近（战略合作公告后） | 轻仓试探介入，核对 Q3 真实财报 | 1.5% |'), '首笔建仓计划数据必须格式化');
 
   // Verify Checklist Checkboxes
-  assert.ok(md.includes('- [x] 我完成了 Pre-mortem 事前验尸，正视了亏损 50% 的死因'), 'Checked items must be [x]');
   assert.ok(md.includes('- [x] 我锁死了仓位硬顶上限（Hard Cap）与最大容忍亏损'), 'Checked items must be [x]');
 });
 
@@ -187,8 +183,8 @@ test('buildSimpleMarkdown generates concise cooldown Markdown structure', () => 
   assert.ok(md.includes('mode: "simple"'), 'Front Matter mode must be simple');
   assert.ok(md.includes('hard_cap: "总资金严卡 3% 上限"'), 'Front Matter hard_cap must be present');
   assert.ok(md.includes('# 投资决策检查清单 - Lumentum (LITE)（极简防冲动版）'), 'H1 heading must be 极简防冲动版');
-  assert.ok(md.includes('## 01 / EV 核心命题与事前验尸'), 'EV heading must match simple mode');
-  assert.ok(md.includes('🔥 Pre-mortem 事前验尸（致命排雷）'), 'Pre-mortem must be present in simple mode');
+  assert.ok(md.includes('## 01 / EV 核心命题'), 'EV heading must match simple mode');
+  assert.ok(!md.includes('事前验尸'), 'Pre-mortem must NOT be in simple mode');
   assert.ok(md.includes('## 02 / SIZE 仓位硬顶与最大容忍亏损'), 'SIZE heading must match simple mode');
   assert.ok(md.includes('🔥 仓位硬顶上限 (Hard Cap)'), 'Hard Cap must be in simple mode');
   assert.ok(md.includes('## 03 / EXIT 逻辑失效与出场约束'), 'EXIT heading must match simple mode');
@@ -213,7 +209,6 @@ test('migrateData smoothly migrates legacy v3 / v2 / v1 data to v4', () => {
   const migrated = exports.migrateData(legacyV3);
   assert.equal(migrated.__version, 4);
   assert.equal(migrated.context_asset, 'BABA');
-  assert.equal(migrated.ev_premortem, '电商竞争加剧；云业务放缓');
   assert.equal(migrated.size_hard_cap, '5%');
   assert.equal(migrated.entry_1_trigger, '$70');
   assert.equal(migrated.entry_1_size, '2%');

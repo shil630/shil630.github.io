@@ -68,9 +68,6 @@ tool_id: investment-checklist
     .numbered b { position:absolute; left:10px; top:11px; color:var(--red); font:700 12px Georgia,serif; }
     .numbered textarea { padding-left:34px; }
     .numbered.wide { grid-column:1 / -1; }
-    .premortem-card { border-left:3px solid var(--red); background:rgba(182,75,59,.038); padding:18px 20px; border-radius:0 6px 6px 0; margin-bottom:8px; border-top:1px solid rgba(182,75,59,.12); border-right:1px solid rgba(182,75,59,.12); border-bottom:1px solid rgba(182,75,59,.12); }
-    .premortem-title { margin:0 0 6px; font-family:"Songti SC","STSong",serif; font-size:17px; color:var(--red); font-weight:700; display:flex; align-items:center; gap:6px; }
-    .premortem-note { margin:0 0 14px; font-size:12px; color:#6b5d52; line-height:1.65; }
     .risk-hard-cap { display:grid; grid-template-columns:1fr 1.15fr 1.15fr; gap:14px; }
     .samples-bar { display:flex; align-items:center; gap:12px; margin:22px 0 6px; padding:12px 16px; border:1px solid var(--sand); border-radius:7px; background:rgba(255,255,255,.45); }
     .samples-label { color:var(--muted); font-size:12px; white-space:nowrap; letter-spacing:.04em; }
@@ -183,7 +180,7 @@ tool_id: investment-checklist
       </div>
     </div>
 
-    <div class="steps"><div class="step"><strong>01 · EV</strong>命题、支柱与事前验尸</div><div class="step"><strong>02 · SIZE</strong>角色、硬顶与亏损预算</div><div class="step"><strong>03 · EXIT</strong>失效出场、削峰与冷静</div></div>
+    <div class="steps"><div class="step"><strong>01 · EV</strong>命题与三大支柱</div><div class="step"><strong>02 · SIZE</strong>角色、硬顶与亏损预算</div><div class="step"><strong>03 · EXIT</strong>失效出场、削峰与冷静</div></div>
 
     <form id="checklist">
       <div id="simpleChecklist">
@@ -197,15 +194,10 @@ tool_id: investment-checklist
         </section>
 
         <section class="panel">
-          <div class="panel-head"><span class="panel-num">01 / EV</span><h3>核心命题与事前验尸</h3></div>
-          <p class="panel-note">反过来想，总是反过来想。写可以被推翻的命题，愿望不算论据。</p>
+          <div class="panel-head"><span class="panel-num">01 / EV</span><h3>核心命题</h3></div>
+          <p class="panel-note">写可以被推翻的命题，愿望不算论据。</p>
           <div class="fields">
             <label class="full">我的一句话核心命题<textarea data-bind="ev_judgement" placeholder="写成可以被未来证据推翻的一句话，不写“长期看好”。"></textarea></label>
-            <div class="premortem-card full" style="grid-column:1/-1;">
-              <h4 class="premortem-title">🔥 Pre-mortem 事前验尸（致命排雷）</h4>
-              <p class="premortem-note">假设 1 年后这笔投资暴跌 50%，最致命、最可能的原因是什么？</p>
-              <textarea data-bind="ev_premortem" placeholder="写清哪项核心假设破灭、竞争恶化或不可逆逆风会杀死这笔投资。"></textarea>
-            </div>
           </div>
         </section>
 
@@ -244,8 +236,8 @@ tool_id: investment-checklist
       </section>
 
       <section class="panel">
-        <div class="panel-head"><span class="panel-num">01 / EV</span><h3>这件事为什么值得参与？（证伪与排雷）</h3></div>
-        <p class="panel-note">核心命题、支柱事实与逆向事前验尸缺一不可。愿望不算论据，反思才能保命。</p>
+        <div class="panel-head"><span class="panel-num">01 / EV</span><h3>这件事为什么值得参与？（命题与事实）</h3></div>
+        <p class="panel-note">核心命题与支柱事实缺一不可。愿望不算论据，客观才能保命。</p>
 
         <div class="subsection">
           <h4 class="subhead"><span>A</span>一句话核心命题与预期差</h4>
@@ -263,17 +255,6 @@ tool_id: investment-checklist
             <label class="numbered"><b>01</b><textarea class="compact" name="reason_1" placeholder="支柱一：需求扩张 / 产业周期硬事实"></textarea></label>
             <label class="numbered"><b>02</b><textarea class="compact" name="reason_2" placeholder="支柱二：竞争壁垒 / 不可替代性证据"></textarea></label>
             <label class="numbered"><b>03</b><textarea class="compact" name="reason_3" placeholder="支柱三：财务真实兑现 / 自由现金流支撑"></textarea></label>
-          </div>
-        </div>
-
-        <div class="subsection">
-          <div class="premortem-card">
-            <h4 class="premortem-title">🔥 Pre-mortem 事前验尸（致命隐患排雷）</h4>
-            <p class="premortem-note">反过来想，总是反过来想：<strong>假设 1 年后这笔投资暴跌 50%，最致命、最可能的原因是什么？</strong>提前把最坏的死因摆在桌面上。</p>
-            <div class="fields">
-              <label class="full">最致命的排雷点与崩盘隐患<textarea name="ev_premortem" placeholder="写清哪项核心假设破灭、竞争替代、大客户流失或利润率崩塌会杀死这笔投资。"></textarea></label>
-              <label class="full">终局止损信号（Kill Switch）<input name="ev_kill_switch" placeholder="哪一个确凿的恶化信号出现时，宣告核心命题被彻底击穿，必须立刻无条件出场？"></label>
-            </div>
           </div>
         </div>
 
@@ -346,7 +327,6 @@ tool_id: investment-checklist
 
         <div class="check-row">
           <label class="check"><input type="checkbox" name="done_hypothesis"> 我写出了可被证伪的核心命题，而非空洞“长期看好”</label>
-          <label class="check"><input type="checkbox" name="done_premortem"> 我完成了 Pre-mortem 事前验尸，正视了亏损 50% 的死因</label>
           <label class="check"><input type="checkbox" name="done_hard_cap"> 我锁死了仓位硬顶上限（Hard Cap）与最大容忍亏损</label>
           <label class="check"><input type="checkbox" name="done_no_averaging_down"> 我确立了加仓纪律，绝不纯因股价下跌而盲目补仓</label>
           <label class="check"><input type="checkbox" name="done_exit"> 我写清了退出条件，给未来的情绪冲动立下了硬规矩</label>
@@ -474,8 +454,6 @@ tool_id: investment-checklist
         reason_1: '全球双边网络，活跃账户数超 4 亿，海外独立站与商户覆盖深度仍处头部。',
         reason_2: '年产生 40-50 亿美元真实自由现金流，账面现金充裕，管理层持续进行大额回购。',
         reason_3: 'P/E 与 P/FCF 估值落入历史最低 5% 分位数，看似赔率极佳。',
-        ev_premortem: '【致命隐患】品牌结账按钮在移动端被 Apple Pay/Shop Pay 彻底边缘化；商户因结账转化率差距放弃主推；自由现金流被低毛利业务稀释导致估值锚永久下移。',
-        ev_kill_switch: '核心品牌结账量连续两个季度负增长，或交易毛利率跌破 45%。',
         valuation_level: '明显偏低',
         valuation_metrics: 'P/FCF < 12x, EV/EBITDA < 9x',
         valuation_priced_in: '计入了零增长、长期份额流失与利润率永久受损。',
@@ -502,7 +480,6 @@ tool_id: investment-checklist
         profit_rule_2: '无',
         exit_emotion: '【贪婪与不甘】把便宜当安全；深套后心存侥幸不肯认错；总想靠加仓拉低成本迅速回本。',
         done_hypothesis: false,
-        done_premortem: false,
         done_hard_cap: false,
         done_no_averaging_down: false,
         done_exit: false
@@ -519,8 +496,6 @@ tool_id: investment-checklist
         reason_1: '产业合作硬事实：NVIDIA 与 Lumentum 宣布多年战略合作，包含明确的采购承诺与联合投资安排。',
         reason_2: '真实财务兑现：FY2026 Q3 收入达 8.084 亿美元（同比 +90.1%），Non-GAAP 营业利润率达 32.2%，高增长在报表中兑现。',
         reason_3: '核心器件壁垒：在高端 EML / CW 光源芯片领域具备稀缺产能与工艺护城河。',
-        ev_premortem: '【事前验尸】下游云厂商 AI 资本开支周期性收缩，或 NVIDIA 扶持二供、三供导致光器件陷入价格战，利润率从 32% 骤降至 15% 以下。',
-        ev_kill_switch: '单季度出货量环比下滑超 20%，或核心客户宣布引入其他排他性替代方案。',
         valuation_level: '中性偏贵',
         valuation_metrics: '动态 PE > 28x, PS > 6x',
         valuation_priced_in: '已提前透支未来 1 年产能拉满、单价坚挺的最乐观场景。',
@@ -547,7 +522,6 @@ tool_id: investment-checklist
         profit_rule_2: '若单标的因暴涨市值占比突破 4.5%，被动削减至 3% 试错上限，再平衡至现金',
         exit_emotion: '【FOMO 与自满】警惕在行业最火热时把试探仓擅自加成重仓；警惕涨起来后误以为自己懂光芯片。',
         done_hypothesis: true,
-        done_premortem: true,
         done_hard_cap: true,
         done_no_averaging_down: true,
         done_exit: true
@@ -558,9 +532,6 @@ tool_id: investment-checklist
       if (!data) return {};
       if (data.__version === 4) return data;
       const migrated = { ...data, __version: 4 };
-      if (!migrated.ev_premortem && (data.risk_1 || data.size_downside)) {
-        migrated.ev_premortem = [data.risk_1, data.risk_2].filter(Boolean).join('；') || data.size_downside || '';
-      }
       if (!migrated.size_hard_cap && data.size_limit) {
         migrated.size_hard_cap = data.size_limit;
       }
@@ -660,15 +631,13 @@ tool_id: investment-checklist
         `标的 / 机会：${value(d, 'context_asset') || '（未填写）'}`,
         `计划持有周期：${value(d, 'context_horizon') || '（未填写）'}`,
         `市场情景与自身情绪：${value(d, 'context_market') || '（未填写）'}`, '',
-        '01 / EV｜核心命题与逆向排雷',
+        '01 / EV｜核心命题与三大支柱',
         `一句话核心命题：${value(d, 'ev_judgement') || '（未填写）'}`,
         `市场已知：${value(d, 'ev_market_knows') || '（未填写）'}`,
         `差异判断：${value(d, 'ev_difference') || '（未填写）'}`,
         `支柱一（需求扩张/周期）：${value(d, 'reason_1') || '（未填写）'}`,
         `支柱二（竞争壁垒/护城河）：${value(d, 'reason_2') || '（未填写）'}`,
         `支柱三（真实兑现/现金流）：${value(d, 'reason_3') || '（未填写）'}`,
-        `🔥 事前验尸（致命隐患）：${value(d, 'ev_premortem') || '（未填写）'}`,
-        `终局止损信号 (Kill Switch)：${value(d, 'ev_kill_switch') || '（未填写）'}`,
         `估值体感：${value(d, 'valuation_level') || '（未填写）'}`,
         `参考指标：${value(d, 'valuation_metrics') || '（未填写）'}`,
         `价格已计入预期：${value(d, 'valuation_priced_in') || '（未填写）'}`,
@@ -701,9 +670,8 @@ tool_id: investment-checklist
         '00 / CONTEXT｜决策背景',
         `记录日期：${value(d, 'context_date') || '（未填写）'}`,
         `标的 / 机会：${value(d, 'context_asset') || '（未填写）'}`, '',
-        '01 / EV｜核心命题与事前验尸',
-        `一句话核心命题：${value(d, 'ev_judgement') || '（未填写）'}`,
-        `🔥 事前验尸（若亏 50% 死因）：${value(d, 'ev_premortem') || '（未填写）'}`, '',
+        '01 / EV｜核心命题',
+        `一句话核心命题：${value(d, 'ev_judgement') || '（未填写）'}`, '',
         '02 / SIZE｜仓位硬顶与最大容忍亏损',
         `仓位角色：${value(d, 'size_role') || '（未填写）'}`,
         `🔥 仓位硬顶上限 (Hard Cap)：${value(d, 'size_hard_cap') || '（未填写）'}`,
@@ -745,7 +713,6 @@ tool_id: investment-checklist
       const role = value(d, 'size_role');
       const hardCap = value(d, 'size_hard_cap');
       const maxPain = value(d, 'size_max_pain');
-      const preMortem = value(d, 'ev_premortem');
       const title = asset ? `投资决策检查清单 - ${asset}` : '投资决策检查清单';
 
       const frontMatter = [
@@ -757,7 +724,6 @@ tool_id: investment-checklist
         `role: "${role.replace(/"/g, '\\"')}"`,
         `hard_cap: "${hardCap.replace(/"/g, '\\"')}"`,
         `max_pain: "${maxPain.replace(/"/g, '\\"')}"`,
-        `pre_mortem: "${preMortem.replace(/"/g, '\\"')}"`,
         'type: "investment-checklist"',
         'mode: "full"',
         'source: "https://shiliang.me/tools/investment-checklist/"',
@@ -773,7 +739,7 @@ tool_id: investment-checklist
         `- **标的 / 机会**：${asset || '（未填写）'}`,
         `- **计划持有周期**：${horizon || '（未填写）'}`,
         `- **当时市场情景与自身情绪**：${value(d, 'context_market') || '（未填写）'}`, '',
-        '## 01 / EV 核心命题与逆向排雷',
+        '## 01 / EV 核心命题与三大支柱',
         '### 一句话核心命题',
         `> ${value(d, 'ev_judgement') || '（未填写核心判断）'}`, '',
         '### 认知与预期差',
@@ -783,10 +749,6 @@ tool_id: investment-checklist
         `1. **需求扩张 / 产业周期硬事实**：${value(d, 'reason_1') || '（未填写）'}`,
         `2. **竞争壁垒 / 不可替代性证据**：${value(d, 'reason_2') || '（未填写）'}`,
         `3. **财务真实兑现 / 现金流支撑**：${value(d, 'reason_3') || '（未填写）'}`, '',
-        '### 🔥 Pre-mortem 事前验尸（致命排雷）',
-        `> **假设 1 年后这笔投资暴跌 50%，最致命、最可能的原因是什么？**`,
-        `> ${preMortem || '（未正视致命排雷隐患）'}`, '',
-        `- **终局止损信号 (Kill Switch)**：${value(d, 'ev_kill_switch') || '（未填写）'}`, '',
         '### 估值透支与安全边际核对',
         `- **当前估值体感**：${value(d, 'valuation_level') || '（未选择）'}`,
         `- **参考估值指标**：${value(d, 'valuation_metrics') || '（未填写）'}`,
@@ -817,7 +779,6 @@ tool_id: investment-checklist
         `- **买入前情绪警惕**：${value(d, 'exit_emotion') || '（未填写）'}`, '',
         '### 买入前底线核对项',
         `- [${d.done_hypothesis ? 'x' : ' '}] 我写出了可被证伪的核心命题，而非空洞“长期看好”`,
-        `- [${d.done_premortem ? 'x' : ' '}] 我完成了 Pre-mortem 事前验尸，正视了亏损 50% 的死因`,
         `- [${d.done_hard_cap ? 'x' : ' '}] 我锁死了仓位硬顶上限（Hard Cap）与最大容忍亏损`,
         `- [${d.done_no_averaging_down ? 'x' : ' '}] 我确立了加仓纪律，绝不纯因股价下跌而盲目补仓`,
         `- [${d.done_exit ? 'x' : ' '}] 我写清了退出条件，给未来的情绪冲动立下了硬规矩`, '',
@@ -835,7 +796,6 @@ tool_id: investment-checklist
       const role = value(d, 'size_role');
       const hardCap = value(d, 'size_hard_cap');
       const maxPain = value(d, 'size_max_pain');
-      const preMortem = value(d, 'ev_premortem');
       const title = asset ? `投资决策检查清单 - ${asset}` : '投资决策检查清单';
 
       const frontMatter = [
@@ -846,7 +806,6 @@ tool_id: investment-checklist
         `role: "${role.replace(/"/g, '\\"')}"`,
         `hard_cap: "${hardCap.replace(/"/g, '\\"')}"`,
         `max_pain: "${maxPain.replace(/"/g, '\\"')}"`,
-        `pre_mortem: "${preMortem.replace(/"/g, '\\"')}"`,
         'type: "investment-checklist"',
         'mode: "simple"',
         'source: "https://shiliang.me/tools/investment-checklist/"',
@@ -860,12 +819,9 @@ tool_id: investment-checklist
         '## 00 / CONTEXT 决策背景',
         `- **记录日期**：${date}`,
         `- **标的 / 机会**：${asset || '（未填写）'}`, '',
-        '## 01 / EV 核心命题与事前验尸',
+        '## 01 / EV 核心命题',
         '### 一句话核心命题',
         `> ${value(d, 'ev_judgement') || '（未填写核心判断）'}`, '',
-        '### 🔥 Pre-mortem 事前验尸（致命排雷）',
-        `> **假设 1 年后这笔投资暴跌 50%，最致命、最可能的原因是什么？**`,
-        `> ${preMortem || '（未填写）'}`, '',
         '## 02 / SIZE 仓位硬顶与最大容忍亏损',
         `- **仓位角色**：${role || '（未填写）'}`,
         `- **🔥 仓位硬顶上限 (Hard Cap)**：${hardCap || '（未设定）'}`,
