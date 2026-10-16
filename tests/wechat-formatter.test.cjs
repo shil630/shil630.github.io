@@ -136,3 +136,13 @@ test('font pairing switching takes effect correctly without style-breaking doubl
   assert.ok(mixedHtml.includes("<h1 style=\"margin:0 0 16px;color:#1E1D1B;font-family:'Songti SC'"), 'Mixed mode heading must be Songti SC');
   assert.ok(mixedHtml.includes("font-family:-apple-system,BlinkMacSystemFont,'PingFang SC'"), 'Mixed mode body must be PingFang SC');
 });
+
+test('wechat-formatter layout supports split scroll and sticky headers', () => {
+  assert.ok(html.includes('class="workspace-sticky-header"'), 'Must have workspace-sticky-header');
+  assert.ok(html.includes('class="preview-sticky-header"'), 'Must have preview-sticky-header');
+  assert.ok(html.includes('class="editor-wrap"'), 'Must have editor-wrap');
+  assert.ok(html.includes('.workspace-sticky-header'), 'CSS must define workspace-sticky-header');
+  assert.ok(html.includes('.preview-sticky-header'), 'CSS must define preview-sticky-header');
+  assert.ok(html.includes('position: sticky'), 'Must use sticky positioning for toolbar headers');
+});
+
