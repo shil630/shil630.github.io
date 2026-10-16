@@ -22,10 +22,11 @@ tool_id: wechat-formatter
       --sidebar-bg: #efe9df;
     }
     * { box-sizing: border-box; }
-    body {
+    html, body {
       margin: 0;
       min-width: 0;
       width: 100%;
+      height: 100%;
       color: var(--ink);
       background: var(--paper);
       font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -40,14 +41,42 @@ tool_id: wechat-formatter
     .mobile-drawer { display: none; }
 
     .app {
-      min-height: 100vh;
+      height: 100vh;
+      height: 100dvh;
       display: grid;
       grid-template-columns: 272px minmax(380px, 1fr) minmax(420px, 1.15fr);
+      overflow: hidden;
     }
     .sidebar {
       border-right: 1px solid var(--line);
       padding: 30px 24px;
       background: var(--sidebar-bg);
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Subtle custom scrollbars */
+    .sidebar, .workspace, .preview-area, .editor {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(31, 35, 40, .2) transparent;
+    }
+    .sidebar::-webkit-scrollbar,
+    .editor::-webkit-scrollbar,
+    .preview-area::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .sidebar::-webkit-scrollbar-thumb,
+    .editor::-webkit-scrollbar-thumb,
+    .preview-area::-webkit-scrollbar-thumb {
+      background: rgba(31, 35, 40, .14);
+      border-radius: 3px;
+    }
+    .sidebar::-webkit-scrollbar-thumb:hover,
+    .editor::-webkit-scrollbar-thumb:hover,
+    .preview-area::-webkit-scrollbar-thumb:hover {
+      background: rgba(31, 35, 40, .28);
     }
     .back-link {
       display: inline-block;
@@ -166,16 +195,23 @@ tool_id: wechat-formatter
     /* Workspace */
     .workspace {
       min-width: 0;
-      padding: 28px 28px 26px;
+      height: 100%;
+      padding: 24px 28px 18px;
       display: flex;
       flex-direction: column;
       background: #fbfbfb;
+      overflow: hidden;
+      position: relative;
+    }
+    .workspace-sticky-header {
+      flex: 0 0 auto;
+      margin-bottom: 12px;
     }
     .workspace-head, .preview-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       gap: 12px;
     }
     .eyebrow { color: var(--muted); font-size: 11px; letter-spacing: .12em; font-weight: 600; }
@@ -185,7 +221,7 @@ tool_id: wechat-formatter
       display: flex;
       align-items: flex-start;
       gap: 16px;
-      margin-bottom: 14px;
+      margin-bottom: 0;
     }
     .insert-tools {
       min-width: 0;
@@ -231,9 +267,17 @@ tool_id: wechat-formatter
     .utility-btn { padding: 7px 9px; border: 0; color: var(--muted); background: transparent; font-size: 12px; }
     .utility-btn:hover { color: var(--ink); background: rgba(31, 35, 40, .06); }
     .utility-btn.danger:hover { color: var(--red); background: rgba(182, 75, 59, .07); }
+    .editor-wrap {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
     .editor {
-      flex: 1;
-      min-height: 600px;
+      flex: 1 1 0;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
       resize: none;
       border: 1px solid var(--line);
       border-radius: 5px;
@@ -244,12 +288,14 @@ tool_id: wechat-formatter
       font-family: "SFMono-Regular", Consolas, Menlo, monospace;
       font-size: 13.5px;
       line-height: 1.8;
+      overflow-y: auto;
     }
     .editor:focus { border-color: rgba(182, 75, 59, .65); box-shadow: 0 0 0 3px rgba(182, 75, 59, .08); }
     .editor-foot {
+      flex: 0 0 auto;
       display: flex;
       justify-content: space-between;
-      padding: 10px 2px 0;
+      padding: 8px 2px 0;
       color: var(--muted);
       font-size: 11px;
     }
@@ -257,9 +303,24 @@ tool_id: wechat-formatter
     /* Preview Area */
     .preview-area {
       min-width: 0;
-      padding: 28px 34px 34px;
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 34px 34px;
       border-left: 1px solid var(--line);
       background: #ffffff;
+      position: relative;
+    }
+    .preview-sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, .96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 24px 34px 14px;
+      margin: 0 -34px 20px;
+      border-bottom: 1px solid var(--line);
     }
     .preview-actions { display: flex; align-items: center; gap: 8px; }
     .button {
@@ -287,7 +348,7 @@ tool_id: wechat-formatter
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin: 0 0 14px;
+      margin: 0;
     }
     .theme-row { display: flex; flex-wrap: wrap; gap: 6px; }
     .theme-pill {
@@ -330,13 +391,15 @@ tool_id: wechat-formatter
 
     /* Tuning Panel */
     .tune-panel {
-      margin: 0 0 18px;
+      margin: 12px 0 0;
       padding: 16px 18px;
       background: rgba(255, 255, 255, .94);
       border: 1px solid var(--sand);
       border-radius: 8px;
       backdrop-filter: blur(8px);
       box-shadow: 0 4px 16px rgba(15, 23, 42, .06);
+      max-height: calc(85vh - 120px);
+      overflow-y: auto;
     }
     .tune-panel[hidden] { display: none; }
     .tune-grid {
@@ -462,12 +525,28 @@ tool_id: wechat-formatter
     /* Responsive Breakpoints */
     @media (min-width: 900px) and (max-width: 1180px) {
       .app { grid-template-columns: 230px minmax(320px, 1fr) minmax(360px, 1fr); }
-      .sidebar, .workspace, .preview-area { padding-left: 18px; padding-right: 18px; }
+      .sidebar { padding-left: 18px; padding-right: 18px; }
+      .workspace { padding: 20px 18px 14px; }
+      .preview-area { padding-left: 18px; padding-right: 18px; }
+      .preview-sticky-header {
+        margin: 0 -18px 16px;
+        padding: 20px 18px 12px;
+      }
       .tune-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 899px) {
-      .app { display: block; min-height: auto; }
+      html, body {
+        height: auto;
+        min-height: 100%;
+        overflow-y: auto;
+      }
+      .app {
+        display: block;
+        height: auto;
+        min-height: auto;
+        overflow: visible;
+      }
       .mobile-header {
         display: flex;
         position: sticky;
@@ -523,7 +602,12 @@ tool_id: wechat-formatter
 
       /* View switching */
       .sidebar { display: none; }
-      body.view-edit .workspace { display: flex; padding: 16px 14px 28px; }
+      body.view-edit .workspace {
+        display: flex;
+        padding: 16px 14px 28px;
+        height: auto;
+        overflow: visible;
+      }
       body.view-edit .preview-area { display: none; }
       body.view-preview .workspace { display: none; }
       body.view-preview .preview-area {
@@ -531,9 +615,15 @@ tool_id: wechat-formatter
         padding: 16px 12px 96px;
         border-left: 0;
         background: #ffffff;
+        height: auto;
+        overflow: visible;
       }
 
       /* Workspace in mobile */
+      .workspace-sticky-header {
+        position: static;
+        margin-bottom: 12px;
+      }
       .workspace-head { margin-bottom: 12px; }
       .toolbar { flex-direction: column; gap: 8px; margin-bottom: 10px; }
       .insert-tools {
@@ -554,8 +644,13 @@ tool_id: wechat-formatter
         padding-top: 6px;
         justify-content: flex-end;
       }
+      .editor-wrap {
+        flex: none;
+      }
       .editor {
         min-height: 52vh;
+        height: auto;
+        flex: none;
         font-size: 14px;
         padding: 14px;
         line-height: 1.75;
@@ -577,6 +672,15 @@ tool_id: wechat-formatter
       }
 
       /* Preview in mobile */
+      .preview-sticky-header {
+        position: static;
+        padding: 0;
+        margin: 0 0 12px;
+        border-bottom: 0;
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
       .preview-head { display: none; }
       .theme-bar { margin-bottom: 12px; }
       .theme-row {
@@ -729,25 +833,29 @@ tool_id: wechat-formatter
 
     <!-- Workspace (Editor) -->
     <section class="workspace" id="workspacePanel" role="tabpanel" aria-labelledby="tabEdit">
-      <div class="workspace-head">
-        <span class="eyebrow">01 / 编辑原稿</span>
-        <span class="state"><b></b><span id="wordCount">0 字</span></span>
-      </div>
-      <div class="toolbar">
-        <div class="insert-tools" role="group" aria-label="插入格式">
-          <button class="tool-btn insert-btn" data-insert="## 小标题" aria-label="插入二级标题"><span>二级标题</span></button>
-          <button class="tool-btn insert-btn" data-insert="> 一句值得停下来的话" aria-label="插入引用"><span>引用</span></button>
-          <button class="tool-btn insert-btn" data-insert="- 一个要点" aria-label="插入列表"><span>列表</span></button>
-          <button class="tool-btn insert-btn" data-insert="==值得记住的一句话==" aria-label="插入高亮"><span>高亮</span></button>
-          <button class="tool-btn insert-btn" data-insert="```&#10;echo &quot;代码或引用原文&quot;&#10;```" aria-label="插入代码块"><span>代码块</span></button>
-          <button class="tool-btn insert-btn" data-insert="---" aria-label="插入分隔线"><span>分隔线</span></button>
+      <div class="workspace-sticky-header">
+        <div class="workspace-head">
+          <span class="eyebrow">01 / 编辑原稿</span>
+          <span class="state"><b></b><span id="wordCount">0 字</span></span>
         </div>
-        <div class="toolbar-actions" role="group" aria-label="编辑操作">
-          <button class="tool-btn utility-btn" id="sampleBtn">载入示例</button>
-          <button class="tool-btn utility-btn danger" id="clearBtn">清空</button>
+        <div class="toolbar">
+          <div class="insert-tools" role="group" aria-label="插入格式">
+            <button class="tool-btn insert-btn" data-insert="## 小标题" aria-label="插入二级标题"><span>二级标题</span></button>
+            <button class="tool-btn insert-btn" data-insert="> 一句值得停下来的话" aria-label="插入引用"><span>引用</span></button>
+            <button class="tool-btn insert-btn" data-insert="- 一个要点" aria-label="插入列表"><span>列表</span></button>
+            <button class="tool-btn insert-btn" data-insert="==值得记住的一句话==" aria-label="插入高亮"><span>高亮</span></button>
+            <button class="tool-btn insert-btn" data-insert="```&#10;echo &quot;代码或引用原文&quot;&#10;```" aria-label="插入代码块"><span>代码块</span></button>
+            <button class="tool-btn insert-btn" data-insert="---" aria-label="插入分隔线"><span>分隔线</span></button>
+          </div>
+          <div class="toolbar-actions" role="group" aria-label="编辑操作">
+            <button class="tool-btn utility-btn" id="sampleBtn">载入示例</button>
+            <button class="tool-btn utility-btn danger" id="clearBtn">清空</button>
+          </div>
         </div>
       </div>
-      <textarea id="source" class="editor" spellcheck="false" aria-label="Markdown 原稿"></textarea>
+      <div class="editor-wrap">
+        <textarea id="source" class="editor" spellcheck="false" aria-label="Markdown 原稿"></textarea>
+      </div>
       <div class="editor-foot">
         <span>Markdown 会实时转换</span>
         <span>图片请用完整的 https 地址</span>
@@ -757,89 +865,91 @@ tool_id: wechat-formatter
 
     <!-- Preview Area -->
     <section class="preview-area" id="previewPanel" role="tabpanel" aria-labelledby="tabPreview">
-      <div class="preview-head">
-        <span class="eyebrow">02 / 公众号预览</span>
-        <div class="preview-actions">
-          <button class="button" id="downloadBtn">下载 HTML</button>
-          <button class="button primary" id="copyBtn">复制到公众号</button>
-        </div>
-      </div>
-
-      <!-- Theme Row & Tuning Switch -->
-      <div class="theme-bar">
-        <div class="theme-row" id="themeRow" role="group" aria-label="配色主题"></div>
-        <button type="button" class="tune-toggle-btn" id="tuneToggleBtn" aria-expanded="false" aria-controls="tunePanel">
-          ⚙ 微调排版
-        </button>
-      </div>
-
-      <!-- Tuning Panel (Collapsible) -->
-      <div class="tune-panel" id="tunePanel" hidden>
-        <div class="tune-grid">
-          <!-- 1. 自定义主色调 -->
-          <div class="tune-item">
-            <label class="tune-label">自定义主色</label>
-            <div class="tune-color-control">
-              <input type="color" id="tuneColorPicker" class="tune-color-picker" aria-label="选取自定义主色" value="#B64B3B">
-              <span class="tune-color-val" id="tuneColorVal">默认</span>
-              <button type="button" class="tune-sm-btn" id="tuneResetColor">清除自选</button>
-            </div>
-          </div>
-          <!-- 2. 正文字号 -->
-          <div class="tune-item">
-            <label class="tune-label">正文字号</label>
-            <div class="tune-btn-group" id="tuneFontSizeGroup" role="radiogroup">
-              <button type="button" class="tune-opt-btn" data-val="15px">15px 紧凑</button>
-              <button type="button" class="tune-opt-btn active" data-val="16px">16px 标准</button>
-              <button type="button" class="tune-opt-btn" data-val="17px">17px 宽松</button>
-            </div>
-          </div>
-          <!-- 3. 字体搭配 -->
-          <div class="tune-item">
-            <label class="tune-label">字体搭配</label>
-            <div class="tune-btn-group" id="tuneFontGroup" role="radiogroup">
-              <button type="button" class="tune-opt-btn active" data-val="sans">现代黑体</button>
-              <button type="button" class="tune-opt-btn" data-val="serif">全篇宋体</button>
-              <button type="button" class="tune-opt-btn" data-val="mixed">宋体标+黑体文</button>
-            </div>
-          </div>
-          <!-- 4. 行间距 -->
-          <div class="tune-item">
-            <label class="tune-label">段落行距</label>
-            <div class="tune-btn-group" id="tuneLineHeightGroup" role="radiogroup">
-              <button type="button" class="tune-opt-btn" data-val="1.75">紧凑 1.75</button>
-              <button type="button" class="tune-opt-btn active" data-val="1.9">标准 1.90</button>
-              <button type="button" class="tune-opt-btn" data-val="2.1">疏朗 2.10</button>
-            </div>
-          </div>
-          <!-- 5. H2 标题样式 -->
-          <div class="tune-item">
-            <label class="tune-label" for="tuneH2Select">H2 标题徽章</label>
-            <select id="tuneH2Select" class="tune-select">
-              <option value="auto">跟随主题预设</option>
-              <option value="circle">圆形实心徽章 (circle)</option>
-              <option value="rule">底部细线强调 (rule)</option>
-              <option value="eyebrow-bar">侧边强调条 (eyebrow-bar)</option>
-              <option value="spaced">大号留白 (spaced)</option>
-              <option value="square">圆角方徽 (square)</option>
-              <option value="pill">胶囊徽章 (pill)</option>
-            </select>
-          </div>
-          <!-- 6. 引用块样式 -->
-          <div class="tune-item">
-            <label class="tune-label" for="tuneQuoteSelect">引用块样式</label>
-            <select id="tuneQuoteSelect" class="tune-select">
-              <option value="auto">跟随主题预设</option>
-              <option value="card">圆角底色卡片 (card)</option>
-              <option value="classic">经典左边线+底色 (classic)</option>
-              <option value="minimal">极简墨线 (minimal)</option>
-              <option value="airy">柔和无边线 (airy)</option>
-            </select>
+      <div class="preview-sticky-header">
+        <div class="preview-head">
+          <span class="eyebrow">02 / 公众号预览</span>
+          <div class="preview-actions">
+            <button class="button" id="downloadBtn">下载 HTML</button>
+            <button class="button primary" id="copyBtn">复制到公众号</button>
           </div>
         </div>
-        <div class="tune-foot">
-          <span>微调参数已自动保存，复制或下载时同步生效</span>
-          <button type="button" class="tune-sm-btn danger" id="tuneResetAll">恢复当前主题全部默认</button>
+
+        <!-- Theme Row & Tuning Switch -->
+        <div class="theme-bar">
+          <div class="theme-row" id="themeRow" role="group" aria-label="配色主题"></div>
+          <button type="button" class="tune-toggle-btn" id="tuneToggleBtn" aria-expanded="false" aria-controls="tunePanel">
+            ⚙ 微调排版
+          </button>
+        </div>
+
+        <!-- Tuning Panel (Collapsible) -->
+        <div class="tune-panel" id="tunePanel" hidden>
+          <div class="tune-grid">
+            <!-- 1. 自定义主色调 -->
+            <div class="tune-item">
+              <label class="tune-label">自定义主色</label>
+              <div class="tune-color-control">
+                <input type="color" id="tuneColorPicker" class="tune-color-picker" aria-label="选取自定义主色" value="#B64B3B">
+                <span class="tune-color-val" id="tuneColorVal">默认</span>
+                <button type="button" class="tune-sm-btn" id="tuneResetColor">清除自选</button>
+              </div>
+            </div>
+            <!-- 2. 正文字号 -->
+            <div class="tune-item">
+              <label class="tune-label">正文字号</label>
+              <div class="tune-btn-group" id="tuneFontSizeGroup" role="radiogroup">
+                <button type="button" class="tune-opt-btn" data-val="15px">15px 紧凑</button>
+                <button type="button" class="tune-opt-btn active" data-val="16px">16px 标准</button>
+                <button type="button" class="tune-opt-btn" data-val="17px">17px 宽松</button>
+              </div>
+            </div>
+            <!-- 3. 字体搭配 -->
+            <div class="tune-item">
+              <label class="tune-label">字体搭配</label>
+              <div class="tune-btn-group" id="tuneFontGroup" role="radiogroup">
+                <button type="button" class="tune-opt-btn active" data-val="sans">现代黑体</button>
+                <button type="button" class="tune-opt-btn" data-val="serif">全篇宋体</button>
+                <button type="button" class="tune-opt-btn" data-val="mixed">宋体标+黑体文</button>
+              </div>
+            </div>
+            <!-- 4. 行间距 -->
+            <div class="tune-item">
+              <label class="tune-label">段落行距</label>
+              <div class="tune-btn-group" id="tuneLineHeightGroup" role="radiogroup">
+                <button type="button" class="tune-opt-btn" data-val="1.75">紧凑 1.75</button>
+                <button type="button" class="tune-opt-btn active" data-val="1.9">标准 1.90</button>
+                <button type="button" class="tune-opt-btn" data-val="2.1">疏朗 2.10</button>
+              </div>
+            </div>
+            <!-- 5. H2 标题样式 -->
+            <div class="tune-item">
+              <label class="tune-label" for="tuneH2Select">H2 标题徽章</label>
+              <select id="tuneH2Select" class="tune-select">
+                <option value="auto">跟随主题预设</option>
+                <option value="circle">圆形实心徽章 (circle)</option>
+                <option value="rule">底部细线强调 (rule)</option>
+                <option value="eyebrow-bar">侧边强调条 (eyebrow-bar)</option>
+                <option value="spaced">大号留白 (spaced)</option>
+                <option value="square">圆角方徽 (square)</option>
+                <option value="pill">胶囊徽章 (pill)</option>
+              </select>
+            </div>
+            <!-- 6. 引用块样式 -->
+            <div class="tune-item">
+              <label class="tune-label" for="tuneQuoteSelect">引用块样式</label>
+              <select id="tuneQuoteSelect" class="tune-select">
+                <option value="auto">跟随主题预设</option>
+                <option value="card">圆角底色卡片 (card)</option>
+                <option value="classic">经典左边线+底色 (classic)</option>
+                <option value="minimal">极简墨线 (minimal)</option>
+                <option value="airy">柔和无边线 (airy)</option>
+              </select>
+            </div>
+          </div>
+          <div class="tune-foot">
+            <span>微调参数已自动保存，复制或下载时同步生效</span>
+            <button type="button" class="tune-sm-btn danger" id="tuneResetAll">恢复当前主题全部默认</button>
+          </div>
         </div>
       </div>
 
@@ -1404,6 +1514,14 @@ tool_id: wechat-formatter
     $('#mobileCopyBtn').addEventListener('click', handleCopy);
     $('#downloadBtn').addEventListener('click', handleDownload);
     $('#mobileDownloadBtn').addEventListener('click', handleDownload);
+
+    // 在原稿工作区顶部工具栏滚动滚轮时，转发滚动至 source textarea
+    const wsHeader = document.querySelector('.workspace-sticky-header');
+    if (wsHeader && source) {
+      wsHeader.addEventListener('wheel', (e) => {
+        source.scrollTop += e.deltaY;
+      }, { passive: true });
+    }
 
     syncTuningUI();
     update();
