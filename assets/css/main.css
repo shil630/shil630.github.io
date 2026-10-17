@@ -128,47 +128,6 @@ img { max-width: 100%; height: auto; }
   line-height: 1.28;
   letter-spacing: -0.015em;
 }
-.hero-lead {
-  max-width: 600px;
-  margin: 14px auto 0;
-  color: var(--fg-soft);
-  font-size: 16px;
-  line-height: 1.75;
-}
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  flex-wrap: balance;
-  justify-content: center;
-  align-items: safe center;
-  gap: 12px;
-  margin-top: 22px;
-}
-.hero-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 18px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-  text-decoration: none;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
-}
-.hero-btn:hover { text-decoration: none; }
-.hero-btn-primary {
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: #fff;
-}
-.hero-btn-primary:hover { opacity: 0.9; color: #fff; }
-.hero-btn-secondary {
-  background: color-mix(in srgb, var(--bg-soft) 75%, var(--bg));
-  border: 1px solid var(--border);
-  color: var(--fg);
-}
-.hero-btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 .decision-framework { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 22px; }
 .decision-step {
   display: flex;
@@ -323,26 +282,6 @@ img { max-width: 100%; height: auto; }
 
 /* ---------- Featured posts ---------- */
 .featured-section { margin: 0 0 48px; }
-.featured-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-.featured-label {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-}
-.featured-hint {
-  font-size: 13px;
-  color: var(--fg-faint);
-}
 .featured-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
 .featured-card {
   display: flex;
@@ -739,9 +678,8 @@ a.text-cta:hover,
 @media (max-width: 600px) {
   body { font-size: 16px; }
   .site-main { padding: 36px 0 56px; }
-  .hero { margin-bottom: 36px; padding-bottom: 24px; }
+  .hero { margin-bottom: 36px; }
   .hero-title { font-size: 31px; }
-  .hero-lead { font-size: 15px; }
   .featured-list { grid-template-columns: 1fr; }
   .home-tool-grid { grid-template-columns: 1fr; row-gap: 12px; }
   .home-tool-card { grid-row: auto; display: flex; flex-direction: column; gap: 6px; }

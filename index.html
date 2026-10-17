@@ -5,11 +5,6 @@ image: "/assets/images/blog-home-og-1200x630.png"
 <section class="hero wrap">
   <p class="hero-pillars" data-en="Design · Investing · Poker" data-zh="设计 · 投资 · 德州">设计 · 投资 · 德州</p>
   <h1 class="hero-title" data-en="Keep making better decisions under uncertainty" data-zh="在不确定中，持续做更好的决策">在不确定中，持续做更好的决策</h1>
-  <p class="hero-lead" data-en="Liang Shi's long-term notebook — applying Expected Value (EV), Position Sizing (SIZE), and Exit Discipline (EXIT) across investing, poker, and complex system design." data-zh="UX 设计师石亮的长期实验——用「期望值 EV · 投入尺度 SIZE · 退出纪律 EXIT」拆解美股投资、德州扑克与复杂系统设计。">UX 设计师石亮的长期实验——用「期望值 EV · 投入尺度 SIZE · 退出纪律 EXIT」拆解美股投资、德州扑克与复杂系统设计。</p>
-  <div class="hero-actions">
-    <a class="hero-btn hero-btn-primary" href="#featured-heading" data-track-cta data-cta-type="hero_featured" data-placement="home_hero"><span data-en="Read featured essays" data-zh="阅读精选代表作">阅读精选代表作</span> ↓</a>
-    <a class="hero-btn hero-btn-secondary" href="#home-tools" data-track-cta data-cta-type="hero_tools" data-placement="home_hero"><span data-en="Try decision tools" data-zh="试用交互决策工具">试用交互决策工具</span> →</a>
-  </div>
 </section>
 
 <section class="posts wrap" id="articles">
@@ -20,11 +15,7 @@ image: "/assets/images/blog-home-og-1200x630.png"
     {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
     {% assign featured_posts = published_posts | where: "featured", true | sort: "date" | reverse %}
     {% if featured_posts.size > 0 %}
-    <section class="featured-section" aria-labelledby="featured-heading">
-      <div class="featured-header">
-        <h2 class="featured-label" id="featured-heading" data-en="Featured Essays" data-zh="精选代表作">精选代表作</h2>
-        <span class="featured-hint" data-en="Start here to understand the system" data-zh="初次到访，建议从这两篇开始">初次到访，建议从这两篇开始</span>
-      </div>
+    <section class="featured-section" aria-label="精选">
       <div class="featured-grid">
         {% for post in featured_posts limit: 2 %}
         <a class="featured-card" href="{{ post.url | relative_url }}" data-lang="{{ post.lang | default: site.lang }}" data-track-cta data-cta-type="featured_article" data-placement="home_featured">
