@@ -77,9 +77,11 @@ assert!(home.match?(/\sdata-en=/) && home.match?(/\sdata-zh=/), "首页缺少双
 assert!(home.include?('rel="canonical"'), "首页缺少 canonical")
 assert!(home.include?('property="og:'), "首页缺少 Open Graph 元数据")
 
-markers = ["精选", "最新文章", "UX 作品集", "订阅正EV实验"]
+markers = ["精选", "最新文章", "自建决策工具", "UX 作品集", "订阅正EV实验"]
 positions = markers.map { |marker| home.index(marker) }
 assert!(positions.none?(&:nil?) && positions == positions.sort, "首页内容顺序不符合预期")
+assert!(home.include?('class="hero-lead"'), "首页缺少个人定位副标题 (.hero-lead)")
+assert!(home.include?('class="hero-actions"'), "首页缺少首屏快捷分流按钮 (.hero-actions)")
 
 article_paths = Dir.glob(File.join(build_dir, "posts", "**", "index.html"))
 assert!(!article_paths.empty?, "未生成任何文章页")
@@ -94,6 +96,9 @@ assert!(article.include?('<article class="post wrap" lang="zh">'), "文章正文
 end
 
 featured_count = home.scan('class="featured-card"').length
+assert!(featured_count == 2, "首页精选代表作数量应为 2，实际为 #{featured_count}")
+home_tools_count = home.scan('class="home-tool-card"').length
+assert!(home_tools_count == 3, "首页自建工具卡片数量应为 3，实际为 #{home_tools_count}")
 tool_dirs = Dir.glob(File.join(build_dir, "tools", "*", "index.html")).map do |path|
   File.basename(File.dirname(path))
 end
