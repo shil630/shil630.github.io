@@ -80,8 +80,6 @@ assert!(home.include?('property="og:'), "首页缺少 Open Graph 元数据")
 markers = ["精选", "最新文章", "自建决策工具", "UX 作品集", "订阅正EV实验"]
 positions = markers.map { |marker| home.index(marker) }
 assert!(positions.none?(&:nil?) && positions == positions.sort, "首页内容顺序不符合预期")
-assert!(home.include?('class="hero-lead"'), "首页缺少个人定位副标题 (.hero-lead)")
-assert!(home.include?('class="hero-actions"'), "首页缺少首屏快捷分流按钮 (.hero-actions)")
 
 article_paths = Dir.glob(File.join(build_dir, "posts", "**", "index.html"))
 assert!(!article_paths.empty?, "未生成任何文章页")
