@@ -91,6 +91,14 @@ tool_id: investment-checklist
     button { border:1px solid var(--ink); border-radius:4px; padding:11px 15px; color:var(--ink); background:transparent; cursor:pointer; font:inherit; font-size:13px; }
     button.primary { border-color:var(--red); color:#fffdf9; background:var(--red); }
     button:hover { opacity:.84; }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible,
+    a:focus-visible {
+      outline: 2px solid var(--red);
+      outline-offset: 2px;
+    }
     .saved { margin-left:auto; color:var(--muted); font-size:12px; align-self:center; }
     .bottom-note { margin-top:34px; color:var(--muted); font-size:12px; line-height:1.8; font-style:italic; }
     @media (max-width:760px) {
@@ -140,6 +148,14 @@ tool_id: investment-checklist
     .tool-subscribe-card input[type="email"]:focus { border-color: var(--red); outline: none; }
     .tool-subscribe-card button[type="submit"] { padding: 10px 20px; border: 1px solid var(--red); border-radius: 4px; background: var(--red); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
     .tool-subscribe-card button[type="submit"]:hover { opacity: .88; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
     @media print {
       body { background:#fff; }
       .actions, .steps, .back-link, .tool-related-posts, .tool-subscribe-card { display:none; }

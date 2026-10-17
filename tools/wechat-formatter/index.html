@@ -522,6 +522,24 @@ tool_id: wechat-formatter
     }
     .toast.show { transform: translateY(0); opacity: 1; }
 
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible,
+    a:focus-visible {
+      outline: 2px solid var(--red);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
     /* Responsive Breakpoints */
     @media (min-width: 900px) and (max-width: 1180px) {
       .app { grid-template-columns: 230px minmax(320px, 1fr) minmax(360px, 1fr); }
@@ -786,8 +804,8 @@ tool_id: wechat-formatter
   <header class="mobile-header" aria-label="移动端排版器导航">
     <a class="mobile-back" href="/tools/">← 工具</a>
     <div class="mobile-tabs" role="tablist" aria-label="排版视图模式">
-      <button type="button" class="mobile-tab-btn active" id="tabEdit" role="tab" aria-selected="true" aria-controls="workspacePanel">原稿编辑</button>
-      <button type="button" class="mobile-tab-btn" id="tabPreview" role="tab" aria-selected="false" aria-controls="previewPanel">排版预览</button>
+      <button type="button" class="mobile-tab-btn active" id="tabEdit" role="tab" aria-selected="true" tabindex="0" aria-controls="workspacePanel">原稿编辑</button>
+      <button type="button" class="mobile-tab-btn" id="tabPreview" role="tab" aria-selected="false" tabindex="-1" aria-controls="previewPanel">排版预览</button>
     </div>
     <span class="mobile-stat" id="mobileWordCount">0 字</span>
   </header>
@@ -1453,14 +1471,37 @@ tool_id: wechat-formatter
       document.body.classList.add('view-' + view);
       tabEdit.classList.toggle('active', view === 'edit');
       tabEdit.setAttribute('aria-selected', String(view === 'edit'));
+      tabEdit.setAttribute('tabindex', view === 'edit' ? '0' : '-1');
       tabPreview.classList.toggle('active', view === 'preview');
       tabPreview.setAttribute('aria-selected', String(view === 'preview'));
+      tabPreview.setAttribute('tabindex', view === 'preview' ? '0' : '-1');
       if (view === 'preview') window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     tabEdit.addEventListener('click', () => switchMobileView('edit'));
     tabPreview.addEventListener('click', () => switchMobileView('preview'));
     mobilePreviewCta.addEventListener('click', () => switchMobileView('preview'));
+
+    const mobileTabsList = document.querySelector('.mobile-tabs');
+    if (mobileTabsList) {
+      mobileTabsList.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const targetView = e.key === 'ArrowRight' ? 'preview' : 'edit';
+          switchMobileView(targetView);
+          const activeBtn = targetView === 'edit' ? tabEdit : tabPreview;
+          activeBtn.focus();
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          switchMobileView('edit');
+          tabEdit.focus();
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          switchMobileView('preview');
+          tabPreview.focus();
+        }
+      });
+    }
 
     mobileDrawerToggle.addEventListener('click', () => {
       const open = !mobileDrawerBody.hidden;

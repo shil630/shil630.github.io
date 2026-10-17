@@ -224,3 +224,8 @@ test('getFilename sanitizes special characters and includes asset and date', () 
   vm.runInContext(`fields = () => ({ context_asset: '', context_date: '2026-09-13' });`, context);
   assert.equal(exports.getFilename(), '投资检查清单-2026-09-13.md');
 });
+
+test('investment-checklist contains accessible focus-visible styles and reduced motion query', () => {
+  assert.ok(html.includes(':focus-visible'), 'CSS must define focus-visible styles');
+  assert.ok(html.includes('prefers-reduced-motion'), 'CSS must define prefers-reduced-motion media query');
+});
