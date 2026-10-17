@@ -7,7 +7,7 @@ lang: zh
 categories: [投资, 决策系统]
 tags: [公司研究, 股票估值, 投资决策, 仓位管理]
 description: "以 SPGI 为例，拆解好公司与好股票之间的判断差异：先看公司如何创造价值，再看价格与赔率，最后决定投入尺度。"
-series: 投资系统
+series: 投资
 image: "/assets/images/posts/spgi-company-stock-position/company-thesis-chain-blog.png"
 source_version: v1.1
 source_file: "/Users/liangshi/Documents/个人IP/内容项目/10-W11-公司股票仓位判断/08-Blog终稿-v1.0.md"

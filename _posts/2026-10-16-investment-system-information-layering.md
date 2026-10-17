@@ -8,7 +8,7 @@ lang: zh
 categories: [投资, 决策系统]
 tags: [投资系统, 信息分层, 信号与噪音, 决策流程, 交易纪律]
 description: "直击‘看到消息就想调仓’的冲动病，讲透噪音与信号的区别，用四层漏斗与三道硬阻尼为投资决策建立防错机制，并分享《三栏信息过滤卡》与 ThesisFlow 核心逻辑。"
-series: 投资系统
+series: 投资
 related_tool: investment-checklist
 image: "/assets/images/posts/investment-system-information-layering/noise-shortcut-vs-buffered-system-blog.png"
 source_version: v1.1

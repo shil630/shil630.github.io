@@ -7,7 +7,7 @@ lang: zh
 categories: [投资, 决策系统]
 tags: [投资组合, 分散投资, 风险管理, 认知带宽, 仓位管理]
 description: "从一次把不同标的买成同一资本开支敞口的真实经历出发，拆解表面分散与真实风险集中，并用组合底层前提检查卡把精力收敛到少数核心。"
-series: 投资系统
+series: 投资
 image: "/assets/images/posts/portfolio-diversification-common-factor/hidden-factor-common-exposure-blog.png"
 source_version: v1.1
 source_file: "/Users/liangshi/Documents/个人IP/内容项目/11-W12-持仓分散与组合风险/08-Blog终稿-v1.0.md"

@@ -7,7 +7,7 @@ lang: zh
 categories: [投资, 决策系统]
 tags: [投资系统, 账户隔离, 仓位管理, 风险管理]
 description: '账户隔离不是多开几个 App，而是让不同用途的资金按不同规则执行，并在复核时合并检查整体风险。'
-series: 投资系统
+series: 投资
 image: '/assets/images/posts/account-separation/账户分工与资金流向-blog.png'
 source_version: v1.0
 source_file: '内容项目/第四篇-左右互博账户隔离/07-Blog终稿-v1.0.md'

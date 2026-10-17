@@ -8,7 +8,7 @@ lang: zh
 categories: [投资, 德州扑克]
 tags: [期望值, 仓位管理, 投资系统]
 description: "从阿里割肉到重建交易系统——期望值、下注尺度、弃牌纪律，三条线索如何重塑你看市场的方式。"
-series: 投资系统
+series: 投资
 related_tool: preflop-range
 ---
 

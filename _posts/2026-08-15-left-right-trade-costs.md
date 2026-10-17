@@ -7,7 +7,7 @@ lang: zh
 categories: [投资, 决策系统]
 tags: [左侧交易, 右侧交易, 仓位管理, 决策框架]
 description: "从 SpaceX 的分批左侧建仓和立讯精密的右侧进场出发，拆解价格、信息、等待与修正成本，并用交易账单复核卡决定该为哪种不确定性付费。"
-series: 投资系统
+series: 投资
 image: "/assets/images/posts/left-right-trade-costs/information-price-tradeoff-blog.png"
 source_version: v1.2
 source_file: "/Users/liangshi/Documents/个人IP/内容项目/08-W9-左侧与右侧交易/08-Blog终稿-v1.2.md"
