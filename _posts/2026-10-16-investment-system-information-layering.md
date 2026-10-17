@@ -3,11 +3,13 @@ layout: post
 title: "每条新闻都想让你行动，说明你的投资系统还没分层"
 subtitle: "别让混杂着情绪的市场噪音，直接撞开你的交易确认键"
 date: 2026-10-16 20:30:00 +0800
+featured: true
 lang: zh
 categories: [投资, 决策系统]
 tags: [投资系统, 信息分层, 信号与噪音, 决策流程, 交易纪律]
 description: "直击‘看到消息就想调仓’的冲动病，讲透噪音与信号的区别，用四层漏斗与三道硬阻尼为投资决策建立防错机制，并分享《三栏信息过滤卡》与 ThesisFlow 核心逻辑。"
 series: 投资系统
+related_tool: investment-checklist
 image: "/assets/images/posts/investment-system-information-layering/noise-shortcut-vs-buffered-system-blog.png"
 source_version: v1.0
 source_file: "/Users/liangshi/Documents/个人IP/内容项目/12-W13-投资系统信息分层/08-Blog终稿-v1.0.md"
