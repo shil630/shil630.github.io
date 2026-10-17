@@ -344,7 +344,7 @@ tool_id: preflop-range
     .hand-cell:hover {
       z-index: 2;
       border-color: var(--accent);
-      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(30, 29, 27, 0.08);
     }
 
     .hand-cell.open {
@@ -461,7 +461,51 @@ tool_id: preflop-range
       flex-wrap: wrap;
       align-items: center;
       justify-content: flex-end;
-      gap: 6px;
+      gap: 8px;
+    }
+
+    .mode-switch {
+      display: inline-flex;
+      background: var(--surface-soft);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-control);
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .mode-btn {
+      min-height: 28px;
+      padding: 4px 10px;
+      cursor: pointer;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--body);
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .mode-btn:hover {
+      color: var(--ink);
+    }
+
+    .mode-btn.active {
+      background: var(--surface);
+      color: var(--ink);
+      font-weight: 700;
+      box-shadow: 0 1px 3px rgba(30, 29, 27, 0.08);
+    }
+
+    .position-tab.is-customized::after {
+      content: "";
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-left: 5px;
+      vertical-align: middle;
     }
 
     .range-mode {
@@ -471,21 +515,22 @@ tool_id: preflop-range
     }
 
     .tool-action {
-      min-height: 34px;
-      padding: 6px 11px;
+      min-height: 32px;
+      padding: 5px 11px;
       cursor: pointer;
-      color: var(--accent);
+      color: var(--body);
       background: var(--surface);
-      border: 1px solid var(--accent);
+      border: 1px solid var(--sand);
       border-radius: var(--radius-control);
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 600;
       transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
     }
 
     .tool-action:hover:not(:disabled) {
-      color: var(--surface);
-      background: var(--accent);
+      color: var(--ink);
+      background: var(--surface-soft);
+      border-color: var(--accent);
     }
 
     .tool-action.secondary {
@@ -961,7 +1006,7 @@ tool_id: preflop-range
         <h1 id="page-title">翻前开池范围</h1>
         <p class="hero-copy">选择位置，查看前面无人入池时的开池范围。</p>
       </div>
-      <p class="hero-note">先写清行动边界，再看结果。</p>
+      <p class="hero-note">选定位置查看或编辑起手牌范围，支持一键复制到求解器或笔记。</p>
     </section>
 
     <div class="assumptions" aria-label="适用场景">
@@ -976,16 +1021,20 @@ tool_id: preflop-range
       <div class="tool-head">
         <div>
           <h2 id="tool-title">无人入池时开池（RFI）</h2>
-          <p>点选牌格加入或移除；清空后可自定义。</p>
+          <p id="tool-hint">点击或悬停牌格查看开池决策；切换至编辑模式可增删手牌。</p>
         </div>
         <div class="tool-tools">
           <div class="legend" aria-label="牌表图例">
             <span class="legend-item"><span class="legend-swatch open" aria-hidden="true"></span>当前范围</span>
             <span class="legend-item"><span class="legend-swatch" aria-hidden="true"></span>范围外</span>
           </div>
-          <div class="range-actions" aria-label="范围编辑">
+          <div class="range-actions" aria-label="范围操作">
+            <div class="mode-switch" role="radiogroup" aria-label="操作模式">
+              <button class="mode-btn active" id="mode-view" type="button" role="radio" aria-checked="true">查看模式</button>
+              <button class="mode-btn" id="mode-edit" type="button" role="radio" aria-checked="false">编辑模式</button>
+            </div>
             <span class="range-mode" id="range-mode" aria-live="polite">默认范围</span>
-            <button class="tool-action" id="clear-range" type="button">清空当前范围</button>
+            <button class="tool-action secondary" id="clear-range" type="button">清空</button>
             <button class="tool-action secondary" id="restore-range" type="button">恢复默认</button>
           </div>
         </div>
@@ -1020,7 +1069,7 @@ tool_id: preflop-range
               </div>
               <div class="stat">
                 <span class="stat-value" id="range-percent">—</span>
-                <span class="stat-label">全部起手牌</span>
+                <span class="stat-label">占全部组合</span>
               </div>
             </div>
           </div>
@@ -1252,22 +1301,75 @@ tool_id: preflop-range
         return hand.endsWith("s") ? 4 : 12;
       }
 
+      const STORAGE_KEY = "positive-ev-preflop-ranges-v1";
+
+      function loadStoredRanges() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return null;
+          const data = JSON.parse(raw);
+          if (!data || data.version !== 1 || typeof data.positions !== "object") return null;
+          return data.positions;
+        } catch (_e) {
+          return null;
+        }
+      }
+
+      function saveStoredRanges() {
+        try {
+          const customPositions = {};
+          let hasCustom = false;
+          parsedRanges.forEach((val, posId) => {
+            if (val.isEdited) {
+              customPositions[posId] = Array.from(val.hands);
+              hasCustom = true;
+            }
+          });
+          if (hasCustom) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+              version: 1,
+              updatedAt: new Date().toISOString(),
+              positions: customPositions
+            }));
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        } catch (_e) {
+          // ignore storage quota issues
+        }
+      }
+
+      const storedCustomPositions = loadStoredRanges();
+
       const parsedRanges = new Map(positions.map((position) => {
         const parsed = parseRange(position.range);
         if (parsed.errors.length) {
           throw new Error(`${position.id} 范围文本无法解析：${parsed.errors.join(", ")}`);
         }
+        const defaultHands = new Set(parsed.hands);
+        let hands = new Set(parsed.hands);
+        let isEdited = false;
+
+        if (storedCustomPositions && Array.isArray(storedCustomPositions[position.id])) {
+          const validHands = storedCustomPositions[position.id].filter(
+            (hand) => typeof hand === "string" && isValidHand(hand)
+          );
+          hands = new Set(validHands);
+          isEdited = true;
+        }
+
         return [position.id, {
-          defaultHands: new Set(parsed.hands),
-          hands: new Set(parsed.hands),
-          isEdited: false
+          defaultHands,
+          hands,
+          isEdited
         }];
       }));
 
       const state = {
         positionId: "UTG",
         activeHand: null,
-        keyboardHand: "AA"
+        keyboardHand: "AA",
+        interactionMode: "view"
       };
 
       const positionTabs = document.getElementById("position-tabs");
@@ -1283,6 +1385,32 @@ tool_id: preflop-range
       const rangeMode = document.getElementById("range-mode");
       const clearRangeButton = document.getElementById("clear-range");
       const restoreRangeButton = document.getElementById("restore-range");
+      const modeViewBtn = document.getElementById("mode-view");
+      const modeEditBtn = document.getElementById("mode-edit");
+      const toolHint = document.getElementById("tool-hint");
+
+      function setInteractionMode(mode) {
+        state.interactionMode = mode;
+        if (modeViewBtn) {
+          modeViewBtn.classList.toggle("active", mode === "view");
+          modeViewBtn.setAttribute("aria-checked", String(mode === "view"));
+        }
+        if (modeEditBtn) {
+          modeEditBtn.classList.toggle("active", mode === "edit");
+          modeEditBtn.setAttribute("aria-checked", String(mode === "edit"));
+        }
+        if (toolHint) {
+          toolHint.textContent = mode === "edit"
+            ? "点击牌格加入或移除；清空后可自定义绘制。"
+            : "点击或悬停牌格查看开池决策；切换至编辑模式可增删手牌。";
+        }
+        updateMatrix(currentRangeState().hands);
+      }
+
+      if (modeViewBtn && modeEditBtn) {
+        modeViewBtn.addEventListener("click", () => setInteractionMode("view"));
+        modeEditBtn.addEventListener("click", () => setInteractionMode("edit"));
+      }
 
       function currentPosition() {
         return positions.find((position) => position.id === state.positionId);
@@ -1354,19 +1482,29 @@ tool_id: preflop-range
 
       function updatePositionTabs() {
         positionTabs.querySelectorAll("[data-position]").forEach((button) => {
-          const isActive = button.dataset.position === state.positionId;
+          const posId = button.dataset.position;
+          const isActive = posId === state.positionId;
+          const posState = parsedRanges.get(posId);
+          const isCustom = posState && posState.isEdited;
           button.setAttribute("aria-selected", String(isActive));
+          button.classList.toggle("is-customized", Boolean(isCustom));
           button.tabIndex = isActive ? 0 : -1;
+          const posObj = positions.find((p) => p.id === posId);
+          const baseName = posObj ? posObj.short : posId;
+          button.setAttribute("aria-label", `${baseName}${isCustom ? "（已自定义）" : ""}`);
         });
       }
 
       function updateMatrix(openHands) {
+        const isEditing = state.interactionMode === "edit";
         matrix.querySelectorAll("[data-hand]").forEach((button) => {
           const hand = button.dataset.hand;
           const isOpen = openHands.has(hand);
 
           button.classList.toggle("open", isOpen);
-          button.setAttribute("aria-label", `${hand}，${isOpen ? "当前在范围内，点击移除" : "当前在范围外，点击加入"}`);
+          const stateLabel = isOpen ? "在开池范围内" : "在开池范围外";
+          const actionLabel = isEditing ? (isOpen ? "，点击移除" : "，点击加入") : "，点击查看详情";
+          button.setAttribute("aria-label", `${hand}，当前${stateLabel}${actionLabel}`);
           button.setAttribute("aria-pressed", String(isOpen));
           button.tabIndex = hand === state.keyboardHand ? 0 : -1;
         });
@@ -1387,13 +1525,16 @@ tool_id: preflop-range
 
       function renderHandResult(openHands) {
         handResult.innerHTML = "";
+        const rangeState = currentRangeState();
 
         if (!state.activeHand) {
           const prompt = document.createElement("strong");
           prompt.textContent = "悬停查看手牌";
 
           const hint = document.createElement("p");
-          hint.textContent = "将鼠标移到任意牌格上查看开池结果；手机可轻触。";
+          hint.textContent = state.interactionMode === "edit"
+            ? "点击任意牌格可加入或移出范围；清空后可自定义绘制。"
+            : "点击或悬停任意牌格查看开池决策；切换至编辑模式可增删手牌。";
 
           handResult.append(prompt, hint);
           return;
@@ -1406,10 +1547,11 @@ tool_id: preflop-range
         title.className = isOpen ? "is-open" : "";
         title.textContent = `${state.activeHand} · ${action}`;
 
+        const scope = rangeState.isEdited ? "你的自定义" : "当前作者";
         const detail = document.createElement("p");
         detail.textContent = isOpen
-          ? "这手牌已写入当前作者开池范围。"
-          : "这手牌未写入当前作者开池范围。";
+          ? `这手牌已写入${scope}开池范围。`
+          : `这手牌未写入${scope}开池范围。`;
 
         handResult.append(title, detail);
       }
@@ -1471,6 +1613,7 @@ tool_id: preflop-range
         }
         rangeState.isEdited = true;
         state.activeHand = hand;
+        saveStoredRanges();
         render();
       }
 
@@ -1494,7 +1637,11 @@ tool_id: preflop-range
         const button = event.target.closest("[data-hand]");
         if (!button) return;
         state.keyboardHand = button.dataset.hand;
-        toggleHand(button.dataset.hand);
+        if (state.interactionMode === "edit") {
+          toggleHand(button.dataset.hand);
+        } else {
+          showHandDetail(button.dataset.hand);
+        }
       });
 
       matrix.addEventListener("focusin", (event) => {
@@ -1532,20 +1679,31 @@ tool_id: preflop-range
       });
 
       clearRangeButton.addEventListener("click", () => {
-        window.toolAnalytics?.action('clear_range');
         const rangeState = currentRangeState();
+        if (rangeState.hands.size === 0) return;
+        const pos = currentPosition();
+        if (!confirm(`确认清空【${pos.name}】的开池范围吗？`)) return;
+        window.toolAnalytics?.action('clear_range');
         rangeState.hands.clear();
         rangeState.isEdited = true;
         state.activeHand = null;
+        if (state.interactionMode !== "edit") {
+          setInteractionMode("edit");
+        }
+        saveStoredRanges();
         render();
       });
 
       restoreRangeButton.addEventListener("click", () => {
-        window.toolAnalytics?.action('restore_range');
         const rangeState = currentRangeState();
+        if (!rangeState.isEdited) return;
+        const pos = currentPosition();
+        if (!confirm(`确认将【${pos.name}】恢复为作者默认开池范围吗？`)) return;
+        window.toolAnalytics?.action('restore_range');
         rangeState.hands = new Set(rangeState.defaultHands);
         rangeState.isEdited = false;
         state.activeHand = null;
+        saveStoredRanges();
         render();
       });
 
@@ -1608,6 +1766,17 @@ tool_id: preflop-range
       copyButton.addEventListener("click", copyRange);
       initializePositionTabs();
       initializeMatrix();
+      if (typeof window !== "undefined") {
+        window.__preflop = {
+          state,
+          parsedRanges,
+          toggleHand,
+          renderHandResult,
+          currentRangeState,
+          saveStoredRanges,
+          setInteractionMode
+        };
+      }
       render();
     })();
   </script>
