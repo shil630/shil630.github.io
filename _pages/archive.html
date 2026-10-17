@@ -9,6 +9,9 @@ permalink: /archive/
     <p class="page-subtitle" data-en="All posts, newest first" data-zh="全部文章，按时间倒序">全部文章，按时间倒序</p>
   </header>
 
+  {% assign has_zh = false %}{% assign has_en = false %}
+  {% for post in site.posts %}{% if post.draft != true %}{% if post.lang == 'zh' %}{% assign has_zh = true %}{% elsif post.lang == 'en' %}{% assign has_en = true %}{% endif %}{% endif %}{% endfor %}
+
   {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
   {% assign postsByYear = published_posts | group_by_exp: "post", "post.date | date: '%Y'" %}
   {% for year in postsByYear %}
@@ -20,7 +23,9 @@ permalink: /archive/
         <a href="{{ post.url | relative_url }}">
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m-%d" }}</time>
           <span class="archive-title">{{ post.title }}</span>
+          {% if has_zh and has_en %}
           <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
+          {% endif %}
         </a>
       </li>
       {% endfor %}

@@ -5,7 +5,14 @@ layout: default
   <header class="post-header">
     <div class="post-meta">
       <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
+      {% if page.series %}
+      <span class="post-series-badge">{{ page.series }}</span>
+      {% endif %}
+      {% assign has_zh = false %}{% assign has_en = false %}
+      {% for post in site.posts %}{% if post.draft != true %}{% if post.lang == 'zh' %}{% assign has_zh = true %}{% elsif post.lang == 'en' %}{% assign has_en = true %}{% endif %}{% endif %}{% endfor %}
+      {% if has_zh and has_en %}
       <span class="post-lang-badge">{% if page.lang == 'en' %}EN{% else %}中文{% endif %}</span>
+      {% endif %}
       {% if page.tags.size > 0 %}
       <span class="post-tags">
         {% for tag in page.tags %}<span class="tag">#{{ tag }}</span>{% endfor %}
