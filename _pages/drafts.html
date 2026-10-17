@@ -29,6 +29,9 @@ sitemap: false
 
   {% assign drafts = site.posts | where_exp: "post", "post.draft == true" %}
 
+  {% assign has_zh = false %}{% assign has_en = false %}
+  {% for post in site.posts %}{% if post.lang == 'zh' %}{% assign has_zh = true %}{% elsif post.lang == 'en' %}{% assign has_en = true %}{% endif %}{% endfor %}
+
   {% if drafts.size > 0 %}
   <ul class="post-list">
     {% for post in drafts %}
@@ -37,7 +40,9 @@ sitemap: false
         <div class="post-card-meta">
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
           <span class="draft-badge" data-en="Draft" data-zh="草稿">草稿</span>
+          {% if has_zh and has_en %}
           <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
+          {% endif %}
         </div>
         <h2 class="post-card-title">{{ post.title }}</h2>
         {% if post.subtitle %}<p class="post-card-subtitle">{{ post.subtitle }}</p>{% endif %}

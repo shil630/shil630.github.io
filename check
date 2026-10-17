@@ -86,12 +86,16 @@ assert!(!article_paths.empty?, "未生成任何文章页")
 article = File.read(article_paths.max, encoding: "UTF-8")
 assert!(article.include?('<html lang="zh">'), "文章页 html[lang] 不是 zh")
 assert!(article.include?('<article class="post wrap" lang="zh">'), "文章正文 lang 不是 zh")
+assert!(!article.include?('class="post-lang-badge"'), "全中文文章页不应显示冗余的 post-lang-badge 徽章")
 
 %w[work archive tools about].each do |slug|
   page = File.read(File.join(build_dir, slug, "index.html"), encoding: "UTF-8")
   assert!(page.include?('<html lang="zh">'), "#{slug} 页 html[lang] 不是 zh")
   assert!(page.match?(/\sdata-en=/) && page.match?(/\sdata-zh=/), "#{slug} 页缺少双语界面文案")
 end
+archive = File.read(File.join(build_dir, "archive", "index.html"), encoding: "UTF-8")
+assert!(!archive.include?('class="post-lang-badge"'), "全中文归档页不应显示冗余的 post-lang-badge 徽章")
+assert!(!home.include?('class="post-lang-badge"'), "全中文首页不应显示冗余的 post-lang-badge 徽章")
 
 featured_count = home.scan('class="featured-card"').length
 assert!(featured_count == 2, "首页精选代表作数量应为 2，实际为 #{featured_count}")
