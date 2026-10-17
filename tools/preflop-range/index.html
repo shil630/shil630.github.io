@@ -56,7 +56,11 @@ tool_id: preflop-range
       font: inherit;
     }
 
-    button:focus-visible {
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
       outline: 2px solid var(--accent-deep);
       outline-offset: 2px;
       box-shadow: var(--focus-ring);
@@ -979,6 +983,8 @@ tool_id: preflop-range
       *,
       *::before,
       *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
       }

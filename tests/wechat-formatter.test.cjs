@@ -146,3 +146,12 @@ test('wechat-formatter layout supports split scroll and sticky headers', () => {
   assert.ok(html.includes('position: sticky'), 'Must use sticky positioning for toolbar headers');
 });
 
+test('wechat-formatter contains focus-visible, reduced motion and roving tabindex for mobile tabs', () => {
+  assert.ok(html.includes(':focus-visible'), 'CSS must define focus-visible styles');
+  assert.ok(html.includes('prefers-reduced-motion'), 'CSS must define prefers-reduced-motion');
+  assert.ok(html.includes('tabindex="0"'), 'Active mobile tab must have initial tabindex 0');
+  assert.ok(html.includes('tabindex="-1"'), 'Inactive mobile tab must have initial tabindex -1');
+  assert.ok(html.includes("e.key === 'ArrowRight'"), 'Mobile tabs must handle ArrowRight keyboard navigation');
+  assert.ok(html.includes("e.key === 'ArrowLeft'"), 'Mobile tabs must handle ArrowLeft keyboard navigation');
+});
+

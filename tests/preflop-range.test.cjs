@@ -177,3 +177,10 @@ test('hand result copy reflects custom vs author scope correctly', () => {
   assert.ok(customText.includes('你的自定义开池范围'), 'Customized range must mention 你的自定义');
 });
 
+test('preflop-range contains comprehensive focus-visible and reduced motion query', () => {
+  assert.ok(html.includes('button:focus-visible'), 'CSS must define button:focus-visible');
+  assert.ok(html.includes('a:focus-visible'), 'CSS must define a:focus-visible');
+  assert.ok(html.includes('input:focus-visible'), 'CSS must define input:focus-visible');
+  assert.ok(html.includes('prefers-reduced-motion'), 'CSS must define prefers-reduced-motion');
+});
+
