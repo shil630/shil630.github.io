@@ -194,3 +194,10 @@ test('preflop-range masthead title matches unified 31px font size, integrates ch
   assert.ok(!html.includes('border-bottom: 1px solid var(--sand);\n    }\n\n    .back-link'), 'Masthead must not have border-bottom divider');
 });
 
+test('preflop-range tool-head repositions mode switch to left and removes duplicate RFI title', () => {
+  assert.ok(!html.includes('无人入池时开池（RFI）'), 'Duplicate RFI title must be removed');
+  assert.ok(!html.includes('id="tool-title"'), 'tool-title id must be removed');
+  assert.ok(html.includes('<div class="tool-head">\n        <div class="mode-switch"'), 'mode-switch must be placed at the start of tool-head');
+  assert.ok(html.includes('id="tool-hint"'), 'tool-hint must remain for screen reader feedback');
+});
+

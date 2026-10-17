@@ -171,12 +171,24 @@ tool_id: preflop-range
       border-radius: var(--radius-card);
     }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     .tool-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
-      padding: 16px 20px 12px;
+      gap: 16px;
+      padding: 12px 20px;
       border-bottom: 1px solid var(--divider);
     }
 
@@ -184,18 +196,6 @@ tool_id: preflop-range
       display: flex;
       align-items: center;
       gap: 16px;
-    }
-
-    .tool-head h2 {
-      margin-bottom: 1px;
-      font-family: var(--font-serif);
-      font-size: 19px;
-    }
-
-    .tool-head p {
-      margin-bottom: 0;
-      color: var(--body);
-      font-size: 12px;
     }
 
     .position-tabs {
@@ -949,11 +949,12 @@ tool_id: preflop-range
       </div>
     </header>
 
-    <section class="tool" aria-labelledby="tool-title">
+    <section class="tool" aria-labelledby="page-title">
       <div class="tool-head">
-        <div>
-          <h2 id="tool-title">无人入池时开池（RFI）</h2>
-          <p id="tool-hint">点击或悬停牌格查看开池决策；切换至编辑模式可增删手牌。</p>
+        <div class="mode-switch" role="radiogroup" aria-label="操作模式">
+          <button class="mode-btn active" id="mode-view" type="button" role="radio" aria-checked="true">查看模式</button>
+          <button class="mode-btn" id="mode-edit" type="button" role="radio" aria-checked="false">编辑模式</button>
+          <span id="tool-hint" class="sr-only" aria-live="polite">点击或悬停牌格查看开池决策；切换至编辑模式可增删手牌。</span>
         </div>
         <div class="tool-tools">
           <div class="legend" aria-label="牌表图例">
@@ -961,10 +962,6 @@ tool_id: preflop-range
             <span class="legend-item"><span class="legend-swatch" aria-hidden="true"></span>范围外</span>
           </div>
           <div class="range-actions" aria-label="范围操作">
-            <div class="mode-switch" role="radiogroup" aria-label="操作模式">
-              <button class="mode-btn active" id="mode-view" type="button" role="radio" aria-checked="true">查看模式</button>
-              <button class="mode-btn" id="mode-edit" type="button" role="radio" aria-checked="false">编辑模式</button>
-            </div>
             <span class="range-mode" id="range-mode" aria-live="polite">默认范围</span>
             <button class="tool-action secondary" id="clear-range" type="button">清空</button>
             <button class="tool-action secondary" id="restore-range" type="button">恢复默认</button>
