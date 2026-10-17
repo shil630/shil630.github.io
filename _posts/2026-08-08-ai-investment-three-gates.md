@@ -7,7 +7,7 @@ lang: zh
 categories: [投资, 决策系统]
 tags: [AI投资, 期望值, 仓位管理, 投资纪律]
 description: "我看好 AI，也警惕估值泡沫。用 EV、SIZE、EXIT 三关，把增长预期、仓位边界和退出条件提前写清楚。"
-series: 投资系统
+series: 投资
 image: "/assets/images/posts/ai-investment-three-gates/ai-five-layers-blog.png"
 source_version: v1.1
 source_file: "/Users/liangshi/Documents/个人IP/内容项目/07-W8-AI投资与决策框架/07-Blog终稿-v1.1.md"

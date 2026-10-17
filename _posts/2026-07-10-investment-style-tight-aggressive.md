@@ -7,7 +7,7 @@ lang: zh
 categories: [投资, 德州扑克]
 tags: [牌风, 仓位管理, 投资系统, 组合管理]
 description: "从松弱到紧凶：提高入场门槛，用角色、上限和退出规则组织风险，不再把账户开成超市。"
-series: 投资系统
+series: 投资
 related_tool: investment-checklist
 ---
 

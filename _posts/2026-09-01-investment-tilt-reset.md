@@ -7,7 +7,7 @@ lang: zh
 categories: [投资, 决策系统]
 tags: [情绪管理, Tilt, 决策纪律, 仓位管理]
 description: "从德州扑克的六种 Tilt 场景出发，拆解情绪如何偷换投资中的参与范围、投入尺度、行动节奏和退出条件，并用五分钟复位卡把动作拉回规则。"
-series: 投资系统
+series: 投资
 image: "/assets/images/posts/investment-tilt-reset/tilt-scenarios-parameters-blog.png"
 source_version: v1.1
 source_file: "/Users/liangshi/Documents/个人IP/内容项目/09-W10-投资情绪管理/08-Blog终稿-v1.1.md"

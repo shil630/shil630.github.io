@@ -7,7 +7,7 @@ lang: zh
 categories: [投资, 决策系统]
 tags: [投资系统, 认知偏差, 概率思维, 决策复盘]
 description: '一次盈利里混合了判断、环境和运气。比结果更值得复盘的，是盈利以后自己扩大了哪些范围、尺度、频率或仓位。'
-series: 投资系统
+series: 投资
 image: '/assets/images/posts/winning-streak-illusion/fragile-process-loop-blog.png'
 source_version: v1.0
 source_file: '内容项目/第五篇-上风期幻觉/08-Blog终稿-v1.0.md'

@@ -7,7 +7,7 @@ lang: zh
 categories: [投资, 德州扑克]
 tags: [投资系统, 仓位管理, 决策清单, 期望值]
 description: "从一笔 PayPal 的价值陷阱，到 LITE 的小仓试错：我怎样用 EV、SIZE、EXIT 把买入前最容易跳过的问题写下来。"
-series: 投资系统
+series: 投资
 related_tool: investment-checklist
 ---
 
