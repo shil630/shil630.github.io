@@ -73,3 +73,17 @@ test('all subdirectories under tools/ contain index.html that includes tool-head
     assert.ok(html.includes('description:'), `${folder}/index.html must declare description in front matter`);
   }
 });
+
+test('tool-head.html and all tool index.html files include correct favicon links', () => {
+  const toolHeadContent = fs.readFileSync(toolHeadPath, 'utf8');
+  assert.ok(toolHeadContent.includes('favicon.svg'), 'tool-head.html must link favicon.svg');
+  assert.ok(toolHeadContent.includes('favicon.png'), 'tool-head.html must link favicon.png');
+
+  const entries = fs.readdirSync(toolsDir, { withFileTypes: true });
+  const toolFolders = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+  for (const folder of toolFolders) {
+    const indexPath = path.join(toolsDir, folder, 'index.html');
+    const html = fs.readFileSync(indexPath, 'utf8');
+    assert.ok(html.includes('favicon.svg'), `${folder}/index.html must contain favicon.svg link`);
+  }
+});
