@@ -184,3 +184,10 @@ test('preflop-range contains comprehensive focus-visible and reduced motion quer
   assert.ok(html.includes('prefers-reduced-motion'), 'CSS must define prefers-reduced-motion');
 });
 
+test('preflop-range masthead title matches unified 31px font size and brand structure', () => {
+  assert.ok(html.includes('<h1 id="page-title">翻前开池范围</h1>'), 'Masthead must contain h1 page-title');
+  assert.ok(html.includes('font-size: 31px'), 'h1 font size must be unified to 31px');
+  assert.ok(!html.includes('clamp(32px, 4.5vw, 48px)'), 'Must not have obsolete 48px clamp title');
+  assert.ok(!html.includes('class="hero"'), 'Must not have redundant hero section');
+});
+
