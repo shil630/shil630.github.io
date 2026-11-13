@@ -83,4 +83,28 @@
   ]
 }
 </script>
+{% elsif page.permalink == '/tools/' or page.url == '/tools/' %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "{{ '/tools/' | absolute_url }}#collection",
+  "url": "{{ '/tools/' | absolute_url }}",
+  "name": {{ page.title | jsonify }},
+  "description": {{ page.description | default: site.description | jsonify }},
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {% for tool_entry in site.data.tools %}{% assign tool = tool_entry[1] %}
+      {
+        "@type": "ListItem",
+        "position": {{ forloop.index }},
+        "url": "{{ tool.url | absolute_url }}",
+        "name": {{ tool.title_zh | jsonify }}
+      }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+  }
+}
+</script>
 {% endif %}

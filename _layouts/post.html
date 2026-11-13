@@ -33,8 +33,19 @@ layout: default
     {% if page.subtitle %}<p class="post-subtitle">{{ page.subtitle }}</p>{% endif %}
   </header>
 
+  {% if page.key_points.size > 0 %}
+  <aside class="post-key-points" aria-label="核心结论">
+    <p class="post-key-points-title" data-en="Key takeaways" data-zh="核心结论">核心结论</p>
+    <ul>
+      {% for point in page.key_points %}
+      <li>{{ point }}</li>
+      {% endfor %}
+    </ul>
+  </aside>
+  {% endif %}
+
   <div class="prose">
-    {{ content }}
+    {{ content | replace: '<img src=', '<img loading="lazy" decoding="async" src=' }}
   </div>
 
   {% if page.related_tool and site.data.tools[page.related_tool] %}
