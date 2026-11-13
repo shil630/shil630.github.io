@@ -63,6 +63,15 @@ defaults:
       layout: "post"
       lang: "zh"
       image: "/assets/images/blog-home-og-1200x630.png"
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      image: "/assets/images/blog-home-og-1200x630.png"
+  - scope:
+      path: "google104eaf0e822d4aad.html"
+    values:
+      sitemap: false
 
 exclude:
   - tests

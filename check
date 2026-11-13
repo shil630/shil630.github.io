@@ -223,6 +223,45 @@ assert!(llms.include?("https://shiliang.me/tools/investment-checklist/"), "llms.
 assert!(llms.scan(%r{https://shiliang\.me/posts/\d{4}/\d{2}/\d{2}/}).size >= 5, "llms.txt 文章链接少于预期")
 assert!(!llms.include?("{%") && !llms.include?("{{"), "llms.txt 存在未渲染 Liquid")
 puts "✓ llms.txt 生成正常且包含站点定位、工具与深度文章索引"
+
+# SEO-GEO-1 核心页面、robots、sitemap 与 E-E-A-T 结构化数据校验
+home_doc = Nokogiri::HTML(home)
+home_desc = home_doc.at_css('meta[name="description"]')&.[]("content")
+%w[about work archive tools].each do |slug|
+  pdoc = Nokogiri::HTML(File.read(File.join(build_dir, slug, "index.html"), encoding: "UTF-8"))
+  pdesc = pdoc.at_css('meta[name="description"]')&.[]("content")
+  pog_img = pdoc.at_css('meta[property="og:image"]')&.[]("content")
+  assert!(pdesc && !pdesc.strip.empty? && pdesc != home_desc, "#{slug} 页必须配置独立的 meta description")
+  assert!(pog_img && !pog_img.strip.empty?, "#{slug} 页缺少 og:image")
+end
+
+about_doc = Nokogiri::HTML(File.read(File.join(build_dir, "about", "index.html"), encoding: "UTF-8"))
+about_schemas = about_doc.css('script[type="application/ld+json"]').map { |n| JSON.parse(n.text) }
+about_graph = about_schemas.flat_map { |s| s["@graph"] || [s] }
+profile_node = about_graph.find { |n| n["@type"] == "ProfilePage" }
+person_node = about_graph.find { |n| n["@type"] == "Person" && n["@id"] == "https://shiliang.me/#person" }
+assert!(profile_node && person_node, "about 页缺少 ProfilePage / Person 结构化数据")
+assert!(person_node["sameAs"].is_a?(Array) && !person_node["sameAs"].empty?, "about 页 Person 缺少 sameAs 社交档案关联")
+
+article_doc = Nokogiri::HTML(article)
+assert!(article_doc.at_css('.post-breadcrumb'), "文章页缺少可见面包屑导航")
+assert!(article_doc.at_css('.post-author-card'), "文章页缺少作者归属卡片")
+article_schemas = article_doc.css('script[type="application/ld+json"]').map { |n| JSON.parse(n.text) }
+article_breadcrumb = article_schemas.find { |s| s["@type"] == "BreadcrumbList" }
+assert!(article_breadcrumb && article_breadcrumb["itemListElement"]&.size == 3, "文章页缺少 3 级 BreadcrumbList 结构化数据")
+
+%w[drafts/index.html 404.html page/2/index.html].each do |rel|
+  fpath = File.join(build_dir, rel)
+  next unless File.file?(fpath)
+  rdoc = Nokogiri::HTML(File.read(fpath, encoding: "UTF-8"))
+  robots = rdoc.at_css('meta[name="robots"]')&.[]("content").to_s
+  assert!(robots.include?("noindex"), "#{rel} 必须输出 meta robots noindex")
+end
+assert!(!sitemap.include?("404.html"), "sitemap.xml 不应包含 404.html")
+assert!(!sitemap.include?("/drafts/"), "sitemap.xml 不应包含 /drafts/")
+assert!(!sitemap.include?("google104eaf0e822d4aad.html"), "sitemap.xml 不应包含站点验证文件")
+puts "✓ 核心页面 Meta/OG、ProfilePage+Person、文章 BreadcrumbList/作者卡 与 noindex/sitemap 清理正常"
+
 latest_count = home.scan('class="post-item"').length
 puts "✓ 首页内容顺序：精选 → 最新文章 → UX 作品集 → 订阅"
 puts "✓ 首页内容基线：#{featured_count} 篇精选，#{latest_count} 篇最新文章"

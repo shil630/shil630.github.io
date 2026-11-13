@@ -4,7 +4,7 @@ layout: default
 <article class="page wrap">
   {% if page.title %}
   <header class="page-header">
-    <h1 class="page-title">{{ page.title }}</h1>
+    <h1 class="page-title"{% if page.title_en and page.title_zh %} data-en="{{ page.title_en }}" data-zh="{{ page.title_zh }}"{% endif %}>{{ page.title_zh | default: page.title }}</h1>
     {% if page.subtitle %}<p class="page-subtitle">{{ page.subtitle }}</p>{% endif %}
   </header>
   {% endif %}

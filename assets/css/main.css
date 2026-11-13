@@ -402,8 +402,29 @@ img { max-width: 100%; height: auto; }
 .tool-waitlist-note { margin: 10px 0 0 !important; color: var(--fg-faint); font-size: 12px; line-height: 1.55; }
 
 /* ---------- Single post / page ---------- */
+.post-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fg-faint);
+  margin-bottom: 16px;
+  min-width: 0;
+}
+.post-breadcrumb a {
+  color: var(--fg-soft);
+  flex-shrink: 0;
+}
+.post-breadcrumb a:hover { color: var(--accent); }
+.post-breadcrumb-current {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg-faint);
+}
 .post-header, .page-header { margin-bottom: 36px; }
 .post-meta { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-faint); margin-bottom: 14px; flex-wrap: wrap; }
+.post-updated { color: var(--fg-faint); }
 .post-title, .page-title {
   font-family: var(--font-serif);
   font-size: 38px;
@@ -629,6 +650,60 @@ a.text-cta:hover,
   text-decoration: none;
 }
 
+/* ---------- Post Author Attribution Card ---------- */
+.post-author-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin: 36px 0 0;
+  padding: 20px 22px;
+  background: color-mix(in srgb, var(--bg-soft) 55%, var(--bg));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.post-author-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.post-author-body {
+  flex: 1;
+  min-width: 0;
+}
+.post-author-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.post-author-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+}
+.post-author-role {
+  font-size: 13px;
+  color: var(--fg-faint);
+}
+.post-author-bio {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--fg-soft);
+}
+.post-author-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
 /* ---------- Subscribe ---------- */
 .subscribe { margin-top: 48px; }
 .subscribe-box {
@@ -702,6 +777,7 @@ a.text-cta:hover,
   .tool-grid { grid-template-columns: 1fr; }
   .tool-callout-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
   .tool-callout-btn { width: 100%; justify-content: center; }
+  .post-author-card { padding: 16px; gap: 12px; }
   .post-nav { flex-direction: column; }
   .post-nav .next { text-align: left; }
   .subscribe-form { flex-direction: column; }
