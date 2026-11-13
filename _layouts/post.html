@@ -2,9 +2,19 @@
 layout: default
 ---
 <article class="post wrap" lang="{{ page.lang | default: site.lang }}">
+  <nav class="post-breadcrumb" aria-label="面包屑导航">
+    <a href="{{ '/' | relative_url }}" data-en="Home" data-zh="首页">首页</a>
+    <span aria-hidden="true">/</span>
+    <a href="{{ '/archive/' | relative_url }}" data-en="Articles" data-zh="文章">文章</a>
+    <span aria-hidden="true">/</span>
+    <span class="post-breadcrumb-current">{{ page.title }}</span>
+  </nav>
   <header class="post-header">
     <div class="post-meta">
       <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
+      {% if page.last_modified_at %}
+      <span class="post-updated">· <span data-en="Updated" data-zh="更新于">更新于</span> <time datetime="{{ page.last_modified_at | date_to_xmlschema }}">{{ page.last_modified_at | date: "%Y-%m-%d" }}</time></span>
+      {% endif %}
       {% if page.series %}
       <span class="post-series-badge">{{ page.series }}</span>
       {% endif %}
@@ -42,6 +52,21 @@ layout: default
     </div>
   </aside>
   {% endif %}
+
+  <aside class="post-author-card" aria-label="作者与出处信息">
+    <img class="post-author-avatar" src="{{ site.logo | relative_url }}" alt="石亮 / Liang Shi" width="44" height="44" loading="lazy" decoding="async">
+    <div class="post-author-body">
+      <div class="post-author-head">
+        <strong class="post-author-name" data-en="Liang Shi" data-zh="石亮（Liang Shi）">石亮（Liang Shi）</strong>
+        <span class="post-author-role" data-en="Design Lead · Author of Positive EV" data-zh="UX 设计负责人 · 《石亮正EV》作者">UX 设计负责人 · 《石亮正EV》作者</span>
+      </div>
+      <p class="post-author-bio" data-en="10+ years designing complex systems across top tech teams. Writing about design, investing, poker and decision-making under uncertainty." data-zh="10 年+ 跨中美科技团队产品与设计经验，持续在设计、投资与德州扑克中实验「在不确定中做更好的决策」。">10 年+ 跨中美科技团队产品与设计经验，持续在设计、投资与德州扑克中实验「在不确定中做更好的决策」。</p>
+      <p class="post-author-links">
+        <a href="{{ '/about/' | relative_url }}" data-en="About & decision framework →" data-zh="关于作者与决策框架 →">关于作者与决策框架 →</a>
+        <a href="{{ '/work/' | relative_url }}" data-en="Selected UX work →" data-zh="查看 UX 作品集 →">查看 UX 作品集 →</a>
+      </p>
+    </div>
+  </aside>
 
   {% include subscribe.html %}
 
