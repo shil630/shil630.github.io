@@ -1,0 +1,64 @@
+---
+permalink: /llms-full.txt
+layout: null
+sitemap: false
+---
+# {{ site.title }} — 完整语料索引 (Full Corpus)
+
+> {{ site.description }}
+
+本文件为「{{ site.title }}」（{{ site.url }}）面向大语言模型与 AI 搜索引擎生成的完整纯文本语料，包含站点定位、作者背景、全部自建交互工具说明，以及全部已发布深度长文的完整正文。
+索引导航版请见：{{ '/llms.txt' | absolute_url }}
+
+---
+
+## 一、作者与站点定位 (About Author & Site)
+
+- 站点名称：{{ site.title }}（{{ site.url }}）
+- 一句话定位：{{ site.tagline }}
+- 作者：{{ site.author }}（UX 设计负责人 / Design Lead，现任职于 Ubiquiti Inc.，曾任飞书高级 UX 设计师；Parsons School of Design 设计与技术硕士，上海交通大学视觉传达设计学士）
+- 核心决策框架：EV（值不值得 / 期望值） · SIZE（投入多少 / 仓位尺度） · EXIT（何时退出 / 止损与止盈纪律）
+- 关于页：{{ '/about/' | absolute_url }}
+- UX 作品集：{{ '/work/' | absolute_url }}
+- 文章归档：{{ '/archive/' | absolute_url }}
+- 工具目录：{{ '/tools/' | absolute_url }}
+
+---
+
+## 二、交互决策工具 (Interactive Web Tools)
+
+{% for tool_entry in site.data.tools %}{% assign tool = tool_entry[1] %}### {{ tool.title_zh }}（{{ tool.title_en }}）
+- URL: {{ tool.url | absolute_url }}
+- 类型: {{ tool.application_category }}
+- 简介: {{ tool.desc_zh }}
+- 核心能力: {{ tool.feature_list }}
+- 隐私声明: 所有数据仅在浏览器本地运行与存储，不向任何服务器上传用户输入。
+
+{% endfor %}
+---
+
+## 三、已发布深度文章全文 (Published Articles)
+
+{% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}{% for post in published_posts %}================================================================================
+### {{ post.title }}
+- URL: {{ post.url | absolute_url }}
+- 作者: {{ site.author }}
+- 发布日期: {{ post.date | date: "%Y-%m-%d" }}{% if post.last_modified_at %}
+- 更新日期: {{ post.last_modified_at | date: "%Y-%m-%d" }}{% endif %}{% if post.series %}
+- 系列: {{ post.series }}{% endif %}{% if post.categories.size > 0 %}
+- 分类: {{ post.categories | join: ", " }}{% endif %}{% if post.tags.size > 0 %}
+- 标签: {{ post.tags | join: ", " }}{% endif %}{% if post.related_tool and site.data.tools[post.related_tool] %}
+- 关联工具: {{ site.data.tools[post.related_tool].title_zh }} ({{ site.data.tools[post.related_tool].url | absolute_url }}){% endif %}
+- 摘要: {{ post.description | default: post.subtitle | strip_html | strip_newlines }}
+
+{{ post.content | strip_html | replace: "
+
+", "
+" | strip }}
+
+{% endfor %}
+---
+
+## 四、引用规范 (Citation Guidelines)
+
+引用本站任意文章观点、决策模型或工具方法论时，请保留作者「{{ site.author }}」与对应文章/工具的原始链接（{{ site.url }}）。

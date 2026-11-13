@@ -58,7 +58,8 @@ required_pages = {
   "RSS" => "feed.xml",
   "sitemap" => "sitemap.xml",
   "robots" => "robots.txt",
-  "llms" => "llms.txt"
+  "llms" => "llms.txt",
+  "llms_full" => "llms-full.txt"
 }
 
 missing = required_pages.filter_map do |label, relative_path|
@@ -219,10 +220,25 @@ puts "✓ 文章 ⇄ 工具双向 Callout 关联验证正常"
 
 llms = File.read(File.join(build_dir, "llms.txt"), encoding: "UTF-8")
 assert!(llms.include?("# 石亮正EV"), "llms.txt 缺少主标题")
+assert!(llms.include?("https://shiliang.me/llms-full.txt"), "llms.txt 缺少 llms-full.txt 引导链接")
 assert!(llms.include?("https://shiliang.me/tools/investment-checklist/"), "llms.txt 缺少工具链接")
+assert!(llms.include?("https://shiliang.me/tools/preflop-range/"), "llms.txt 缺少德州工具链接")
+assert!(llms.include?("https://shiliang.me/tools/wechat-formatter/"), "llms.txt 缺少排版工具链接")
 assert!(llms.scan(%r{https://shiliang\.me/posts/\d{4}/\d{2}/\d{2}/}).size >= 5, "llms.txt 文章链接少于预期")
 assert!(!llms.include?("{%") && !llms.include?("{{"), "llms.txt 存在未渲染 Liquid")
-puts "✓ llms.txt 生成正常且包含站点定位、工具与深度文章索引"
+
+llms_full = File.read(File.join(build_dir, "llms-full.txt"), encoding: "UTF-8")
+assert!(llms_full.include?("# 石亮正EV — 完整语料索引"), "llms-full.txt 缺少主标题")
+assert!(llms_full.include?("https://shiliang.me/tools/investment-checklist/"), "llms-full.txt 缺少工具条目")
+assert!(llms_full.scan(%r{https://shiliang\.me/posts/\d{4}/\d{2}/\d{2}/}).size >= 5, "llms-full.txt 文章全文索引少于预期")
+assert!(!llms_full.include?("{%") && !llms_full.include?("{{"), "llms-full.txt 存在未渲染 Liquid")
+assert!(!llms_full.include?("<article") && !llms_full.include?("<script"), "llms-full.txt 不应混入 HTML/Script 标签")
+
+robots_txt = File.read(File.join(build_dir, "robots.txt"), encoding: "UTF-8")
+%w[OAI-SearchBot PerplexityBot Claude-SearchBot Google-Extended].each do |bot|
+  assert!(robots_txt.include?(bot), "robots.txt 缺少 #{bot} 声明")
+end
+puts "✓ llms.txt、llms-full.txt 与 robots.txt AI 爬虫策略生成正常"
 
 # SEO-GEO-1 核心页面、robots、sitemap 与 E-E-A-T 结构化数据校验
 home_doc = Nokogiri::HTML(home)
@@ -245,7 +261,11 @@ assert!(person_node["sameAs"].is_a?(Array) && !person_node["sameAs"].empty?, "ab
 
 article_doc = Nokogiri::HTML(article)
 assert!(article_doc.at_css('.post-breadcrumb'), "文章页缺少可见面包屑导航")
+assert!(article_doc.at_css('a.post-series-badge[href*="/archive/?series="]'), "文章页系列徽章应可点击跳转归档")
+assert!(article_doc.at_css('.post-related-posts a[href*="/posts/"]'), "文章页缺少同主题延伸阅读内链")
 assert!(article_doc.at_css('.post-author-card'), "文章页缺少作者归属卡片")
+archive_doc = Nokogiri::HTML(archive)
+assert!(archive_doc.at_css('.archive-series-bar .archive-series-chip[data-series]'), "归档页缺少系列筛选栏")
 article_schemas = article_doc.css('script[type="application/ld+json"]').map { |n| JSON.parse(n.text) }
 article_breadcrumb = article_schemas.find { |s| s["@type"] == "BreadcrumbList" }
 assert!(article_breadcrumb && article_breadcrumb["itemListElement"]&.size == 3, "文章页缺少 3 级 BreadcrumbList 结构化数据")

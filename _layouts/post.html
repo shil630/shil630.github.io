@@ -16,7 +16,7 @@ layout: default
       <span class="post-updated">· <span data-en="Updated" data-zh="更新于">更新于</span> <time datetime="{{ page.last_modified_at | date_to_xmlschema }}">{{ page.last_modified_at | date: "%Y-%m-%d" }}</time></span>
       {% endif %}
       {% if page.series %}
-      <span class="post-series-badge">{{ page.series }}</span>
+      <a class="post-series-badge" href="{{ '/archive/' | relative_url }}?series={{ page.series | url_encode }}">{{ page.series }}</a>
       {% endif %}
       {% assign has_zh = false %}{% assign has_en = false %}
       {% for post in site.posts %}{% if post.draft != true %}{% if post.lang == 'zh' %}{% assign has_zh = true %}{% elsif post.lang == 'en' %}{% assign has_en = true %}{% endif %}{% endif %}{% endfor %}
@@ -69,6 +69,55 @@ layout: default
   </aside>
 
   {% include subscribe.html %}
+
+  {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
+  {% assign related_posts = "" | split: "" %}
+  {% for candidate in published_posts %}
+    {% if candidate.url != page.url and page.series and candidate.series == page.series %}
+      {% assign related_posts = related_posts | push: candidate %}
+      {% if related_posts.size == 3 %}{% break %}{% endif %}
+    {% endif %}
+  {% endfor %}
+  {% if related_posts.size < 3 %}
+    {% for candidate in published_posts %}
+      {% if candidate.url != page.url %}
+        {% assign already_added = false %}
+        {% for existing in related_posts %}
+          {% if existing.url == candidate.url %}{% assign already_added = true %}{% break %}{% endif %}
+        {% endfor %}
+        {% unless already_added %}
+          {% assign topic_match = false %}
+          {% for cat in page.categories %}
+            {% if candidate.categories contains cat %}{% assign topic_match = true %}{% break %}{% endif %}
+          {% endfor %}
+          {% unless topic_match %}
+            {% for tag in page.tags %}
+              {% if candidate.tags contains tag %}{% assign topic_match = true %}{% break %}{% endif %}
+            {% endfor %}
+          {% endunless %}
+          {% if topic_match %}
+            {% assign related_posts = related_posts | push: candidate %}
+            {% if related_posts.size == 3 %}{% break %}{% endif %}
+          {% endif %}
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% if related_posts.size > 0 %}
+  <section class="post-related-posts" aria-label="同主题延伸阅读">
+    <h2 class="post-related-heading" data-en="Related reading" data-zh="同主题延伸阅读">同主题延伸阅读</h2>
+    <ul class="post-related-list">
+      {% for item in related_posts %}
+      <li>
+        <a href="{{ item.url | relative_url }}" data-track-cta data-cta-type="related_topic_article" data-placement="post_related_reading">
+          <time datetime="{{ item.date | date_to_xmlschema }}">{{ item.date | date: "%Y-%m-%d" }}</time>
+          <span class="post-related-title">{{ item.title }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
 
   {% assign show_previous = false %}
   {% assign show_next = false %}

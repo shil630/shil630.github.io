@@ -265,6 +265,12 @@ img { max-width: 100%; height: auto; }
   border-radius: 4px;
   padding: 1px 7px;
   letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: color 0.15s, background-color 0.15s;
+}
+a.post-series-badge:hover {
+  color: var(--accent);
+  text-decoration: none;
 }
 .post-lang-badge {
   font-size: 11px;
@@ -475,8 +481,48 @@ img { max-width: 100%; height: auto; }
 .prose th { background: var(--bg-soft); }
 .lead { font-size: 19px; color: var(--fg-soft); }
 
+/* ---------- Related reading ---------- */
+.post-related-posts {
+  margin-top: 44px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.post-related-heading {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--fg);
+}
+.post-related-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.post-related-list li a {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 8px 0;
+  color: var(--fg);
+  border-bottom: 1px solid var(--border);
+}
+.post-related-list li:last-child a { border-bottom: 0; }
+.post-related-list li a:hover { text-decoration: none; }
+.post-related-list li a:hover .post-related-title { color: var(--accent); }
+.post-related-list time {
+  font-size: 13px;
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.post-related-title {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 /* ---------- Post nav ---------- */
-.post-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--border); }
+.post-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); }
 .post-nav a { flex: 1; display: flex; flex-direction: column; gap: 4px; color: var(--fg-soft); }
 .post-nav a:hover { text-decoration: none; color: var(--fg); }
 .post-nav .next { text-align: right; }
@@ -484,6 +530,39 @@ img { max-width: 100%; height: auto; }
 .post-nav .ttl { font-family: var(--font-serif); font-size: 16px; font-weight: 500; }
 
 /* ---------- Archive ---------- */
+.archive-series-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.archive-series-label {
+  font-size: 13px;
+  color: var(--fg-faint);
+  margin-right: 4px;
+}
+.archive-series-chip {
+  font-size: 13px;
+  color: var(--fg-soft);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 13px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.archive-series-chip:hover { border-color: var(--fg-faint); color: var(--fg); text-decoration: none; }
+.archive-series-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.archive-series-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-soft);
+  background: var(--bg-soft);
+  border-radius: 4px;
+  padding: 1px 7px;
+  flex-shrink: 0;
+}
 .archive-year { margin-bottom: 36px; }
 .archive-year-title { font-family: var(--font-serif); font-size: 24px; color: var(--fg-faint); margin: 0 0 12px; font-weight: 500; }
 .archive-list { list-style: none; margin: 0; padding: 0; }
