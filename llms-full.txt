@@ -49,7 +49,10 @@ sitemap: false
 - 分类: {{ post.categories | join: ", " }}{% endif %}{% if post.tags.size > 0 %}
 - 标签: {{ post.tags | join: ", " }}{% endif %}{% if post.related_tool and site.data.tools[post.related_tool] %}
 - 关联工具: {{ site.data.tools[post.related_tool].title_zh }} ({{ site.data.tools[post.related_tool].url | absolute_url }}){% endif %}
-- 摘要: {{ post.description | default: post.subtitle | strip_html | strip_newlines }}
+- 摘要: {{ post.description | default: post.subtitle | strip_html | strip_newlines }}{% if post.key_points.size > 0 %}
+- 核心结论:
+{% for point in post.key_points %}  - {{ point }}
+{% endfor %}{% endif %}
 
 {{ post.content | strip_html | replace: "
 

@@ -264,6 +264,13 @@ assert!(article_doc.at_css('.post-breadcrumb'), "文章页缺少可见面包屑�
 assert!(article_doc.at_css('a.post-series-badge[href*="/archive/?series="]'), "文章页系列徽章应可点击跳转归档")
 assert!(article_doc.at_css('.post-related-posts a[href*="/posts/"]'), "文章页缺少同主题延伸阅读内链")
 assert!(article_doc.at_css('.post-author-card'), "文章页缺少作者归属卡片")
+article_doc.css('.prose img').each do |img|
+  assert!(img['loading'] == 'lazy' && img['decoding'] == 'async', "文章正文图片缺少 lazy/async 属性：#{img['src']}")
+end
+tools_doc = Nokogiri::HTML(File.read(File.join(build_dir, "tools", "index.html"), encoding: "UTF-8"))
+tools_schemas = tools_doc.css('script[type="application/ld+json"]').map { |n| JSON.parse(n.text) }
+tools_collection = tools_schemas.find { |s| s["@type"] == "CollectionPage" }
+assert!(tools_collection && tools_collection.dig("mainEntity", "itemListElement")&.size.to_i >= 3, "tools 目录页缺少 CollectionPage/ItemList 结构化数据")
 archive_doc = Nokogiri::HTML(archive)
 assert!(archive_doc.at_css('.archive-series-bar .archive-series-chip[data-series]'), "归档页缺少系列筛选栏")
 article_schemas = article_doc.css('script[type="application/ld+json"]').map { |n| JSON.parse(n.text) }

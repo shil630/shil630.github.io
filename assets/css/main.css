@@ -441,6 +441,31 @@ a.post-series-badge:hover {
 }
 .post-subtitle, .page-subtitle { font-size: 18px; color: var(--fg-soft); margin: 12px 0 0; }
 
+/* ---------- Post Key Points ---------- */
+.post-key-points {
+  margin: 0 0 32px;
+  padding: 18px 22px;
+  background: color-mix(in srgb, var(--bg-soft) 65%, var(--bg));
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+}
+.post-key-points-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.post-key-points ul {
+  margin: 0;
+  padding-left: 1.25em;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--fg-soft);
+}
+.post-key-points li + li { margin-top: 6px; }
+
 /* ---------- Prose ---------- */
 .prose { font-size: 17px; line-height: 1.8; }
 .prose > *:first-child { margin-top: 0; }
