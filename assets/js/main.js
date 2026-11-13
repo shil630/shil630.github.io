@@ -38,21 +38,29 @@
   }
   applyLang(getLang());
 
-  /* ---------- Post language filter (home + archive) ---------- */
+  /* ---------- Post language & series filter (home + archive) ---------- */
   var chips = document.querySelectorAll(".filter-chip");
+  var seriesChips = document.querySelectorAll(".archive-series-chip");
   var items = document.querySelectorAll(".post-item, .archive-item");
   var emptyHint = document.querySelector(".empty-hint");
+  var currentLangFilter = chips.length ? (localStorage.getItem(FILTER_KEY) || "all") : "all";
+  var currentSeriesFilter = "all";
 
-  function applyFilter(filter) {
+  function applyCombinedFilters() {
     var visible = 0;
     items.forEach(function (item) {
-      var show = filter === "all" || item.getAttribute("data-lang") === filter;
+      var langMatch = currentLangFilter === "all" || item.getAttribute("data-lang") === currentLangFilter;
+      var seriesMatch = currentSeriesFilter === "all" || item.getAttribute("data-series") === currentSeriesFilter;
+      var show = langMatch && seriesMatch;
       item.style.display = show ? "" : "none";
       if (show) visible++;
     });
     if (emptyHint) emptyHint.hidden = visible !== 0;
     chips.forEach(function (c) {
-      c.classList.toggle("active", c.getAttribute("data-filter") === filter);
+      c.classList.toggle("active", c.getAttribute("data-filter") === currentLangFilter);
+    });
+    seriesChips.forEach(function (c) {
+      c.classList.toggle("active", c.getAttribute("data-series") === currentSeriesFilter);
     });
     // Hide archive year groups that have no visible items
     document.querySelectorAll(".archive-year").forEach(function (group) {
@@ -75,12 +83,37 @@
   if (chips.length) {
     chips.forEach(function (chip) {
       chip.addEventListener("click", function () {
-        var f = chip.getAttribute("data-filter");
-        localStorage.setItem(FILTER_KEY, f);
-        applyFilter(f);
+        currentLangFilter = chip.getAttribute("data-filter");
+        localStorage.setItem(FILTER_KEY, currentLangFilter);
+        applyCombinedFilters();
       });
     });
-    applyFilter(localStorage.getItem(FILTER_KEY) || "all");
+  }
+
+  if (seriesChips.length) {
+    var params = new URLSearchParams(window.location.search);
+    var initialSeries = params.get("series");
+    if (initialSeries) {
+      var hasMatch = Array.prototype.some.call(seriesChips, function (c) {
+        return c.getAttribute("data-series") === initialSeries;
+      });
+      if (hasMatch) currentSeriesFilter = initialSeries;
+    }
+    seriesChips.forEach(function (chip) {
+      chip.addEventListener("click", function (e) {
+        e.preventDefault();
+        currentSeriesFilter = chip.getAttribute("data-series") || "all";
+        var targetUrl = currentSeriesFilter === "all"
+          ? window.location.pathname
+          : window.location.pathname + "?series=" + encodeURIComponent(currentSeriesFilter);
+        window.history.replaceState(null, "", targetUrl);
+        applyCombinedFilters();
+      });
+    });
+  }
+
+  if (chips.length || seriesChips.length) {
+    applyCombinedFilters();
   }
 
   // Track which free tool readers explicitly join the waitlist for.

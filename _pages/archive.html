@@ -14,16 +14,34 @@ permalink: /archive/
   {% for post in site.posts %}{% if post.draft != true %}{% if post.lang == 'zh' %}{% assign has_zh = true %}{% elsif post.lang == 'en' %}{% assign has_en = true %}{% endif %}{% endif %}{% endfor %}
 
   {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
+  {% assign series_groups = published_posts | where_exp: "post", "post.series" | group_by: "series" %}
+  {% if series_groups.size > 0 %}
+  <nav class="archive-series-bar" aria-label="按系列筛选">
+    <span class="archive-series-label" data-en="Series" data-zh="系列">系列</span>
+    <a class="archive-series-chip active" href="{{ '/archive/' | relative_url }}" data-series="all">
+      <span data-en="All" data-zh="全部">全部</span> ({{ published_posts.size }})
+    </a>
+    {% for group in series_groups %}
+    <a class="archive-series-chip" href="{{ '/archive/' | relative_url }}?series={{ group.name | url_encode }}" data-series="{{ group.name }}">
+      {{ group.name }} ({{ group.items.size }})
+    </a>
+    {% endfor %}
+  </nav>
+  {% endif %}
+
   {% assign postsByYear = published_posts | group_by_exp: "post", "post.date | date: '%Y'" %}
   {% for year in postsByYear %}
   <div class="archive-year">
     <h2 class="archive-year-title">{{ year.name }}</h2>
     <ul class="archive-list">
       {% for post in year.items %}
-      <li class="archive-item" data-lang="{{ post.lang | default: site.lang }}">
+      <li class="archive-item" data-lang="{{ post.lang | default: site.lang }}" data-series="{{ post.series | default: '' }}">
         <a href="{{ post.url | relative_url }}">
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m-%d" }}</time>
           <span class="archive-title">{{ post.title }}</span>
+          {% if post.series %}
+          <span class="archive-series-badge">{{ post.series }}</span>
+          {% endif %}
           {% if has_zh and has_en %}
           <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
           {% endif %}

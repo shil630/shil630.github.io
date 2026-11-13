@@ -6,7 +6,41 @@ User-agent: *
 Allow: /
 Disallow: /drafts/
 
+# AI Search & LLM Retrieval Crawlers
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /drafts/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /drafts/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /drafts/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /drafts/
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /drafts/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /drafts/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /drafts/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /drafts/
+
 Sitemap: {{ site.url }}{{ site.baseurl }}/sitemap.xml
 
 # LLMs & AI Web Crawlers (llmstxt.org)
 # {{ site.url }}{{ site.baseurl }}/llms.txt
+# {{ site.url }}{{ site.baseurl }}/llms-full.txt

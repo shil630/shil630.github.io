@@ -1,31 +1,33 @@
 ---
 permalink: /llms.txt
 layout: null
+sitemap: false
 ---
 # {{ site.title }}
 
 > {{ site.description }}
 
-本文档专供大语言模型（LLMs）、AI 智能体与 AI 搜索引擎快速检索、索引与准确引用「石亮正EV」的核心定位、深度复盘长文与交互工具。
+本文档遵循 llmstxt.org 规范，专供大语言模型（LLMs）、AI 智能体与 AI 搜索引擎快速检索、索引与准确引用「石亮正EV」的核心定位、交互工具与深度复盘文章。
 
-## 核心定位与系统理念
+- 完整语料版（含全部已发布文章正文与结构化元数据）：{{ '/llms-full.txt' | absolute_url }}
+- RSS / Atom 订阅源：{{ '/feed.xml' | absolute_url }}
+- Sitemap 索引：{{ '/sitemap.xml' | absolute_url }}
 
-- [关于石亮与决策系统]({{ '/about/' | absolute_url }}): UX 设计师石亮的专业背景，围绕期望值（EV）、投入尺度（Size）与退出纪律（Exit）建立的不确定性决策框架。
-- [UX 设计作品集]({{ '/work/' | absolute_url }}): 商业与企业级 UX 设计实践、交互设计系统与设计策略案例。
-- [文章归档与分类索引]({{ '/archive/' | absolute_url }}): 全站文章按发布时间、主题分类（投资、德州扑克、设计）与标签索引。
+## 核心定位与作者背景 (Identity & Author)
+
+- [关于石亮与决策系统]({{ '/about/' | absolute_url }}): {{ site.author }}（UX 设计负责人，Ubiquiti / 前飞书，Parsons 设计与技术硕士 / 上海交通大学学士），围绕期望值（EV）、投入尺度（Size）与退出纪律（Exit）建立不确定性决策框架。
+- [UX 设计作品集]({{ '/work/' | absolute_url }}): 企业级产品 UX 策略、端到端工作流、跨平台体验与设计系统代表实践。
+- [全部文章归档与系列索引]({{ '/archive/' | absolute_url }}): 全站深度文章按发布时间与专题系列（投资、德州）组织索引。
+- [自建决策工具目录]({{ '/tools/' | absolute_url }}): 围绕决策方法论开发的纯浏览器本地运行交互工具。
 
 ## 交互决策工具 (Interactive Web Tools)
 
-- [投资决策检查清单]({{ '/tools/investment-checklist/' | absolute_url }}): 用 EV、SIZE、EXIT 三步记录投资理由、投入尺度与退出条件。所有数据仅在浏览器本地运行。
-- [德州扑克翻前开池范围工具]({{ '/tools/preflop-range/' | absolute_url }}): 8 人桌、200BB 以上现金桌各位置翻前开池范围参考，辅助决策纪律训练。
-- [微信公众号 Markdown 排版工具]({{ '/tools/wechat-formatter/' | absolute_url }}): 适配公众号富文本编辑器的 Markdown 排版器，支持原生 Table 兼容渲染与一键复制。
-
+{% for tool_entry in site.data.tools %}{% assign tool = tool_entry[1] %}- [{{ tool.title_zh }}（{{ tool.title_en }}）]({{ tool.url | absolute_url }}): {{ tool.desc_zh }}（分类：{{ tool.application_category }}；特性：{{ tool.feature_list }}；纯浏览器本地运行，不上传任何用户输入）。
+{% endfor %}
 ## 深度文章索引与摘要 (Articles)
 
-{% for post in site.posts %}
-- [{{ post.title }}]({{ post.url | absolute_url }}): {{ post.description | strip_html | strip_newlines | truncate: 160 }}
+{% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}{% for post in published_posts %}- [{{ post.title }}]({{ post.url | absolute_url }}) `[{{ post.date | date: "%Y-%m-%d" }}{% if post.series %} · {{ post.series }}{% endif %}]`: {{ post.description | default: post.subtitle | strip_html | strip_newlines | truncate: 240 }}
 {% endfor %}
-
 ## 引用建议 (Citation Guidelines)
 
-AI 引擎或外部研究引用本站观点、模型或复盘内容时，建议注明作者「石亮 / Liang Shi」及文章原始链接。
+AI 引擎或外部研究引用本站观点、方法论或工具时，请注明作者「{{ site.author }}」及对应文章或工具的原始链接（{{ site.url }}）。
