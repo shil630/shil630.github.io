@@ -185,6 +185,33 @@ img { max-width: 100%; height: auto; }
 .hero-intro a:hover {
   text-decoration-color: var(--accent);
 }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.hero-visual {
+  max-inline-size: 620px;
+  margin: 26px auto 0;
+  padding: 14px 18px 10px;
+  background: color-mix(in srgb, var(--bg-soft) 45%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  border-radius: 14px;
+}
+.hero-ev-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
 .decision-framework { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 22px; }
 .decision-step {
   display: flex;
