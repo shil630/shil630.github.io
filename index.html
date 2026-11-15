@@ -28,6 +28,45 @@ image: "/assets/images/blog-home-og-1200x630.png"
     <p class="hero-desc lang-zh">围绕「值不值得、投入多少、何时退出」记录正EV实验，持续输出<span class="hero-nowrap">「美股投资观察清单」</span>、真实决策复盘，以及正在构建的 AI 投资假设跟踪工具<span class="hero-nowrap">「<a href="https://thesisee.com" target="_blank" rel="noopener" data-track-cta data-cta-type="external_project" data-placement="home_hero_intro">持见（thesisee.com）</a>」。</span></p>
     <p class="hero-desc lang-en" hidden>Exploring Positive EV decisions on whether to bet, how much to size, and when to fold, alongside US equity watchlists, real decision reviews, and <span class="hero-nowrap"><a href="https://thesisee.com" target="_blank" rel="noopener" data-track-cta data-cta-type="external_project" data-placement="home_hero_intro">ThesisSee (thesisee.com)</a>,</span> an AI investment thesis tracker I'm building.</p>
   </div>
+  <div class="hero-visual" aria-hidden="true">
+    <svg class="hero-ev-svg" viewBox="0 0 632 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="evAreaGrad" x1="0" y1="8" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.22" />
+          <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.0" />
+        </linearGradient>
+      </defs>
+      <!-- Zero EV baseline -->
+      <line x1="16" y1="62" x2="616" y2="62" stroke="currentColor" stroke-opacity="0.16" stroke-dasharray="3 4" />
+      <!-- Three decision filter gates: EV / SIZE / EXIT -->
+      <line x1="186" y1="12" x2="186" y2="74" stroke="currentColor" stroke-opacity="0.12" stroke-dasharray="2 3" />
+      <line x1="346" y1="12" x2="346" y2="74" stroke="currentColor" stroke-opacity="0.12" stroke-dasharray="2 3" />
+      <line x1="506" y1="12" x2="506" y2="74" stroke="currentColor" stroke-opacity="0.12" stroke-dasharray="2 3" />
+      <!-- Stochastic Monte Carlo noise paths -->
+      <path d="M 16,62 C 44,28 78,88 118,80 C 148,74 168,82 186,74" stroke="currentColor" stroke-opacity="0.15" stroke-width="1" stroke-dasharray="2 2" />
+      <path d="M 16,62 C 48,86 92,36 138,74 C 162,86 174,64 186,68 C 238,80 292,58 346,66 C 402,72 454,76 506,70" stroke="currentColor" stroke-opacity="0.15" stroke-width="1.05" stroke-dasharray="2 2" />
+      <path d="M 16,62 C 52,20 88,84 128,36 C 156,14 170,72 186,56 C 230,32 280,66 346,46 C 410,34 460,42 506,30" stroke="currentColor" stroke-opacity="0.17" stroke-width="1.1" />
+      <path d="M 16,62 C 60,78 96,26 144,52 C 166,64 176,44 186,50 C 242,60 294,28 346,36 C 406,42 456,20 506,22 C 534,23 550,15 564,14" stroke="currentColor" stroke-opacity="0.2" stroke-width="1.15" />
+      <path d="M 16,62 C 56,42 104,74 152,58 C 170,52 178,60 186,54 C 240,40 296,52 346,42 C 404,34 458,32 506,26 C 534,21 550,22 564,19" stroke="currentColor" stroke-opacity="0.2" stroke-width="1.15" />
+      <!-- +EV area fill & primary trajectory -->
+      <path d="M 16,62 C 72,62 128,58 186,52 C 240,46 292,41 346,35 C 400,29 452,23 506,18 C 534,15 550,13 564,12 L 564,62 L 16,62 Z" fill="url(#evAreaGrad)" />
+      <path d="M 16,62 C 72,62 128,58 186,52 C 240,46 292,41 346,35 C 400,29 452,23 506,18 C 534,15 550,13 564,12" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" />
+      <!-- Origin & decision gate nodes -->
+      <circle cx="16" cy="62" r="2.5" fill="currentColor" fill-opacity="0.38" />
+      <circle cx="186" cy="52" r="3.5" fill="var(--bg)" stroke="var(--accent)" stroke-width="2" />
+      <circle cx="346" cy="35" r="3.5" fill="var(--bg)" stroke="var(--accent)" stroke-width="2" />
+      <circle cx="506" cy="18" r="3.5" fill="var(--bg)" stroke="var(--accent)" stroke-width="2" />
+      <!-- Terminal +EV beacon -->
+      <circle cx="564" cy="12" r="7.5" fill="var(--accent)" fill-opacity="0.18" />
+      <circle cx="564" cy="12" r="3.5" fill="var(--accent)" />
+      <!-- Axis & gate labels -->
+      <text x="16" y="88" fill="currentColor" fill-opacity="0.42" font-size="10" font-weight="600" letter-spacing="0.08em">NOISE · σ</text>
+      <text x="186" y="88" text-anchor="middle" fill="currentColor" fill-opacity="0.58" font-size="10" font-weight="600" letter-spacing="0.08em">01 · EV</text>
+      <text x="346" y="88" text-anchor="middle" fill="currentColor" fill-opacity="0.58" font-size="10" font-weight="600" letter-spacing="0.08em">02 · SIZE</text>
+      <text x="506" y="88" text-anchor="middle" fill="currentColor" fill-opacity="0.58" font-size="10" font-weight="600" letter-spacing="0.08em">03 · EXIT</text>
+      <text x="578" y="16" text-anchor="start" fill="var(--accent)" font-size="11" font-weight="700" letter-spacing="0.06em">+EV</text>
+    </svg>
+  </div>
   {% endif %}
 </section>
 
@@ -40,21 +79,25 @@ image: "/assets/images/blog-home-og-1200x630.png"
     {% assign featured_posts = published_posts | where: "featured", true | sort: "date" | reverse %}
     {% if featured_posts.size > 0 %}
     <section class="featured-section" aria-label="精选">
+      <div class="section-heading section-heading-compact">
+        <h2 data-en="Featured essays" data-zh="精选导读">精选导读</h2>
+      </div>
       <div class="featured-grid">
         {% for post in featured_posts limit: 2 %}
         <a class="featured-card" href="{{ post.url | relative_url }}" data-lang="{{ post.lang | default: site.lang }}" data-track-cta data-cta-type="featured_article" data-placement="home_featured">
           <div class="post-card-meta">
             <span class="featured-pill" data-en="Featured" data-zh="精选">精选</span>
+            {% if post.series %}<span class="post-series-badge">{{ post.series }}</span>{% endif %}
             <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
             {% if has_zh and has_en %}
             <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
             {% endif %}
           </div>
           <h3 class="featured-card-title">{{ post.title }}</h3>
-          {% if post.description %}
-          <p class="featured-card-desc">{{ post.description }}</p>
-          {% elsif post.subtitle %}
+          {% if post.subtitle %}
           <p class="featured-card-desc">{{ post.subtitle }}</p>
+          {% elsif post.description %}
+          <p class="featured-card-desc">{{ post.description }}</p>
           {% endif %}
           <span class="featured-card-cta text-cta"><span data-en="Read essay" data-zh="阅读全文">阅读全文</span> →</span>
         </a>
@@ -65,10 +108,8 @@ image: "/assets/images/blog-home-og-1200x630.png"
   {% endif %}
 
   <div class="section-heading section-heading-compact">
-    <div>
-      <h2 data-en="Latest writing" data-zh="最新文章">最新文章</h2>
-    </div>
-    <a class="text-cta" href="{{ '/archive/' | relative_url }}"><span data-en="All articles" data-zh="全部文章">全部文章</span> →</a>
+    <h2 data-en="Latest writing" data-zh="最新文章">最新文章</h2>
+    <a class="section-pill-link" href="{{ '/archive/' | relative_url }}"><span data-en="All articles" data-zh="全部文章">全部文章</span> →</a>
   </div>
 
   {% if has_zh and has_en %}
@@ -84,20 +125,18 @@ image: "/assets/images/blog-home-og-1200x630.png"
     {% for post in paginator.posts %}
     <li class="post-item" data-lang="{{ post.lang | default: site.lang }}">
       <a class="post-card" href="{{ post.url | relative_url }}">
-        <div class="post-card-meta">
-          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
-          {% if post.series %}<span class="post-series-badge">{{ post.series }}</span>{% endif %}
-          {% if has_zh and has_en %}
-          <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
-          {% endif %}
+        <div class="post-card-body">
+          <div class="post-card-meta">
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+            {% if post.series %}<span class="post-series-badge">{{ post.series }}</span>{% endif %}
+            {% if has_zh and has_en %}
+            <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
+            {% endif %}
+          </div>
+          <h3 class="post-card-title">{{ post.title }}</h3>
+          {% if post.subtitle %}<p class="post-card-subtitle">{{ post.subtitle }}</p>{% elsif post.description %}<p class="post-card-subtitle">{{ post.description }}</p>{% endif %}
         </div>
-        <h2 class="post-card-title">{{ post.title }}</h2>
-        {% if post.subtitle %}<p class="post-card-subtitle">{{ post.subtitle }}</p>{% elsif post.description %}<p class="post-card-subtitle">{{ post.description }}</p>{% endif %}
-        {% if post.tags.size > 0 %}
-        <div class="post-card-tags">
-          {% for tag in post.tags limit: 3 %}<span class="tag">#{{ tag }}</span>{% endfor %}
-        </div>
-        {% endif %}
+        <span class="post-card-arrow" aria-hidden="true">→</span>
       </a>
     </li>
     {% endfor %}
@@ -124,10 +163,8 @@ image: "/assets/images/blog-home-og-1200x630.png"
 
 <section class="home-tools wrap" id="home-tools" aria-labelledby="home-tools-heading">
   <div class="section-heading section-heading-compact">
-    <div>
-      <h2 id="home-tools-heading" data-en="Interactive decision tools" data-zh="自建决策工具">自建决策工具</h2>
-    </div>
-    <a class="text-cta" href="{{ '/tools/' | relative_url }}" data-track-cta data-cta-type="tool_directory" data-placement="home_tools_header"><span data-en="All tools" data-zh="全部工具">全部工具</span> →</a>
+    <h2 id="home-tools-heading" data-en="Interactive decision tools" data-zh="自建决策工具">自建决策工具</h2>
+    <a class="section-pill-link" href="{{ '/tools/' | relative_url }}" data-track-cta data-cta-type="tool_directory" data-placement="home_tools_header"><span data-en="All tools" data-zh="全部工具">全部工具</span> →</a>
   </div>
   <div class="home-tool-grid">
     {% for tool_entry in site.data.tools %}
@@ -150,8 +187,9 @@ image: "/assets/images/blog-home-og-1200x630.png"
     <span class="work-banner-copy">
       <span class="work-banner-label tool-card-eyebrow" data-en="Selected UX work" data-zh="UX 作品集">UX 作品集</span>
       <strong data-en="Designing clarity for complex systems" data-zh="为复杂系统设计清晰体验">为复杂系统设计清晰体验</strong>
+      <span class="work-banner-desc" data-en="Enterprise product strategy, core workflows, and design systems across hardware & software." data-zh="企业级软硬件系统的 UX 策略、核心工作流与跨产品设计系统。">企业级软硬件系统的 UX 策略、核心工作流与跨产品设计系统。</span>
     </span>
-    <span class="work-banner-cta text-cta"><span class="work-banner-cta-label" data-en="View all work" data-zh="查看全部作品">查看全部作品</span> →</span>
+    <span class="work-banner-btn"><span class="work-banner-cta-label" data-en="View work" data-zh="查看作品">查看作品</span> →</span>
   </a>
 </section>
 
