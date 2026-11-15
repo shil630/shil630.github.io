@@ -16,8 +16,9 @@ sitemap: false
 
 - 站点名称：{{ site.title }}（{{ site.url }}）
 - 一句话定位：{{ site.tagline }}
-- 作者：{{ site.author }}（UX 设计负责人 / Design Lead，现任职于 Ubiquiti Inc.，曾任飞书高级 UX 设计师；Parsons School of Design 设计与技术硕士，上海交通大学视觉传达设计学士）
+- 作者：{{ site.author }}（体验设计总监 / Experience Design Director，现任职于 Ubiquiti Inc.，曾任飞书高级 UX 设计师；Parsons School of Design 设计与技术硕士，上海交通大学视觉传达设计学士）
 - 核心决策框架：EV（值不值得 / 期望值） · SIZE（投入多少 / 仓位尺度） · EXIT（何时退出 / 止损与止盈纪律）
+- 正在构建产品：持见 ThesisSee（https://thesisee.com）— AI 投资假设跟踪工具
 - 关于页：{{ '/about/' | absolute_url }}
 - UX 作品集：{{ '/work/' | absolute_url }}
 - 文章归档：{{ '/archive/' | absolute_url }}

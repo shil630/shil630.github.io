@@ -15,7 +15,7 @@ sitemap: false
 
 ## 核心定位与作者背景 (Identity & Author)
 
-- [关于石亮与决策系统]({{ '/about/' | absolute_url }}): {{ site.author }}（UX 设计负责人，Ubiquiti / 前飞书，Parsons 设计与技术硕士 / 上海交通大学学士），围绕期望值（EV）、投入尺度（Size）与退出纪律（Exit）建立不确定性决策框架。
+- [关于石亮与决策系统]({{ '/about/' | absolute_url }}): {{ site.author }}（体验设计总监，Ubiquiti / 前飞书，Parsons 设计与技术硕士 / 上海交通大学学士），围绕期望值（EV）、投入尺度（Size）与退出纪律（Exit）建立不确定性决策框架，持续输出「美股投资观察清单」、真实决策复盘，以及正在构建的 AI 投资假设跟踪工具「持见」（https://thesisee.com）。
 - [UX 设计作品集]({{ '/work/' | absolute_url }}): 企业级产品 UX 策略、端到端工作流、跨平台体验与设计系统代表实践。
 - [全部文章归档与系列索引]({{ '/archive/' | absolute_url }}): 全站深度文章按发布时间与专题系列（投资、德州）组织索引。
 - [自建决策工具目录]({{ '/tools/' | absolute_url }}): 围绕决策方法论开发的纯浏览器本地运行交互工具。
