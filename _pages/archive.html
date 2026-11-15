@@ -7,7 +7,7 @@ permalink: /archive/
 <section class="archive wrap">
   <header class="page-header">
     <h1 class="page-title" data-en="Articles" data-zh="文章">文章</h1>
-    <p class="page-subtitle" data-en="All posts, newest first" data-zh="全部文章，按时间倒序">全部文章，按时间倒序</p>
+    <p class="page-subtitle" data-en="Essays and post-mortems on investing systems, poker strategy, and +EV decisions." data-zh="围绕投资系统、德州扑克与正EV决策的长期写作与复盘。">围绕投资系统、德州扑克与正EV决策的长期写作与复盘。</p>
   </header>
 
   {% assign has_zh = false %}{% assign has_en = false %}
@@ -17,13 +17,15 @@ permalink: /archive/
   {% assign series_groups = published_posts | where_exp: "post", "post.series" | group_by: "series" %}
   {% if series_groups.size > 0 %}
   <nav class="archive-series-bar" aria-label="按系列筛选">
-    <span class="archive-series-label" data-en="Series" data-zh="系列">系列</span>
+    <span class="archive-series-label" data-en="Topic" data-zh="专题">专题</span>
     <a class="archive-series-chip active" href="{{ '/archive/' | relative_url }}" data-series="all">
-      <span data-en="All" data-zh="全部">全部</span> ({{ published_posts.size }})
+      <span data-en="All" data-zh="全部">全部</span>
+      <span class="archive-chip-count">{{ published_posts.size }}</span>
     </a>
     {% for group in series_groups %}
     <a class="archive-series-chip" href="{{ '/archive/' | relative_url }}?series={{ group.name | url_encode }}" data-series="{{ group.name }}">
-      {{ group.name }} ({{ group.items.size }})
+      <span>{{ group.name }}</span>
+      <span class="archive-chip-count">{{ group.items.size }}</span>
     </a>
     {% endfor %}
   </nav>
@@ -32,19 +34,35 @@ permalink: /archive/
   {% assign postsByYear = published_posts | group_by_exp: "post", "post.date | date: '%Y'" %}
   {% for year in postsByYear %}
   <div class="archive-year">
-    <h2 class="archive-year-title">{{ year.name }}</h2>
+    <div class="archive-year-header">
+      <h2 class="archive-year-title">{{ year.name }}</h2>
+      <span class="archive-year-count">{{ year.items.size }} <span data-en="posts" data-zh="篇">篇</span></span>
+    </div>
     <ul class="archive-list">
       {% for post in year.items %}
       <li class="archive-item" data-lang="{{ post.lang | default: site.lang }}" data-series="{{ post.series | default: '' }}">
-        <a href="{{ post.url | relative_url }}">
-          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m-%d" }}</time>
-          <span class="archive-title">{{ post.title }}</span>
-          {% if post.series %}
-          <span class="archive-series-badge">{{ post.series }}</span>
-          {% endif %}
-          {% if has_zh and has_en %}
-          <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
-          {% endif %}
+        <a class="archive-card" href="{{ post.url | relative_url }}">
+          <div class="archive-card-meta">
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m-%d" }}</time>
+            {% if post.series %}
+            <span class="archive-series-badge">{{ post.series }}</span>
+            {% endif %}
+            {% if has_zh and has_en %}
+            <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
+            {% endif %}
+          </div>
+          <div class="archive-card-main">
+            <strong class="archive-title">{{ post.title }}</strong>
+            {% if post.subtitle %}
+            <span class="archive-subtitle">{{ post.subtitle }}</span>
+            {% endif %}
+          </div>
+          <div class="archive-card-end">
+            {% if post.featured %}
+            <span class="featured-pill" data-en="Featured" data-zh="精选">精选</span>
+            {% endif %}
+            <span class="archive-arrow" aria-hidden="true">→</span>
+          </div>
         </a>
       </li>
       {% endfor %}
