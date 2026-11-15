@@ -235,7 +235,7 @@ img { max-width: 100%; height: auto; }
 .section-heading-side a,
 .section-heading-compact > a { display: inline-block; }
 .section-heading-compact {
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 20px;
 }
 .section-pill-link {
@@ -2246,7 +2246,7 @@ a.text-cta:hover { text-decoration: underline; }
   .prose table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .social { flex-wrap: wrap; justify-content: center; }
   .section-heading { display: block; margin-bottom: 18px; }
-  .section-heading-compact { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+  .section-heading-compact { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .section-heading h2 { font-size: 1.375rem; }
   .section-heading-side, .section-heading > p { max-width: none; margin-top: 10px; }
   .work-teaser { margin-top: 48px; margin-bottom: 0; }

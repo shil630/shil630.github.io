@@ -41,10 +41,7 @@ image: "/assets/images/blog-home-og-1200x630.png"
     {% if featured_posts.size > 0 %}
     <section class="featured-section" aria-label="精选">
       <div class="section-heading section-heading-compact">
-        <div>
-          <p class="section-kicker" data-en="Featured" data-zh="精选导读">精选导读</p>
-          <h2 data-en="Start Here" data-zh="代表文章">代表文章</h2>
-        </div>
+        <h2 data-en="Featured essays" data-zh="精选导读">精选导读</h2>
       </div>
       <div class="featured-grid">
         {% for post in featured_posts limit: 2 %}
@@ -72,10 +69,7 @@ image: "/assets/images/blog-home-og-1200x630.png"
   {% endif %}
 
   <div class="section-heading section-heading-compact">
-    <div>
-      <p class="section-kicker" data-en="Writing" data-zh="长期写作">长期写作</p>
-      <h2 data-en="Latest writing" data-zh="最新文章">最新文章</h2>
-    </div>
+    <h2 data-en="Latest writing" data-zh="最新文章">最新文章</h2>
     <a class="section-pill-link" href="{{ '/archive/' | relative_url }}"><span data-en="All articles" data-zh="全部文章">全部文章</span> →</a>
   </div>
 
@@ -130,10 +124,7 @@ image: "/assets/images/blog-home-og-1200x630.png"
 
 <section class="home-tools wrap" id="home-tools" aria-labelledby="home-tools-heading">
   <div class="section-heading section-heading-compact">
-    <div>
-      <p class="section-kicker" data-en="Interactive Tools" data-zh="决策工具">决策工具</p>
-      <h2 id="home-tools-heading" data-en="Interactive decision tools" data-zh="自建决策工具">自建决策工具</h2>
-    </div>
+    <h2 id="home-tools-heading" data-en="Interactive decision tools" data-zh="自建决策工具">自建决策工具</h2>
     <a class="section-pill-link" href="{{ '/tools/' | relative_url }}" data-track-cta data-cta-type="tool_directory" data-placement="home_tools_header"><span data-en="All tools" data-zh="全部工具">全部工具</span> →</a>
   </div>
   <div class="home-tool-grid">
