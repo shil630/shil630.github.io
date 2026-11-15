@@ -23,14 +23,14 @@ layout: default
       {% if has_zh and has_en %}
       <span class="post-lang-badge">{% if page.lang == 'en' %}EN{% else %}中文{% endif %}</span>
       {% endif %}
-      {% if page.tags.size > 0 %}
-      <span class="post-tags">
-        {% for tag in page.tags %}<span class="tag">#{{ tag }}</span>{% endfor %}
-      </span>
-      {% endif %}
     </div>
     <h1 class="post-title">{{ page.title }}</h1>
     {% if page.subtitle %}<p class="post-subtitle">{{ page.subtitle }}</p>{% endif %}
+    {% if page.tags.size > 0 %}
+    <div class="post-tags">
+      {% for tag in page.tags %}<span class="tag">#{{ tag }}</span>{% endfor %}
+    </div>
+    {% endif %}
   </header>
 
   {% if page.key_points.size > 0 %}
@@ -65,15 +65,15 @@ layout: default
   {% endif %}
 
   <aside class="post-author-card" aria-label="作者与出处信息">
-    <img class="post-author-avatar" src="{{ site.logo | relative_url }}" alt="石亮 / Liang Shi" width="44" height="44" loading="lazy" decoding="async">
+    <img class="post-author-avatar" src="{{ '/assets/images/avatar-blog-512.png' | relative_url }}" alt="石亮 / Liang Shi" width="52" height="52" loading="lazy" decoding="async">
     <div class="post-author-body">
       <div class="post-author-head">
-        <strong class="post-author-name" data-en="Liang Shi" data-zh="石亮（Liang Shi）">石亮（Liang Shi）</strong>
-        <span class="post-author-role" data-en="Experience Design Director · Author of Positive EV" data-zh="体验设计总监 · 《石亮正EV》作者">体验设计总监 · 《石亮正EV》作者</span>
+        <strong class="post-author-name" data-en="Liang Shi" data-zh="石亮">石亮</strong>
+        <span class="post-author-role" data-en="Experience Design Director · Parsons MFA" data-zh="体验设计总监 · Parsons 硕士">体验设计总监 · Parsons 硕士</span>
       </div>
-      <p class="post-author-bio" data-en="10+ years designing complex systems across top tech teams. Writing about design, investing, poker and decision-making under uncertainty." data-zh="10 年+ 跨中美科技团队产品与设计经验，持续在设计、投资与德州扑克中实验「在不确定中做更好的决策」。">10 年+ 跨中美科技团队产品与设计经验，持续在设计、投资与德州扑克中实验「在不确定中做更好的决策」。</p>
+      <p class="post-author-bio" data-en="10+ years at US & China tech companies. Exploring +EV decisions across product design, US equities, and Texas Hold'em." data-zh="10+ 年中美科技大厂产品与设计经验，持续在设计、美股投资与德州扑克中记录正EV决策实验。">10+ 年中美科技大厂产品与设计经验，持续在设计、美股投资与德州扑克中记录正EV决策实验。</p>
       <p class="post-author-links">
-        <a href="{{ '/about/' | relative_url }}" data-en="About & decision framework →" data-zh="关于作者与决策框架 →">关于作者与决策框架 →</a>
+        <a href="{{ '/about/' | relative_url }}" data-en="About & framework →" data-zh="关于作者与决策框架 →">关于作者与决策框架 →</a>
         <a href="{{ '/work/' | relative_url }}" data-en="Selected UX work →" data-zh="查看 UX 作品集 →">查看 UX 作品集 →</a>
       </p>
     </div>
@@ -81,10 +81,12 @@ layout: default
 
   {% include subscribe.html %}
 
+  {% assign prev_url = page.previous.url | default: "" %}
+  {% assign next_url = page.next.url | default: "" %}
   {% assign published_posts = site.posts | where_exp: "post", "post.draft != true" %}
   {% assign related_posts = "" | split: "" %}
   {% for candidate in published_posts %}
-    {% if candidate.url != page.url and page.series and candidate.series == page.series %}
+    {% if candidate.url != page.url and candidate.url != prev_url and candidate.url != next_url and page.series and candidate.series == page.series %}
       {% assign related_posts = related_posts | push: candidate %}
       {% if related_posts.size == 3 %}{% break %}{% endif %}
     {% endif %}
@@ -116,13 +118,17 @@ layout: default
   {% endif %}
   {% if related_posts.size > 0 %}
   <section class="post-related-posts" aria-label="同主题延伸阅读">
-    <h2 class="post-related-heading" data-en="Related reading" data-zh="同主题延伸阅读">同主题延伸阅读</h2>
+    <div class="post-related-header">
+      <span class="post-related-kicker" data-en="Further Reading" data-zh="延伸阅读">延伸阅读</span>
+      <h2 class="post-related-heading" data-en="Related Articles" data-zh="同主题文章">同主题文章</h2>
+    </div>
     <ul class="post-related-list">
       {% for item in related_posts %}
       <li>
-        <a href="{{ item.url | relative_url }}" data-track-cta data-cta-type="related_topic_article" data-placement="post_related_reading">
+        <a class="post-related-card" href="{{ item.url | relative_url }}" data-track-cta data-cta-type="related_topic_article" data-placement="post_related_reading">
           <time datetime="{{ item.date | date_to_xmlschema }}">{{ item.date | date: "%Y-%m-%d" }}</time>
           <span class="post-related-title">{{ item.title }}</span>
+          <span class="post-related-arrow" aria-hidden="true">→</span>
         </a>
       </li>
       {% endfor %}
@@ -135,7 +141,7 @@ layout: default
   {% if page.previous and page.previous.home != false %}{% assign show_previous = true %}{% endif %}
   {% if page.next and page.next.home != false %}{% assign show_next = true %}{% endif %}
   {% if show_previous or show_next %}
-  <nav class="post-nav">
+  <nav class="post-nav" aria-label="上下篇导航">
     {% if show_previous %}
     <a class="prev" href="{{ page.previous.url | relative_url }}" data-track-cta data-cta-type="related_article" data-placement="post_navigation">
       <span class="dir">← <span data-en="Previous" data-zh="上一篇">上一篇</span></span>

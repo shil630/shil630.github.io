@@ -1,8 +1,11 @@
 {% if site.buttondown_username != "" and site.buttondown_username %}
 <section class="subscribe wrap" id="subscribe">
   <div class="subscribe-box">
-    <h3 class="subscribe-title" data-en="Subscribe to the Positive EV Lab" data-zh="订阅正EV实验">订阅正EV实验</h3>
-    <p class="subscribe-desc" data-en="Occasional essays on design, investing, poker, and decision-making. No signals. No noise." data-zh="不定期更新关于设计、投资、德州与决策的文章。无喊单，无噪音。">不定期更新关于设计、投资、德州与决策的文章。无喊单，无噪音。</p>
+    <div class="subscribe-copy">
+      <span class="subscribe-kicker" data-en="Newsletter" data-zh="邮件订阅">邮件订阅</span>
+      <h3 class="subscribe-title" data-en="Subscribe to the Positive EV Lab" data-zh="订阅正EV实验">订阅正EV实验</h3>
+      <p class="subscribe-desc" data-en="Occasional essays on design, investing, poker, and decision-making. No signals. No noise." data-zh="不定期更新关于设计、投资、德州与决策的文章。无喊单，无噪音。">不定期更新关于设计、投资、德州与决策的文章。无喊单，无噪音。</p>
+    </div>
     <form class="subscribe-form"
           data-track-cta
           data-cta-type="newsletter"
@@ -11,7 +14,7 @@
           method="post" target="_blank">
       <input type="email" name="email" placeholder="you@example.com" required
              aria-label="Email address">
-      <button type="submit" data-en="Join the experiment" data-zh="加入实验">加入实验</button>
+      <button type="submit" data-en="Subscribe" data-zh="加入实验">加入实验</button>
     </form>
   </div>
 </section>
