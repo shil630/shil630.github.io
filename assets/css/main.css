@@ -481,22 +481,23 @@ img { max-width: 100%; height: auto; }
 }
 .capability-card {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
   padding: 18px 20px;
   background: color-mix(in srgb, var(--bg-soft) 55%, var(--bg));
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
 }
 .capability-media {
-  flex: 0 0 56px;
-  width: 56px;
-  height: 56px;
-  border-radius: 10px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border);
   background: var(--bg-soft);
 }
+.capability-media img,
 .capability-avatar {
   display: block;
   width: 100%;
