@@ -212,6 +212,93 @@ img { max-width: 100%; height: auto; }
   font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
 }
+.hero-ev-base,
+.hero-ev-origin {
+  opacity: 0;
+  animation: evFadeIn 0.35s ease forwards;
+}
+.hero-ev-noise {
+  opacity: 0;
+  animation: evFadeIn 0.6s ease 0.1s forwards;
+}
+.hero-ev-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: evDrawPath 1.35s cubic-bezier(0.22, 1, 0.36, 1) 0.25s forwards;
+}
+.hero-ev-area {
+  opacity: 0;
+  animation: evFadeIn 0.5s ease 1.35s forwards;
+}
+.hero-ev-step {
+  opacity: 0;
+}
+.hero-ev-step-1 { animation: evStepIn 0.35s ease 0.58s forwards; }
+.hero-ev-step-2 { animation: evStepIn 0.35s ease 0.94s forwards; }
+.hero-ev-step-3 { animation: evStepIn 0.35s ease 1.3s forwards; }
+.hero-ev-end {
+  opacity: 0;
+  animation: evStepIn 0.35s ease 1.55s forwards;
+}
+.hero-ev-node,
+.hero-ev-beacon,
+.hero-ev-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.hero-ev-pulse {
+  opacity: 0;
+  animation: evPulseRing 2.4s cubic-bezier(0.16, 1, 0.3, 1) 1.85s infinite;
+}
+.hero-ev-beacon {
+  animation: evBeaconBeat 2.4s ease-in-out 1.85s infinite;
+}
+@keyframes evFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes evDrawPath {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes evStepIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes evPulseRing {
+  0% { opacity: 0.72; transform: scale(1); }
+  70% { opacity: 0; transform: scale(2.6); }
+  100% { opacity: 0; transform: scale(2.6); }
+}
+@keyframes evBeaconBeat {
+  0%, 100% { transform: scale(1); }
+  18% { transform: scale(1.18); }
+  36% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-ev-base,
+  .hero-ev-origin,
+  .hero-ev-noise,
+  .hero-ev-area,
+  .hero-ev-step,
+  .hero-ev-end {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+  .hero-ev-line {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+  .hero-ev-pulse,
+  .hero-ev-beacon {
+    animation: none;
+    opacity: 0;
+  }
+  .hero-ev-beacon {
+    opacity: 1;
+  }
+}
 .decision-framework { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 22px; }
 .decision-step {
   display: flex;
