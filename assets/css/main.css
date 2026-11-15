@@ -985,7 +985,7 @@ a.post-series-badge:hover {
   color: var(--fg-faint);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
-  width: 82px;
+  white-space: nowrap;
 }
 .post-related-title {
   flex: 1;
@@ -1013,6 +1013,9 @@ a.post-series-badge:hover {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   margin-top: 16px;
+}
+.post-nav a:only-child {
+  grid-column: 1 / -1;
 }
 .post-nav a {
   display: flex;
