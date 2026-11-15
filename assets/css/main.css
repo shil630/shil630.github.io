@@ -118,7 +118,6 @@ img { max-width: 100%; height: auto; }
 
 /* ---------- Hero (home) ---------- */
 .hero { margin-block-end: 36px; text-align: center; }
-.hero-pillars { margin: 0 0 10px; color: var(--accent); font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
 .hero-title {
   max-inline-size: 24ch;
   margin-inline: auto;
@@ -131,8 +130,8 @@ img { max-width: 100%; height: auto; }
   text-wrap: balance;
 }
 .hero-intro {
-  max-inline-size: 64ch;
-  margin-block-start: 18px;
+  max-inline-size: 66ch;
+  margin-block-start: 16px;
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -161,7 +160,7 @@ img { max-width: 100%; height: auto; }
 }
 .hero-desc {
   margin: 0;
-  max-inline-size: 64ch;
+  max-inline-size: 66ch;
   margin-inline: auto;
   font-size: 0.9375rem;
   line-height: 1.75;
