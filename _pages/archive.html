@@ -34,7 +34,7 @@ permalink: /archive/
   {% assign postsByYear = published_posts | group_by_exp: "post", "post.date | date: '%Y'" %}
   {% for year in postsByYear %}
   <div class="archive-year">
-    <div class="archive-year-rail">
+    <div class="archive-year-header">
       <h2 class="archive-year-title">{{ year.name }}</h2>
       <span class="archive-year-count">{{ year.items.size }} <span data-en="posts" data-zh="篇">篇</span></span>
     </div>
@@ -47,9 +47,6 @@ permalink: /archive/
             {% if post.series %}
             <span class="archive-series-badge">{{ post.series }}</span>
             {% endif %}
-            {% if post.featured %}
-            <span class="featured-pill" data-en="Featured" data-zh="精选">精选</span>
-            {% endif %}
             {% if has_zh and has_en %}
             <span class="post-lang-badge">{% if post.lang == 'en' %}EN{% else %}中文{% endif %}</span>
             {% endif %}
@@ -60,7 +57,12 @@ permalink: /archive/
             <span class="archive-subtitle">{{ post.subtitle }}</span>
             {% endif %}
           </div>
-          <span class="archive-arrow" aria-hidden="true">→</span>
+          <div class="archive-card-end">
+            {% if post.featured %}
+            <span class="featured-pill" data-en="Featured" data-zh="精选">精选</span>
+            {% endif %}
+            <span class="archive-arrow" aria-hidden="true">→</span>
+          </div>
         </a>
       </li>
       {% endfor %}
