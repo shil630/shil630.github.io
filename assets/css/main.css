@@ -192,15 +192,12 @@ img { max-width: 100%; height: auto; }
   gap: 10px;
   min-width: 0;
   padding: 12px 14px;
-  background: color-mix(in srgb, var(--bg-soft) 70%, transparent);
+  background: color-mix(in srgb, var(--bg-soft) 55%, var(--bg));
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 10px;
 }
-.decision-step strong { flex: 0 0 auto; font-size: 12px; letter-spacing: 0.05em; }
+.decision-step strong { flex: 0 0 auto; font-size: 12px; letter-spacing: 0.05em; color: var(--accent); }
 .decision-step span { min-width: 0; color: var(--fg-soft); font-size: 13px; }
-.decision-step-ev strong { color: var(--accent); }
-.decision-step-size strong { color: var(--fg); }
-.decision-step-exit strong { color: var(--accent); }
 
 /* ---------- Shared section headings ---------- */
 .section-heading {
