@@ -168,6 +168,9 @@ img { max-width: 100%; height: auto; }
   color: var(--fg-soft);
   text-wrap: pretty;
 }
+.hero-nowrap {
+  white-space: nowrap;
+}
 .hero-intro a {
   color: var(--accent);
   font-weight: 500;
