@@ -72,6 +72,7 @@ def assert!(condition, message)
 end
 
 home = File.read(File.join(build_dir, "index.html"), encoding: "UTF-8")
+home_doc = Nokogiri::HTML(home)
 assert!(home.include?('<html lang="zh">'), "首页 html[lang] 不是 zh")
 assert!(home.include?('id="lang-toggle"'), "首页缺少语言切换器")
 assert!(home.match?(/\sdata-en=/) && home.match?(/\sdata-zh=/), "首页缺少双语界面文案")
@@ -100,6 +101,8 @@ assert!(!home.include?('class="post-lang-badge"'), "全中文首页不应显示�
 
 featured_count = home.scan('class="featured-card"').length
 assert!(featured_count == 2, "首页精选代表作数量应为 2，实际为 #{featured_count}")
+assert!(home_doc.at_css('.hero-intro a[href="https://thesisee.com"]'), "首页简介缺少持见 thesisee.com 超链接")
+assert!(home.include?("体验设计总监"), "首页简介未同步最新头衔")
 home_tools_count = home.scan('class="home-tool-card"').length
 assert!(home_tools_count == 3, "首页自建工具卡片数量应为 3，实际为 #{home_tools_count}")
 tool_dirs = Dir.glob(File.join(build_dir, "tools", "*", "index.html")).map do |path|
@@ -241,7 +244,6 @@ end
 puts "✓ llms.txt、llms-full.txt 与 robots.txt AI 爬虫策略生成正常"
 
 # SEO-GEO-1 核心页面、robots、sitemap 与 E-E-A-T 结构化数据校验
-home_doc = Nokogiri::HTML(home)
 home_desc = home_doc.at_css('meta[name="description"]')&.[]("content")
 %w[about work archive tools].each do |slug|
   pdoc = Nokogiri::HTML(File.read(File.join(build_dir, slug, "index.html"), encoding: "UTF-8"))
