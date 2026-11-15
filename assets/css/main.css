@@ -1536,6 +1536,7 @@ a.post-series-badge:hover {
   width: 100%;
   margin-block-end: 2px;
 }
+.decision-step .decision-step-icon,
 .decision-step-icon {
   display: inline-flex;
   align-items: center;
@@ -1581,6 +1582,7 @@ a.post-series-badge:hover {
   row-gap: 8px;
   margin: 16px 0 44px;
 }
+.prose a.about-focus-card,
 .about-focus-card {
   grid-row: span 4;
   display: grid;
@@ -1594,13 +1596,14 @@ a.post-series-badge:hover {
   text-decoration: none;
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
+.prose a.about-focus-card:hover,
 .about-focus-card:hover {
   text-decoration: none;
   border-color: var(--accent);
   transform: translateY(-2px);
 }
-.about-focus-card:hover .text-cta {
-  text-decoration: underline;
+.about-focus-card:hover .about-focus-title {
+  color: var(--accent);
 }
 .about-focus-eyebrow {
   color: var(--accent);
@@ -1700,6 +1703,7 @@ ul.resume-timeline {
   padding: 1px 8px;
   line-height: 1.4;
 }
+.prose a.resume-work-link,
 .resume-work-link {
   font-size: 0.75rem;
   font-weight: 600;
@@ -1709,9 +1713,13 @@ ul.resume-timeline {
   padding: 1px 9px;
   line-height: 1.5;
   text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
+.prose a.resume-work-link:hover,
 .resume-work-link:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  background: var(--accent);
+  color: #fff;
 }
 .resume-org {
   font-size: 0.96875rem;
@@ -1735,6 +1743,7 @@ ul.resume-timeline {
   gap: 12px;
   margin-top: 16px;
 }
+.prose a.about-contact-card,
 .about-contact-card {
   display: flex;
   align-items: center;
@@ -1747,6 +1756,7 @@ ul.resume-timeline {
   text-decoration: none;
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
+.prose a.about-contact-card:hover,
 .about-contact-card:hover {
   text-decoration: none;
   border-color: var(--accent);
