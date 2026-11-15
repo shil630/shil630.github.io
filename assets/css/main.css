@@ -131,7 +131,7 @@ img { max-width: 100%; height: auto; }
   text-wrap: balance;
 }
 .hero-intro {
-  max-inline-size: 62ch;
+  max-inline-size: 64ch;
   margin-block-start: 18px;
   margin-inline: auto;
   display: flex;
@@ -161,7 +161,7 @@ img { max-width: 100%; height: auto; }
 }
 .hero-desc {
   margin: 0;
-  max-inline-size: 56ch;
+  max-inline-size: 64ch;
   margin-inline: auto;
   font-size: 0.9375rem;
   line-height: 1.75;
