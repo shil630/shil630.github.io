@@ -838,23 +838,6 @@ a.post-series-badge:hover {
 .about-focus-card:hover .text-cta {
   text-decoration: underline;
 }
-.about-focus-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-block-end: 2px;
-}
-.about-focus-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  color: var(--accent);
-  background: var(--accent-soft);
-  flex-shrink: 0;
-}
 .about-focus-eyebrow {
   color: var(--accent);
   font-size: 0.6875rem;
