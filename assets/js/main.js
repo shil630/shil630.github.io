@@ -718,7 +718,12 @@
 
   if (cmdKbdHint) {
     var isApple = /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent || "");
-    cmdKbdHint.textContent = isApple ? "⌘K" : "Ctrl K";
+    var cmdModNode = cmdKbdHint.querySelector(".cmd-kbd-mod");
+    if (cmdModNode) {
+      cmdModNode.textContent = isApple ? "⌘" : "Ctrl";
+    } else {
+      cmdKbdHint.textContent = isApple ? "⌘ K" : "Ctrl K";
+    }
   }
 
   if (wireTopLayerDialog(cmdPalette, document.getElementById("cmd-close")) && cmdInput && cmdResults) {
