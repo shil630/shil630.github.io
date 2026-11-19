@@ -1,6 +1,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    try {
+      var savedScheme = localStorage.getItem("color-scheme");
+      if (savedScheme === "light" || savedScheme === "dark") {
+        document.querySelector('meta[name="color-scheme"]').content = savedScheme;
+      }
+    } catch (e) {}
+  </script>
   <meta name="theme-color" content="#0b0d10" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#F5F1EA" media="(prefers-color-scheme: light)">
   <meta name="google-site-verification" content="PX4bjMTRFBc0zm95r-fJ8vpsYHfZ0DRsc8EiJbuxc1Q" />
