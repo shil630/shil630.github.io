@@ -44,6 +44,8 @@ layout: default
   </aside>
   {% endif %}
 
+  <nav class="post-minimap" id="post-minimap" aria-label="章节导航" hidden></nav>
+
   <div class="prose">
     {{ content | replace: '<img src=', '<img loading="lazy" decoding="async" src=' }}
   </div>

@@ -6,6 +6,7 @@
 
   var LANG_KEY = "site-lang";
   var FILTER_KEY = "post-filter";
+  var onLangChangeHooks = [];
 
   /* ---------- Interface language (nav labels, about page) ---------- */
   function applyLang(lang) {
@@ -13,6 +14,10 @@
     document.querySelectorAll("[data-zh][data-en]").forEach(function (el) {
       var val = el.getAttribute(lang === "en" ? "data-en" : "data-zh");
       if (val !== null) el.textContent = val;
+    });
+    document.querySelectorAll("[data-placeholder-zh][data-placeholder-en]").forEach(function (el) {
+      var ph = el.getAttribute(lang === "en" ? "data-placeholder-en" : "data-placeholder-zh");
+      if (ph !== null) el.setAttribute("placeholder", ph);
     });
     // Whole blocks: .lang-zh / .lang-en
     document.querySelectorAll(".lang-zh").forEach(function (el) {
@@ -28,68 +33,59 @@
     return localStorage.getItem(LANG_KEY) || "zh";
   }
 
+  function toggleLang() {
+    var next = getLang() === "zh" ? "en" : "zh";
+    localStorage.setItem(LANG_KEY, next);
+    applyLang(next);
+    onLangChangeHooks.forEach(function (fn) { fn(next); });
+  }
+
   var toggle = document.getElementById("lang-toggle");
   if (toggle) {
-    toggle.addEventListener("click", function () {
-      var next = getLang() === "zh" ? "en" : "zh";
-      localStorage.setItem(LANG_KEY, next);
-      applyLang(next);
-    });
+    toggle.addEventListener("click", toggleLang);
   }
   applyLang(getLang());
 
-  /* ---------- Color scheme toggle (light / dark / system) ---------- */
+  /* ---------- Color scheme toggle (Dark Instrument default, Light Paper optional) ---------- */
   var SCHEME_KEY = "color-scheme";
   var schemeMeta = document.querySelector('meta[name="color-scheme"]');
+  var themeColorMeta = document.querySelector('meta[name="theme-color"]');
   var themeToggle = document.getElementById("theme-toggle");
-  var darkMedia = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
-  function getStoredScheme() {
-    try {
-      var val = localStorage.getItem(SCHEME_KEY);
-      return (val === "light" || val === "dark") ? val : null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function getSystemScheme() {
-    return (darkMedia && darkMedia.matches) ? "dark" : "light";
+  function isDarkSchemeActive() {
+    var content = schemeMeta ? schemeMeta.getAttribute("content") : "dark";
+    return content !== "light";
   }
 
   function applySchemeMeta(val) {
-    if (schemeMeta) schemeMeta.setAttribute("content", val || "light dark");
+    var scheme = val === "light" ? "light" : "dark";
+    if (schemeMeta) schemeMeta.setAttribute("content", scheme);
+    if (themeColorMeta) themeColorMeta.setAttribute("content", scheme === "light" ? "#faf7f2" : "#0e1013");
   }
 
   var onThemeChangeHooks = [];
 
+  function toggleTheme() {
+    var target = isDarkSchemeActive() ? "light" : "dark";
+    if (target === "light") {
+      try { localStorage.setItem(SCHEME_KEY, "light"); } catch (e) {}
+    } else {
+      try { localStorage.removeItem(SCHEME_KEY); } catch (e) {}
+    }
+    applySchemeMeta(target);
+    onThemeChangeHooks.forEach(function (fn) { fn(); });
+  }
+
   if (themeToggle) {
-    themeToggle.addEventListener("click", function () {
-      var current = getStoredScheme() || getSystemScheme();
-      var target = current === "dark" ? "light" : "dark";
-      if (target !== getSystemScheme()) {
-        try { localStorage.setItem(SCHEME_KEY, target); } catch (e) {}
-        applySchemeMeta(target);
-      } else {
-        try { localStorage.removeItem(SCHEME_KEY); } catch (e) {}
-        applySchemeMeta("light dark");
-      }
-      onThemeChangeHooks.forEach(function (fn) { fn(); });
-    });
+    themeToggle.addEventListener("click", toggleTheme);
   }
 
   window.addEventListener("storage", function (e) {
     if (e.key === SCHEME_KEY) {
-      applySchemeMeta((e.newValue === "light" || e.newValue === "dark") ? e.newValue : "light dark");
+      applySchemeMeta(e.newValue === "light" ? "light" : "dark");
       onThemeChangeHooks.forEach(function (fn) { fn(); });
     }
   });
-
-  if (darkMedia && darkMedia.addEventListener) {
-    darkMedia.addEventListener("change", function () {
-      onThemeChangeHooks.forEach(function (fn) { fn(); });
-    });
-  }
 
   /* ---------- Hero Option 1: Interactive Magnetic Vector Field ---------- */
   var vectorCanvas = document.getElementById("hero-vector-field");
@@ -115,13 +111,6 @@
     var darkActive = false;
     var fgRgb = [30, 29, 27];
     var accentRgb = [182, 75, 59];
-
-    function isDarkSchemeActive() {
-      var content = schemeMeta ? schemeMeta.getAttribute("content") : "";
-      if (content === "dark") return true;
-      if (content === "light") return false;
-      return getSystemScheme() === "dark";
-    }
 
     function parseCssColor(str, fallback) {
       var s = (str || "").trim();
@@ -199,7 +188,10 @@
           var dxText = (x - width * 0.5) / (width < 640 ? 150 : 280);
           var dyText = (y - height * 0.5) / 64;
           var textMask = 1 - 0.68 * Math.exp(-(dxText * dxText + dyText * dyText));
-          var edgeFade = Math.max(0.15, Math.min(edgeV, edgeH)) * textMask;
+          var dxCue = (x - width * 0.5) / 44;
+          var dyCue = (y - (height - 46)) / 34;
+          var cueMask = 1 - 0.85 * Math.exp(-(dxCue * dxCue + dyCue * dyCue));
+          var edgeFade = Math.max(0.15, Math.min(edgeV, edgeH)) * textMask * cueMask;
           cells.push({
             x: x,
             y: y,
@@ -447,55 +439,90 @@
     });
   });
 
+  /* ---------- Shared Native <dialog> Top-Layer Helpers ---------- */
+  var supportsDisplayTransition;
+
+  function canTransitionDisplay() {
+    if (supportsDisplayTransition !== undefined) return supportsDisplayTransition;
+    if (!window.CSS || !window.CSS.supports || !window.CSS.supports("transition-behavior", "allow-discrete") || !document.body) {
+      supportsDisplayTransition = false;
+      return false;
+    }
+    var probe = document.createElement("div");
+    probe.style.cssText = "transition: display 1s allow-discrete !important; display: block;";
+    document.body.appendChild(probe);
+    window.getComputedStyle(probe).display;
+    probe.style.display = "none";
+    supportsDisplayTransition = window.getComputedStyle(probe).display === "block";
+    probe.remove();
+    return supportsDisplayTransition;
+  }
+
+  function supportsTopLayerExit() {
+    return !!(window.CSS && window.CSS.supports && window.CSS.supports("overlay", "auto") && canTransitionDisplay());
+  }
+
+  function closeTopLayerDialog(dialog) {
+    if (!dialog || !dialog.open) return;
+    if (!supportsTopLayerExit()) {
+      dialog.setAttribute("data-closing", "");
+      var anims = dialog.getAnimations ? dialog.getAnimations({ subtree: true }) : [];
+      if (anims.length > 0) {
+        Promise.race([
+          Promise.allSettled(anims.map(function (a) { return a.finished; })),
+          new Promise(function (resolve) { window.setTimeout(resolve, 600); })
+        ]).then(function () {
+          if (!dialog.hasAttribute("data-closing")) return;
+          dialog.removeAttribute("data-closing");
+          if (dialog.open) dialog.close();
+        });
+        return;
+      }
+      dialog.removeAttribute("data-closing");
+    }
+    dialog.close();
+  }
+
+  function wireTopLayerDialog(dialog, closeBtn) {
+    if (!dialog || typeof dialog.showModal !== "function") return false;
+    dialog.addEventListener("close", function () {
+      dialog.removeAttribute("data-closing");
+      dialog.returnValue = "";
+    });
+    dialog.addEventListener("cancel", function (e) {
+      if (!supportsTopLayerExit()) {
+        e.preventDefault();
+        closeTopLayerDialog(dialog);
+      }
+    });
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function () {
+        closeTopLayerDialog(dialog);
+      });
+    }
+    if (!("closedBy" in HTMLDialogElement.prototype)) {
+      var pressedOutside = false;
+      var isOutsideDialog = function (e) {
+        var r = dialog.getBoundingClientRect();
+        return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      };
+      dialog.addEventListener("pointerdown", function (e) {
+        pressedOutside = isOutsideDialog(e);
+      });
+      dialog.addEventListener("pointerup", function (e) {
+        if (pressedOutside && isOutsideDialog(e)) closeTopLayerDialog(dialog);
+        pressedOutside = false;
+      });
+    }
+    return true;
+  }
+
   /* ---------- Native <dialog> Lightbox (work showcase + article diagrams) ---------- */
   var lightbox = document.getElementById("image-lightbox");
-  if (lightbox && typeof lightbox.showModal === "function") {
+  if (wireTopLayerDialog(lightbox, document.getElementById("lightbox-close"))) {
     var lightboxImg = document.getElementById("lightbox-img");
     var lightboxTitle = document.getElementById("lightbox-title");
     var lightboxSub = document.getElementById("lightbox-subtitle");
-    var lightboxCloseBtn = document.getElementById("lightbox-close");
-    var supportsDisplayTransition;
-
-    function canTransitionDisplay() {
-      if (supportsDisplayTransition !== undefined) return supportsDisplayTransition;
-      if (!window.CSS || !window.CSS.supports || !window.CSS.supports("transition-behavior", "allow-discrete") || !document.body) {
-        supportsDisplayTransition = false;
-        return false;
-      }
-      var probe = document.createElement("div");
-      probe.style.cssText = "transition: display 1s allow-discrete !important; display: block;";
-      document.body.appendChild(probe);
-      window.getComputedStyle(probe).display;
-      probe.style.display = "none";
-      supportsDisplayTransition = window.getComputedStyle(probe).display === "block";
-      probe.remove();
-      return supportsDisplayTransition;
-    }
-
-    function supportsTopLayerExit() {
-      return !!(window.CSS && window.CSS.supports && window.CSS.supports("overlay", "auto") && canTransitionDisplay());
-    }
-
-    function closeLightbox() {
-      if (!lightbox.open) return;
-      if (!supportsTopLayerExit()) {
-        lightbox.setAttribute("data-closing", "");
-        var anims = lightbox.getAnimations ? lightbox.getAnimations({ subtree: true }) : [];
-        if (anims.length > 0) {
-          Promise.race([
-            Promise.allSettled(anims.map(function (a) { return a.finished; })),
-            new Promise(function (resolve) { window.setTimeout(resolve, 600); })
-          ]).then(function () {
-            if (!lightbox.hasAttribute("data-closing")) return;
-            lightbox.removeAttribute("data-closing");
-            if (lightbox.open) lightbox.close();
-          });
-          return;
-        }
-        lightbox.removeAttribute("data-closing");
-      }
-      lightbox.close();
-    }
 
     function openLightbox(opts) {
       if (!opts || !opts.src) return;
@@ -510,39 +537,6 @@
         lightboxSub.hidden = !opts.subtitle;
       }
       lightbox.showModal();
-    }
-
-    lightbox.addEventListener("close", function () {
-      lightbox.removeAttribute("data-closing");
-      lightbox.returnValue = "";
-    });
-
-    lightbox.addEventListener("cancel", function (e) {
-      if (!supportsTopLayerExit()) {
-        e.preventDefault();
-        closeLightbox();
-      }
-    });
-
-    if (lightboxCloseBtn) {
-      lightboxCloseBtn.addEventListener("click", function () {
-        closeLightbox();
-      });
-    }
-
-    if (!("closedBy" in HTMLDialogElement.prototype)) {
-      var pressedOutside = false;
-      var isOutsideDialog = function (e) {
-        var r = lightbox.getBoundingClientRect();
-        return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-      };
-      lightbox.addEventListener("pointerdown", function (e) {
-        pressedOutside = isOutsideDialog(e);
-      });
-      lightbox.addEventListener("pointerup", function (e) {
-        if (pressedOutside && isOutsideDialog(e)) closeLightbox();
-        pressedOutside = false;
-      });
     }
 
     document.querySelectorAll(".media-zoom-btn[data-lightbox-src]").forEach(function (btn) {
@@ -583,6 +577,421 @@
           handleOpen();
         }
       });
+    });
+  }
+
+  /* ---------- Post Reading Progress Hairline Fallback ---------- */
+  var readingProgress = document.getElementById("reading-progress");
+  if (readingProgress) {
+    var progressReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var supportsScrollTimeline = window.CSS && window.CSS.supports && window.CSS.supports("animation-timeline", "scroll()");
+    if (!progressReduced && !supportsScrollTimeline) {
+      var progressTicking = false;
+      var syncProgressFallback = function () {
+        progressTicking = false;
+        var scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        var ratio = scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)) : 0;
+        readingProgress.style.transform = "scaleX(" + ratio.toFixed(4) + ")";
+      };
+      var queueProgress = function () {
+        if (progressTicking) return;
+        progressTicking = true;
+        window.requestAnimationFrame(syncProgressFallback);
+      };
+      syncProgressFallback();
+      window.addEventListener("scroll", queueProgress, { passive: true });
+      window.addEventListener("resize", queueProgress, { passive: true });
+    }
+  }
+
+  /* ---------- Post Wide-Desktop Tick Minimap (Scrollspy) ---------- */
+  var minimapNav = document.getElementById("post-minimap");
+  var postProse = document.querySelector("article.post .prose");
+  if (minimapNav && postProse) {
+    var headings = Array.prototype.slice.call(postProse.querySelectorAll("h2"));
+    if (headings.length >= 2) {
+      var usedHeadingIds = {};
+      var minimapLinks = [];
+
+      headings.forEach(function (h2, idx) {
+        var rawId = (h2.getAttribute("id") || "").trim();
+        var baseId = rawId || ("section-" + (idx + 1));
+        var finalId = baseId;
+        var suffix = 2;
+        while (usedHeadingIds[finalId]) {
+          finalId = baseId + "-" + suffix;
+          suffix++;
+        }
+        usedHeadingIds[finalId] = true;
+        if (h2.id !== finalId) h2.id = finalId;
+        h2.setAttribute("tabindex", "-1");
+
+        var link = document.createElement("a");
+        link.className = "post-minimap-link";
+        link.href = "#" + finalId;
+
+        var label = document.createElement("span");
+        label.className = "post-minimap-label";
+        label.textContent = (h2.textContent || "").trim();
+
+        var tickWrap = document.createElement("span");
+        tickWrap.className = "post-minimap-tick-wrap";
+        tickWrap.setAttribute("aria-hidden", "true");
+        var tick = document.createElement("span");
+        tick.className = "post-minimap-tick";
+        tickWrap.appendChild(tick);
+
+        link.appendChild(label);
+        link.appendChild(tickWrap);
+        minimapNav.appendChild(link);
+        minimapLinks.push(link);
+      });
+
+      minimapNav.hidden = false;
+
+      var supportsScrollTargetGroup = window.CSS && window.CSS.supports && window.CSS.supports("scroll-target-group", "auto");
+      if (supportsScrollTargetGroup) {
+        var syncAriaCurrentNative = function () {
+          var currentLink = minimapNav.querySelector("a:target-current");
+          minimapLinks.forEach(function (link, idx) {
+            var active = currentLink ? (link === currentLink) : (idx === 0 && window.scrollY < 160);
+            link.setAttribute("aria-current", active ? "true" : "false");
+          });
+        };
+        syncAriaCurrentNative();
+        document.addEventListener("scrollend", syncAriaCurrentNative, { passive: true });
+        minimapLinks.forEach(function (link) {
+          link.addEventListener("click", function () {
+            window.setTimeout(syncAriaCurrentNative, 120);
+          });
+        });
+      } else {
+        var activeHeadingIdx = -1;
+        var minimapTicking = false;
+        var syncMinimapFallback = function () {
+          minimapTicking = false;
+          var nextIdx = 0;
+          var docBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 24;
+          if (docBottom) {
+            nextIdx = headings.length - 1;
+          } else {
+            for (var i = 0; i < headings.length; i++) {
+              if (headings[i].getBoundingClientRect().top <= 140) {
+                nextIdx = i;
+              }
+            }
+          }
+          if (nextIdx === activeHeadingIdx) return;
+          activeHeadingIdx = nextIdx;
+          minimapLinks.forEach(function (link, idx) {
+            var isActive = idx === activeHeadingIdx;
+            link.classList.toggle("target-current", isActive);
+            link.setAttribute("aria-current", isActive ? "true" : "false");
+          });
+        };
+        var queueMinimapSync = function () {
+          if (minimapTicking) return;
+          minimapTicking = true;
+          window.requestAnimationFrame(syncMinimapFallback);
+        };
+        syncMinimapFallback();
+        if ("IntersectionObserver" in window) {
+          var headingObserver = new IntersectionObserver(queueMinimapSync, {
+            rootMargin: "-15% 0px -70% 0px",
+            threshold: 0
+          });
+          headings.forEach(function (h2) { headingObserver.observe(h2); });
+        }
+        window.addEventListener("scroll", queueMinimapSync, { passive: true });
+      }
+    }
+  }
+
+  /* ---------- Global Command Palette (⌘K / /) ---------- */
+  var cmdPalette = document.getElementById("cmd-palette");
+  var cmdInput = document.getElementById("cmd-input");
+  var cmdResults = document.getElementById("cmd-results");
+  var cmdEmpty = document.getElementById("cmd-empty");
+  var cmdTrigger = document.getElementById("cmd-trigger");
+  var cmdKbdHint = document.getElementById("cmd-kbd-hint");
+  var cmdIndexNode = document.getElementById("cmd-index");
+
+  if (cmdKbdHint) {
+    var isApple = /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent || "");
+    var cmdModNode = cmdKbdHint.querySelector(".cmd-kbd-mod");
+    if (cmdModNode) {
+      cmdModNode.textContent = isApple ? "⌘" : "Ctrl";
+    } else {
+      cmdKbdHint.textContent = isApple ? "⌘ K" : "Ctrl K";
+    }
+  }
+
+  if (wireTopLayerDialog(cmdPalette, document.getElementById("cmd-close")) && cmdInput && cmdResults) {
+    var cmdData = { pages: [], tools: [], posts: [] };
+    if (cmdIndexNode) {
+      try {
+        cmdData = JSON.parse(cmdIndexNode.textContent || "{}") || cmdData;
+      } catch (e) {}
+    }
+
+    var cmdVisibleItems = [];
+    var cmdActiveIdx = 0;
+
+    function buildCommandItems() {
+      var lang = getLang();
+      var darkNow = isDarkSchemeActive();
+      var groups = [
+        {
+          id: "actions",
+          label: lang === "en" ? "Actions" : "快捷操作",
+          items: [
+            {
+              title: lang === "en"
+                ? (darkNow ? "Switch to Light Paper theme" : "Switch to Dark Instrument theme")
+                : (darkNow ? "切换到「纸墨浅色」主题" : "切换到「深空仪器」暗色主题"),
+              sub: lang === "en" ? "Toggle color appearance immediately" : "立即切换全站浅色 / 深色视觉模式",
+              meta: darkNow ? (lang === "en" ? "Dark → Light" : "深色 → 浅色") : (lang === "en" ? "Light → Dark" : "浅色 → 深色"),
+              keywords: "theme dark light mode 主题 浅色 深色 暗色 纸墨 深空",
+              run: function () { toggleTheme(); }
+            },
+            {
+              title: lang === "en" ? "切换为中文界面 (Switch to Chinese)" : "Switch UI to English (切换英文界面)",
+              sub: lang === "en" ? "Switch navigation & interface labels to Chinese" : "将全站导航与界面文案切换为英文",
+              meta: "中 / EN",
+              keywords: "language lang zh en 中文 英文 语言 切换",
+              run: function () { toggleLang(); }
+            }
+          ]
+        },
+        {
+          id: "tools",
+          label: lang === "en" ? "Tools" : "自建决策工具",
+          items: (cmdData.tools || []).map(function (t) {
+            return {
+              title: lang === "en" ? (t.title_en || t.title_zh) : t.title_zh,
+              sub: lang === "en" ? (t.sub_en || t.sub_zh) : t.sub_zh,
+              meta: lang === "en" ? (t.eyebrow_en || t.eyebrow_zh) : t.eyebrow_zh,
+              url: t.url,
+              keywords: [t.title_zh, t.title_en, t.sub_zh, t.sub_en, t.eyebrow_zh, t.eyebrow_en, "工具 tool"].join(" ")
+            };
+          })
+        },
+        {
+          id: "posts",
+          label: lang === "en" ? "Articles" : "文章",
+          items: (cmdData.posts || []).map(function (p) {
+            return {
+              title: p.title || "",
+              sub: p.sub || "",
+              meta: p.date || "",
+              url: p.url,
+              keywords: [p.title, p.sub, p.series, p.date, Array.isArray(p.tags) ? p.tags.join(" ") : ""].join(" ")
+            };
+          })
+        },
+        {
+          id: "pages",
+          label: lang === "en" ? "Pages" : "页面导航",
+          items: (cmdData.pages || []).map(function (pg) {
+            return {
+              title: lang === "en" ? (pg.title_en || pg.title_zh) : pg.title_zh,
+              sub: lang === "en" ? (pg.sub_en || pg.sub_zh) : pg.sub_zh,
+              meta: pg.url === "/feed.xml" ? "RSS" : (lang === "en" ? "Page" : "页面"),
+              url: pg.url,
+              keywords: [pg.title_zh, pg.title_en, pg.sub_zh, pg.sub_en, pg.url].join(" ")
+            };
+          })
+        }
+      ];
+      return groups;
+    }
+
+    function updateCmdSelection(scrollIntoView) {
+      var optNodes = cmdResults.querySelectorAll(".cmd-item");
+      optNodes.forEach(function (node, idx) {
+        var selected = idx === cmdActiveIdx;
+        node.setAttribute("aria-selected", selected ? "true" : "false");
+        if (selected && scrollIntoView) {
+          node.scrollIntoView({ block: "nearest" });
+        }
+      });
+      if (cmdVisibleItems[cmdActiveIdx]) {
+        cmdInput.setAttribute("aria-activedescendant", "cmd-opt-" + cmdActiveIdx);
+      } else {
+        cmdInput.setAttribute("aria-activedescendant", "");
+      }
+    }
+
+    function activateCmdItem(item) {
+      if (!item) return;
+      if (typeof item.run === "function") {
+        closeTopLayerDialog(cmdPalette);
+        item.run();
+        return;
+      }
+      if (item.url) {
+        closeTopLayerDialog(cmdPalette);
+        window.location.href = item.url;
+      }
+    }
+
+    function renderCmdResults(rawQuery) {
+      var q = (rawQuery || "").trim().toLowerCase();
+      var tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+      var groups = buildCommandItems();
+      cmdResults.textContent = "";
+      cmdVisibleItems = [];
+      cmdActiveIdx = 0;
+
+      groups.forEach(function (group) {
+        var matched = tokens.length
+          ? group.items.filter(function (item) {
+              var hay = (item.title + " " + item.sub + " " + item.keywords).toLowerCase();
+              return tokens.every(function (tok) { return hay.indexOf(tok) !== -1; });
+            })
+          : (group.id === "posts" ? group.items.slice(0, 5) : group.items);
+
+        if (!matched.length) return;
+
+        var groupEl = document.createElement("div");
+        groupEl.className = "cmd-group-label";
+        groupEl.setAttribute("role", "presentation");
+        groupEl.textContent = group.label;
+        cmdResults.appendChild(groupEl);
+
+        matched.forEach(function (item) {
+          var itemIdx = cmdVisibleItems.length;
+          cmdVisibleItems.push(item);
+
+          var el = document.createElement(item.url ? "a" : "button");
+          el.className = "cmd-item";
+          el.id = "cmd-opt-" + itemIdx;
+          el.setAttribute("role", "option");
+          el.setAttribute("aria-selected", itemIdx === 0 ? "true" : "false");
+          el.setAttribute("data-cmd-idx", String(itemIdx));
+          if (item.url) {
+            el.href = item.url;
+          } else {
+            el.type = "button";
+          }
+
+          var main = document.createElement("span");
+          main.className = "cmd-item-main";
+          var titleEl = document.createElement("span");
+          titleEl.className = "cmd-item-title";
+          titleEl.textContent = item.title;
+          main.appendChild(titleEl);
+          if (item.sub) {
+            var subEl = document.createElement("span");
+            subEl.className = "cmd-item-sub";
+            subEl.textContent = item.sub;
+            main.appendChild(subEl);
+          }
+          el.appendChild(main);
+
+          if (item.meta) {
+            var metaEl = document.createElement("span");
+            metaEl.className = "cmd-item-meta";
+            metaEl.textContent = item.meta;
+            el.appendChild(metaEl);
+          }
+
+          cmdResults.appendChild(el);
+        });
+      });
+
+      var hasResults = cmdVisibleItems.length > 0;
+      cmdResults.hidden = !hasResults;
+      if (cmdEmpty) cmdEmpty.hidden = hasResults;
+      cmdInput.setAttribute("aria-expanded", hasResults ? "true" : "false");
+      cmdInput.setAttribute("aria-activedescendant", hasResults ? "cmd-opt-0" : "");
+    }
+
+    function openCmdPalette() {
+      if (lightbox && lightbox.open) {
+        lightbox.close();
+      }
+      cmdPalette.removeAttribute("data-closing");
+      cmdInput.value = "";
+      renderCmdResults("");
+      cmdPalette.showModal();
+      cmdResults.scrollTop = 0;
+      window.requestAnimationFrame(function () {
+        if (cmdPalette.open) cmdInput.focus();
+      });
+    }
+
+    if (cmdTrigger) {
+      cmdTrigger.addEventListener("click", openCmdPalette);
+    }
+
+    cmdInput.addEventListener("input", function () {
+      renderCmdResults(cmdInput.value);
+      cmdResults.scrollTop = 0;
+    });
+
+    cmdInput.addEventListener("keydown", function (e) {
+      if (!cmdVisibleItems.length) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        cmdActiveIdx = (cmdActiveIdx + 1) % cmdVisibleItems.length;
+        updateCmdSelection(true);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        cmdActiveIdx = (cmdActiveIdx - 1 + cmdVisibleItems.length) % cmdVisibleItems.length;
+        updateCmdSelection(true);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        activateCmdItem(cmdVisibleItems[cmdActiveIdx]);
+      }
+    });
+
+    cmdResults.addEventListener("mousemove", function (e) {
+      var opt = e.target && e.target.closest ? e.target.closest("[data-cmd-idx]") : null;
+      if (!opt) return;
+      var idx = parseInt(opt.getAttribute("data-cmd-idx"), 10);
+      if (!isNaN(idx) && idx !== cmdActiveIdx && idx >= 0 && idx < cmdVisibleItems.length) {
+        cmdActiveIdx = idx;
+        updateCmdSelection(false);
+      }
+    });
+
+    cmdResults.addEventListener("click", function (e) {
+      var opt = e.target && e.target.closest ? e.target.closest("[data-cmd-idx]") : null;
+      if (!opt) return;
+      e.preventDefault();
+      var idx = parseInt(opt.getAttribute("data-cmd-idx"), 10);
+      if (!isNaN(idx)) activateCmdItem(cmdVisibleItems[idx]);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      var keyLower = (e.key || "").toLowerCase();
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && keyLower === "k") {
+        e.preventDefault();
+        if (cmdPalette.open) {
+          closeTopLayerDialog(cmdPalette);
+        } else {
+          openCmdPalette();
+        }
+        return;
+      }
+      if (e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+        if (cmdPalette.open || (lightbox && lightbox.open) || document.querySelector("dialog[open]")) return;
+        var active = document.activeElement;
+        var tag = active ? active.tagName : "";
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (active && active.isContentEditable)) {
+          return;
+        }
+        e.preventDefault();
+        openCmdPalette();
+      }
+    });
+
+    onThemeChangeHooks.push(function () {
+      if (cmdPalette.open) renderCmdResults(cmdInput.value);
+    });
+    onLangChangeHooks.push(function () {
+      if (cmdPalette.open) renderCmdResults(cmdInput.value);
     });
   }
 })();

@@ -1,17 +1,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0e1013">
   <script>
     try {
       var savedScheme = localStorage.getItem("color-scheme");
       if (savedScheme === "light" || savedScheme === "dark") {
         document.querySelector('meta[name="color-scheme"]').content = savedScheme;
+        document.querySelector('meta[name="theme-color"]').content = savedScheme === "light" ? "#faf7f2" : "#0e1013";
       }
     } catch (e) {}
   </script>
-  <meta name="theme-color" content="#0b0d10" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#F5F1EA" media="(prefers-color-scheme: light)">
   <meta name="google-site-verification" content="PX4bjMTRFBc0zm95r-fJ8vpsYHfZ0DRsc8EiJbuxc1Q" />
   {% if page.robots %}
   <meta name="robots" content="{{ page.robots }}">
@@ -22,13 +22,13 @@
   <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% elsif paginator and paginator.page > 1 %}{{ site.title }} · 第 {{ paginator.page }} 页{% else %}{{ site.title }} · {{ site.tagline }}{% endif %}</title>
 
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ site.time | date: '%s' }}">
-  <link rel="icon" href="{{ '/assets/images/favicon.svg' | relative_url }}" type="image/svg+xml">
-  <link rel="alternate icon" href="{{ '/assets/images/favicon.png' | relative_url }}" type="image/png">
+  <link rel="icon" href="{{ '/assets/images/favicon.svg' | relative_url }}?v=2" type="image/svg+xml">
+  <link rel="alternate icon" href="{{ '/assets/images/favicon.png' | relative_url }}?v=2" type="image/png">
   <link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
   {% seo title=false %}
   {% if page.image == site.og_image %}
