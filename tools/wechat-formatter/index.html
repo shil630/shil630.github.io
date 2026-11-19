@@ -9,17 +9,59 @@ tool_id: wechat-formatter
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% include tool-head.html %}
-  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
-  <link rel="alternate icon" href="/assets/images/favicon.png" type="image/png">
   <style>
     :root {
+      --paper: #0e1013;
+      --ink: #e6e8eb;
+      --ink-soft: #b6bcc6;
+      --red: #e5715f;
+      --red-hover: #ee8272;
+      --red-soft: rgba(229, 113, 95, 0.14);
+      --muted: #858c96;
+      --sand: #2a303a;
+      --line: rgba(230, 232, 235, .12);
+      --sidebar-bg: #13161b;
+      --preview-bay: #111419;
+      --surface: #171b22;
+      --surface-hover: #1f242e;
+      --header-glass: rgba(17, 20, 25, .92);
+      --pill-bg: rgba(255, 255, 255, .05);
+      --seg-bg: rgba(255, 255, 255, .08);
+      --seg-active-bg: #232934;
+      --ghost-hover: rgba(255, 255, 255, .07);
+      --scroll-thumb: rgba(230, 232, 235, .16);
+      --scroll-thumb-hover: rgba(230, 232, 235, .3);
+      --toast-bg: #e6e8eb;
+      --toast-fg: #0e1013;
+      --shell-shadow: 0 10px 32px rgba(0, 0, 0, .42), 0 1px 3px rgba(0, 0, 0, .28);
+      --panel-shadow: 0 8px 28px rgba(0, 0, 0, .38);
+      --font-brand: "Space Grotesk", "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+    :root:has(> head > meta[name="color-scheme"][content="light"]) {
       --paper: #fbfbfb;
       --ink: #1f2328;
+      --ink-soft: #4b5158;
       --red: #B64B3B;
+      --red-hover: #9f3f31;
+      --red-soft: rgba(182, 75, 59, 0.08);
       --muted: #6e7781;
       --sand: #d0d7de;
       --line: rgba(31, 35, 40, .12);
       --sidebar-bg: #efe9df;
+      --preview-bay: #ffffff;
+      --surface: #ffffff;
+      --surface-hover: #ffffff;
+      --header-glass: rgba(255, 255, 255, .96);
+      --pill-bg: rgba(255, 255, 255, .7);
+      --seg-bg: rgba(31, 35, 40, .07);
+      --seg-active-bg: #ffffff;
+      --ghost-hover: rgba(31, 35, 40, .06);
+      --scroll-thumb: rgba(31, 35, 40, .14);
+      --scroll-thumb-hover: rgba(31, 35, 40, .28);
+      --toast-bg: #1f2328;
+      --toast-fg: #fffdf9;
+      --shell-shadow: 0 6px 24px rgba(15, 23, 42, .06), 0 1px 2px rgba(15, 23, 42, .04);
+      --panel-shadow: 0 4px 16px rgba(15, 23, 42, .06);
     }
     * { box-sizing: border-box; }
     html, body {
@@ -29,10 +71,44 @@ tool_id: wechat-formatter
       height: 100%;
       color: var(--ink);
       background: var(--paper);
-      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-family: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       overflow-x: hidden;
     }
     button, textarea, select, input { font: inherit; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .tool-theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--sand);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+    }
+    .tool-theme-toggle:hover { color: var(--red); border-color: var(--red); }
+    .theme-opt { align-items: center; justify-content: center; }
+    .theme-opt-to-light { display: inline-flex; }
+    .theme-opt-to-dark { display: none; }
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-opt-to-light { display: inline-flex; }
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-opt-to-dark { display: none; }
+    :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-opt-to-light { display: none; }
+    :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-opt-to-dark { display: inline-flex; }
 
     /* Desktop Layout */
     .mobile-header { display: none; }
@@ -59,7 +135,7 @@ tool_id: wechat-formatter
     /* Subtle custom scrollbars */
     .sidebar, .workspace, .preview-area, .editor {
       scrollbar-width: thin;
-      scrollbar-color: rgba(31, 35, 40, .2) transparent;
+      scrollbar-color: var(--scroll-thumb) transparent;
     }
     .sidebar::-webkit-scrollbar,
     .editor::-webkit-scrollbar,
@@ -70,17 +146,24 @@ tool_id: wechat-formatter
     .sidebar::-webkit-scrollbar-thumb,
     .editor::-webkit-scrollbar-thumb,
     .preview-area::-webkit-scrollbar-thumb {
-      background: rgba(31, 35, 40, .14);
+      background: var(--scroll-thumb);
       border-radius: 3px;
     }
     .sidebar::-webkit-scrollbar-thumb:hover,
     .editor::-webkit-scrollbar-thumb:hover,
     .preview-area::-webkit-scrollbar-thumb:hover {
-      background: rgba(31, 35, 40, .28);
+      background: var(--scroll-thumb-hover);
+    }
+    .sidebar-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 22px;
     }
     .back-link {
       display: inline-block;
-      margin: 0 0 22px;
+      margin: 0;
       color: var(--muted);
       font-size: 12px;
       text-decoration: none;
@@ -90,9 +173,19 @@ tool_id: wechat-formatter
     .brand-header {
       margin-bottom: 28px;
     }
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .tool-brand-mark {
+      display: block;
+      flex-shrink: 0;
+      color: var(--ink);
+    }
     .brand {
       margin: 0;
-      font-family: "Songti SC", "STSong", serif;
+      font-family: var(--font-brand);
       font-weight: 700;
       font-size: 20px;
       line-height: 1.35;
@@ -118,7 +211,7 @@ tool_id: wechat-formatter
       align-items: flex-start;
       gap: 10px;
       margin: 0 0 16px;
-      color: #655f58;
+      color: var(--ink-soft);
       font-size: 13px;
       line-height: 1.5;
     }
@@ -135,7 +228,7 @@ tool_id: wechat-formatter
       font-style: normal;
     }
     .step.active { color: var(--ink); font-weight: 600; }
-    .step.active i { color: var(--paper); border-color: var(--red); background: var(--red); }
+    .step.active i { color: #fff; border-color: var(--red); background: var(--red); }
     .sidebar hr { border: 0; border-top: 1px solid var(--line); margin: 26px 0; }
     .sidebar-post { margin-bottom: 10px; }
     .sidebar-post-link {
@@ -143,14 +236,14 @@ tool_id: wechat-formatter
       text-decoration: none;
       color: inherit;
       padding: 10px 12px;
-      background: rgba(255, 255, 255, .5);
+      background: var(--pill-bg);
       border: 1px solid var(--line);
       border-radius: 5px;
       transition: border-color .15s, box-shadow .15s;
     }
     .sidebar-post-link:hover {
       border-color: var(--red);
-      box-shadow: 0 2px 8px rgba(30, 29, 27, .05);
+      box-shadow: var(--shell-shadow);
       text-decoration: none;
     }
     .sidebar-post-link strong {
@@ -172,7 +265,7 @@ tool_id: wechat-formatter
       padding: 8px 10px;
       border: 1px solid var(--sand);
       border-radius: 4px;
-      background: #fff;
+      background: var(--surface);
       font-size: 12px;
       color: var(--ink);
       box-sizing: border-box;
@@ -190,7 +283,7 @@ tool_id: wechat-formatter
       cursor: pointer;
       transition: background .15s;
     }
-    .sidebar-subscribe button[type="submit"]:hover { background: #9f3f31; }
+    .sidebar-subscribe button[type="submit"]:hover { background: var(--red-hover); }
 
     /* Workspace */
     .workspace {
@@ -199,7 +292,7 @@ tool_id: wechat-formatter
       padding: 24px 28px 18px;
       display: flex;
       flex-direction: column;
-      background: #fbfbfb;
+      background: var(--paper);
       overflow: hidden;
       position: relative;
     }
@@ -235,14 +328,14 @@ tool_id: wechat-formatter
       padding: 7px 10px;
       border: 1px solid var(--line);
       border-radius: 4px;
-      color: #4b5158;
-      background: rgba(255, 255, 255, .6);
+      color: var(--ink-soft);
+      background: var(--pill-bg);
       font-size: 12px;
       cursor: pointer;
       white-space: nowrap;
       transition: border-color .16s ease, color .16s ease, background .16s ease;
     }
-    .tool-btn:hover { border-color: var(--red); color: var(--red); background: #ffffff; }
+    .tool-btn:hover { border-color: var(--red); color: var(--red); background: var(--surface-hover); }
     .insert-btn::before {
       content: "+";
       position: absolute;
@@ -265,8 +358,8 @@ tool_id: wechat-formatter
       border-left: 1px solid var(--line);
     }
     .utility-btn { padding: 7px 9px; border: 0; color: var(--muted); background: transparent; font-size: 12px; }
-    .utility-btn:hover { color: var(--ink); background: rgba(31, 35, 40, .06); }
-    .utility-btn.danger:hover { color: var(--red); background: rgba(182, 75, 59, .07); }
+    .utility-btn:hover { color: var(--ink); background: var(--ghost-hover); }
+    .utility-btn.danger:hover { color: var(--red); background: var(--red-soft); }
     .editor-wrap {
       flex: 1 1 0;
       min-height: 0;
@@ -283,14 +376,14 @@ tool_id: wechat-formatter
       border-radius: 5px;
       outline: none;
       padding: 20px;
-      color: #1f2328;
-      background: #ffffff;
+      color: var(--ink);
+      background: var(--surface);
       font-family: "SFMono-Regular", Consolas, Menlo, monospace;
       font-size: 13.5px;
       line-height: 1.8;
       overflow-y: auto;
     }
-    .editor:focus { border-color: rgba(182, 75, 59, .65); box-shadow: 0 0 0 3px rgba(182, 75, 59, .08); }
+    .editor:focus { border-color: rgba(229, 113, 95, .65); box-shadow: 0 0 0 3px var(--red-soft); }
     .editor-foot {
       flex: 0 0 auto;
       display: flex;
@@ -308,14 +401,14 @@ tool_id: wechat-formatter
       -webkit-overflow-scrolling: touch;
       padding: 0 34px 34px;
       border-left: 1px solid var(--line);
-      background: #ffffff;
+      background: var(--preview-bay);
       position: relative;
     }
     .preview-sticky-header {
       position: sticky;
       top: 0;
       z-index: 20;
-      background: rgba(255, 255, 255, .96);
+      background: var(--header-glass);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       padding: 24px 34px 14px;
@@ -337,9 +430,9 @@ tool_id: wechat-formatter
       gap: 6px;
       transition: background .15s, color .15s;
     }
-    .button:hover { background: rgba(30, 29, 27, .06); }
+    .button:hover { background: var(--ghost-hover); }
     .button.primary { color: #fffdf9; background: var(--red); font-weight: 600; }
-    .button.primary:hover { background: #9f3f31; }
+    .button.primary:hover { background: var(--red-hover); }
 
     /* Theme Bar & Tuning */
     .theme-bar {
@@ -358,19 +451,19 @@ tool_id: wechat-formatter
       padding: 5px 12px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      color: #4b5158;
-      background: rgba(255, 255, 255, .7);
+      color: var(--ink-soft);
+      background: var(--pill-bg);
       font-size: 12px;
       cursor: pointer;
       transition: .15s ease;
     }
-    .theme-pill:hover { border-color: #8c959f; background: #fff; }
+    .theme-pill:hover { border-color: var(--muted); background: var(--surface-hover); }
     .theme-pill.active {
       border-color: var(--ink);
       box-shadow: inset 0 0 0 1px var(--ink);
       color: var(--ink);
       font-weight: 600;
-      background: #fff;
+      background: var(--surface);
     }
     .theme-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
     .tune-toggle-btn {
@@ -380,24 +473,24 @@ tool_id: wechat-formatter
       padding: 5px 12px;
       border: 1px dashed var(--line);
       border-radius: 999px;
-      color: #4b5158;
-      background: rgba(255, 255, 255, .6);
+      color: var(--ink-soft);
+      background: var(--pill-bg);
       font-size: 11.5px;
       cursor: pointer;
       transition: .15s ease;
     }
-    .tune-toggle-btn:hover { border-color: var(--red); color: var(--red); background: #fff; }
-    .tune-toggle-btn.open { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .tune-toggle-btn:hover { border-color: var(--red); color: var(--red); background: var(--surface-hover); }
+    .tune-toggle-btn.open { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
     /* Tuning Panel */
     .tune-panel {
       margin: 12px 0 0;
       padding: 16px 18px;
-      background: rgba(255, 255, 255, .94);
+      background: var(--surface);
       border: 1px solid var(--sand);
       border-radius: 8px;
       backdrop-filter: blur(8px);
-      box-shadow: 0 4px 16px rgba(15, 23, 42, .06);
+      box-shadow: var(--panel-shadow);
       max-height: calc(85vh - 120px);
       overflow-y: auto;
     }
@@ -408,11 +501,11 @@ tool_id: wechat-formatter
       gap: 14px 18px;
     }
     .tune-item { display: flex; flex-direction: column; gap: 6px; }
-    .tune-label { color: #57606a; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .tune-label { color: var(--ink-soft); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
     .tune-btn-group {
       display: flex;
       padding: 2px;
-      background: rgba(31, 35, 40, .07);
+      background: var(--seg-bg);
       border-radius: 5px;
       gap: 2px;
     }
@@ -423,14 +516,14 @@ tool_id: wechat-formatter
       padding: 5px 6px;
       border-radius: 4px;
       font-size: 11px;
-      color: #57606a;
+      color: var(--ink-soft);
       cursor: pointer;
       white-space: nowrap;
       text-align: center;
       transition: background .12s, color .12s;
     }
     .tune-opt-btn:hover { color: var(--ink); }
-    .tune-opt-btn.active { background: #fff; color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+    .tune-opt-btn.active { background: var(--seg-active-bg); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
     .tune-color-control {
       display: flex;
       align-items: center;
@@ -451,21 +544,21 @@ tool_id: wechat-formatter
     .tune-sm-btn {
       border: 1px solid var(--line);
       border-radius: 4px;
-      background: rgba(255, 255, 255, .7);
+      background: var(--pill-bg);
       padding: 4px 8px;
       font-size: 11px;
-      color: #5d564f;
+      color: var(--ink-soft);
       cursor: pointer;
       transition: .15s;
     }
-    .tune-sm-btn:hover { color: var(--ink); border-color: #8d8881; }
+    .tune-sm-btn:hover { color: var(--ink); border-color: var(--muted); }
     .tune-sm-btn.danger:hover { color: var(--red); border-color: var(--red); }
     .tune-select {
       width: 100%;
       padding: 5px 8px;
       border: 1px solid var(--sand);
       border-radius: 4px;
-      background: #fff;
+      background: var(--paper);
       font-size: 11.5px;
       color: var(--ink);
       outline: none;
@@ -483,22 +576,23 @@ tool_id: wechat-formatter
       color: var(--muted);
     }
 
-    /* Article Shell */
+    /* Article Shell — Always kept crisp paper white to faithfully preview WeChat rendering */
     .article-shell {
       width: min(100%, 540px);
       min-height: 650px;
       margin: 0 auto;
       padding: 40px 32px 48px;
-      background: #fff;
-      border: 1px solid var(--line);
-      box-shadow: 0 6px 24px rgba(15, 23, 42, .06), 0 1px 2px rgba(15, 23, 42, .04);
+      background: #ffffff;
+      color: #1f2328;
+      border: 1px solid var(--sand);
+      box-shadow: var(--shell-shadow);
       border-radius: 4px;
       transition: font-size .15s, line-height .15s;
     }
     .phone-note {
       width: min(100%, 540px);
       margin: 14px auto 0;
-      color: #656d76;
+      color: var(--muted);
       font-size: 11px;
       text-align: center;
     }
@@ -514,8 +608,8 @@ tool_id: wechat-formatter
       pointer-events: none;
       padding: 10px 15px;
       border-radius: 6px;
-      color: #fffdf9;
-      background: var(--ink);
+      color: var(--toast-fg);
+      background: var(--toast-bg);
       font-size: 12px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, .2);
       transition: .22s cubic-bezier(0.16, 1, 0.3, 1);
@@ -570,13 +664,19 @@ tool_id: wechat-formatter
         position: sticky;
         top: 0;
         z-index: 50;
-        background: #efe9df;
+        background: var(--sidebar-bg);
         border-bottom: 1px solid var(--line);
         padding: 8px 12px;
         align-items: center;
         justify-content: space-between;
         gap: 8px;
         backdrop-filter: blur(10px);
+      }
+      .mobile-header-end {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 0 auto;
       }
       .mobile-back {
         color: var(--muted);
@@ -586,10 +686,10 @@ tool_id: wechat-formatter
         padding: 4px 6px;
         border-radius: 4px;
       }
-      .mobile-back:hover { color: var(--red); background: rgba(30,29,27,.04); }
+      .mobile-back:hover { color: var(--red); background: var(--ghost-hover); }
       .mobile-tabs {
         display: inline-flex;
-        background: rgba(30, 29, 27, .08);
+        background: var(--seg-bg);
         padding: 3px;
         border-radius: 7px;
         gap: 2px;
@@ -597,25 +697,25 @@ tool_id: wechat-formatter
       .mobile-tab-btn {
         border: 0;
         background: transparent;
-        padding: 6px 14px;
+        padding: 6px 12px;
         border-radius: 5px;
         font-size: 12px;
         font-weight: 500;
-        color: #5d564f;
+        color: var(--ink-soft);
         cursor: pointer;
         transition: background .12s, color .12s;
       }
       .mobile-tab-btn.active {
-        background: #fff;
+        background: var(--seg-active-bg);
         color: var(--ink);
         font-weight: 600;
-        box-shadow: 0 1px 3px rgba(30, 29, 27, .12);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .14);
       }
       .mobile-stat {
         font-size: 11px;
         color: var(--muted);
         flex: 0 0 auto;
-        padding-right: 4px;
+        padding-right: 2px;
       }
 
       /* View switching */
@@ -632,7 +732,7 @@ tool_id: wechat-formatter
         display: block;
         padding: 16px 12px 96px;
         border-left: 0;
-        background: #ffffff;
+        background: var(--preview-bay);
         height: auto;
         overflow: visible;
       }
@@ -736,7 +836,7 @@ tool_id: wechat-formatter
         width: 100%;
         border: 1px solid var(--sand);
         border-radius: 6px;
-        background: rgba(255, 255, 255, .6);
+        background: var(--pill-bg);
         padding: 10px 14px;
         font-size: 12px;
         color: var(--ink);
@@ -746,7 +846,7 @@ tool_id: wechat-formatter
       .mobile-drawer-body {
         margin-top: 12px;
         padding: 14px;
-        background: #efe9df;
+        background: var(--sidebar-bg);
         border-radius: 6px;
         border: 1px solid var(--line);
       }
@@ -760,13 +860,13 @@ tool_id: wechat-formatter
         left: 0;
         right: 0;
         z-index: 80;
-        background: rgba(255, 255, 255, .96);
+        background: var(--header-glass);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-top: 1px solid var(--line);
         padding: 10px 14px max(10px, env(safe-area-inset-bottom));
         gap: 10px;
-        box-shadow: 0 -4px 18px rgba(15, 23, 42, .06);
+        box-shadow: 0 -4px 18px rgba(0, 0, 0, .18);
       }
       .mobile-actions .button {
         flex: 1;
@@ -776,7 +876,7 @@ tool_id: wechat-formatter
         border-radius: 6px;
       }
       .mobile-actions .button:not(.primary) {
-        background: #fff;
+        background: var(--surface);
         border: 1px solid var(--sand);
         color: var(--ink);
       }
@@ -807,15 +907,24 @@ tool_id: wechat-formatter
       <button type="button" class="mobile-tab-btn active" id="tabEdit" role="tab" aria-selected="true" tabindex="0" aria-controls="workspacePanel">原稿编辑</button>
       <button type="button" class="mobile-tab-btn" id="tabPreview" role="tab" aria-selected="false" tabindex="-1" aria-controls="previewPanel">排版预览</button>
     </div>
-    <span class="mobile-stat" id="mobileWordCount">0 字</span>
+    <div class="mobile-header-end">
+      <span class="mobile-stat" id="mobileWordCount">0 字</span>
+      {% include tool-theme-toggle.html %}
+    </div>
   </header>
 
   <main class="app">
     <!-- Desktop Sidebar -->
     <aside class="sidebar">
-      <a class="back-link" href="/tools/">← 返回工具</a>
+      <div class="sidebar-topbar">
+        <a class="back-link" href="/tools/">← 返回工具</a>
+        {% include tool-theme-toggle.html %}
+      </div>
       <div class="brand-header">
-        <h1 class="brand">公众号排版器</h1>
+        <div class="brand-title-row">
+          {% include tool-brand-mark.html size=22 %}
+          <h1 class="brand">公众号排版器</h1>
+        </div>
         <p class="tagline">Markdown 实时预览、主题切换，一键复制适配公众号的富文本。</p>
       </div>
       <p class="label">文章工作流</p>

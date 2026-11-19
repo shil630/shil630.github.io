@@ -9,10 +9,35 @@ tool_id: preflop-range
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% include tool-head.html %}
-  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
-  <link rel="alternate icon" href="/assets/images/favicon.png" type="image/png">
   <style>
     :root {
+      --paper: #0e1013;
+      --ink: #e6e8eb;
+      --body: #a7adb6;
+      --muted: #858c96;
+      --sand: #2a303a;
+      --surface: #15181d;
+      --surface-soft: #1b1f26;
+      --divider: #222730;
+      --accent: #e5715f;
+      --accent-hover: #ee8272;
+      --accent-deep: #ffd6cf;
+      --accent-soft: rgba(229, 113, 95, 0.2);
+      --open-border: rgba(229, 113, 95, 0.62);
+      --note-bg: rgba(21, 24, 29, 0.88);
+      --input-bg: #111419;
+      --hero-glow: rgba(229, 113, 95, 0.08);
+      --shadow-subtle: rgba(0, 0, 0, 0.28);
+      --radius-cell: 4px;
+      --radius-control: 4px;
+      --radius-card: 8px;
+      --focus-ring: 0 0 0 3px rgba(229, 113, 95, 0.22);
+      --font-serif: "Newsreader", "Songti SC", STSong, "Noto Serif CJK SC", serif;
+      --font-sans: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-brand: "Space Grotesk", "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    :root:has(> head > meta[name="color-scheme"][content="light"]) {
       --paper: #f5f1ea;
       --ink: #1e1d1b;
       --body: #5d5750;
@@ -25,12 +50,12 @@ tool_id: preflop-range
       --accent-hover: #9f3f31;
       --accent-deep: #744033;
       --accent-soft: #f1e4da;
-      --radius-cell: 4px;
-      --radius-control: 4px;
-      --radius-card: 8px;
+      --open-border: rgba(182, 75, 59, 0.58);
+      --note-bg: rgba(255, 253, 249, 0.6);
+      --input-bg: #fff;
+      --hero-glow: rgba(182, 75, 59, 0.055);
+      --shadow-subtle: rgba(30, 29, 27, 0.08);
       --focus-ring: 0 0 0 3px rgba(182, 75, 59, 0.15);
-      --font-serif: "Songti SC", STSong, "Noto Serif CJK SC", serif;
-      --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     }
 
     * {
@@ -38,7 +63,6 @@ tool_id: preflop-range
     }
 
     html {
-      color-scheme: light;
       background: var(--paper);
     }
 
@@ -46,7 +70,7 @@ tool_id: preflop-range
       margin: 0;
       color: var(--ink);
       background:
-        radial-gradient(circle at 84% 3%, rgba(182, 75, 59, 0.055), transparent 24rem),
+        radial-gradient(circle at 84% 3%, var(--hero-glow), transparent 24rem),
         var(--paper);
       font-family: var(--font-sans);
       line-height: 1.65;
@@ -74,6 +98,47 @@ tool_id: preflop-range
       padding: 18px 0 36px;
     }
 
+    .tool-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .tool-theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      color: var(--muted);
+      background: var(--surface-soft);
+      border: 1px solid var(--sand);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .tool-theme-toggle:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .theme-opt {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .theme-opt-to-light { display: inline-flex; }
+    .theme-opt-to-dark { display: none; }
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-opt-to-light { display: inline-flex; }
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-opt-to-dark { display: none; }
+    :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-opt-to-light { display: none; }
+    :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-opt-to-dark { display: inline-flex; }
+
     .masthead {
       display: flex;
       align-items: center;
@@ -84,7 +149,7 @@ tool_id: preflop-range
 
     .back-link {
       display: inline-block;
-      margin-bottom: 10px;
+      margin: 0;
       color: var(--body);
       font-size: 13px;
       letter-spacing: 0.02em;
@@ -97,31 +162,14 @@ tool_id: preflop-range
 
     .brand {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 12px;
     }
 
-    .dots {
-      display: flex;
-      gap: 5px;
-      padding-top: 8px;
-    }
-
-    .dot {
+    .tool-brand-mark {
       display: block;
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--ink);
-    }
-
-    .dot.red {
-      background: var(--accent);
-    }
-
-    .dot.outline {
-      background: transparent;
-      border: 1px solid var(--accent);
+      flex-shrink: 0;
+      color: var(--ink);
     }
 
     .kicker {
@@ -140,7 +188,7 @@ tool_id: preflop-range
 
     h1 {
       margin: 0;
-      font-family: var(--font-serif);
+      font-family: var(--font-brand);
       font-size: 31px;
       font-weight: 700;
       line-height: 1.25;
@@ -304,13 +352,13 @@ tool_id: preflop-range
     .hand-cell:hover {
       z-index: 2;
       border-color: var(--accent);
-      box-shadow: 0 2px 6px rgba(30, 29, 27, 0.08);
+      box-shadow: 0 2px 6px var(--shadow-subtle);
     }
 
     .hand-cell.open {
       color: var(--accent-deep);
       background: var(--accent-soft);
-      border-color: rgba(182, 75, 59, 0.58);
+      border-color: var(--open-border);
     }
 
     .summary {
@@ -454,7 +502,7 @@ tool_id: preflop-range
       background: var(--surface);
       color: var(--ink);
       font-weight: 700;
-      box-shadow: 0 1px 3px rgba(30, 29, 27, 0.08);
+      box-shadow: 0 1px 3px var(--shadow-subtle);
     }
 
     .position-tab.is-customized::after {
@@ -466,6 +514,10 @@ tool_id: preflop-range
       background: var(--accent);
       margin-left: 5px;
       vertical-align: middle;
+    }
+
+    .position-tab.is-customized[aria-selected="true"]::after {
+      background: #fff;
     }
 
     .range-mode {
@@ -563,7 +615,7 @@ tool_id: preflop-range
     }
 
     .copy-button:hover {
-      color: var(--surface);
+      color: #fffdf9;
       background: var(--accent);
     }
 
@@ -576,7 +628,7 @@ tool_id: preflop-range
 
     .note-card {
       padding: 20px;
-      background: rgba(255, 253, 249, 0.6);
+      background: var(--note-bg);
       border: 1px solid var(--sand);
       border-radius: var(--radius-card);
     }
@@ -640,7 +692,7 @@ tool_id: preflop-range
 
     .tool-post-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 4px 14px rgba(30, 29, 27, 0.06);
+      box-shadow: 0 4px 14px var(--shadow-subtle);
       text-decoration: none;
     }
 
@@ -714,7 +766,7 @@ tool_id: preflop-range
       flex: 1;
       min-width: 0;
       padding: 10px 14px;
-      background: #fff;
+      background: var(--input-bg);
       border: 1px solid var(--sand);
       border-radius: var(--radius-control);
       font-size: 14px;
@@ -931,10 +983,13 @@ tool_id: preflop-range
 </head>
 <body>
   <main class="page">
-    <a class="back-link" href="/tools/" aria-label="返回工具目录">← 返回工具</a>
+    <div class="tool-topbar">
+      <a class="back-link" href="/tools/" aria-label="返回工具目录">← 返回工具</a>
+      {% include tool-theme-toggle.html %}
+    </div>
     <header class="masthead">
       <div class="brand">
-        <span class="dots" aria-hidden="true"><i class="dot red"></i><i class="dot"></i><i class="dot outline"></i></span>
+        {% include tool-brand-mark.html size=28 %}
         <div>
           <h1 id="page-title">翻前开池范围</h1>
           <p class="kicker">正EV实验 · 德州 · RFI 参考</p>
