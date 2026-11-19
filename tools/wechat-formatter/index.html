@@ -352,6 +352,7 @@ tool_id: wechat-formatter
       flex: 0 0 auto;
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 4px;
       margin-left: auto;
       padding-left: 12px;
@@ -365,6 +366,15 @@ tool_id: wechat-formatter
       min-height: 0;
       display: flex;
       flex-direction: column;
+      border-radius: 5px;
+      transition: box-shadow .15s ease;
+    }
+    .editor-wrap.is-dragover {
+      box-shadow: 0 0 0 2px var(--red);
+    }
+    .editor-wrap.is-dragover .editor {
+      border-color: var(--red);
+      background: color-mix(in srgb, var(--surface) 92%, var(--red-soft));
     }
     .editor {
       flex: 1 1 0;
@@ -388,9 +398,30 @@ tool_id: wechat-formatter
       flex: 0 0 auto;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px 12px;
       padding: 8px 2px 0;
       color: var(--muted);
       font-size: 11px;
+    }
+    .editor-foot-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sync-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      color: var(--ink-soft);
+      user-select: none;
+    }
+    .sync-toggle input {
+      margin: 0;
+      accent-color: var(--red);
+      cursor: pointer;
     }
 
     /* Preview Area */
@@ -415,7 +446,32 @@ tool_id: wechat-formatter
       margin: 0 -34px 20px;
       border-bottom: 1px solid var(--line);
     }
-    .preview-actions { display: flex; align-items: center; gap: 8px; }
+    .preview-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .width-switch {
+      display: inline-flex;
+      padding: 2px;
+      background: var(--seg-bg);
+      border-radius: 5px;
+      gap: 2px;
+    }
+    .width-opt-btn {
+      border: 0;
+      background: transparent;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .12s, color .12s;
+    }
+    .width-opt-btn:hover { color: var(--ink); }
+    .width-opt-btn.active {
+      background: var(--seg-active-bg);
+      color: var(--ink);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .12);
+    }
     .button {
       border: 0;
       border-radius: 4px;
@@ -433,6 +489,7 @@ tool_id: wechat-formatter
     .button:hover { background: var(--ghost-hover); }
     .button.primary { color: #fffdf9; background: var(--red); font-weight: 600; }
     .button.primary:hover { background: var(--red-hover); }
+    .button[data-copied] { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35); }
 
     /* Theme Bar & Tuning */
     .theme-bar {
@@ -587,7 +644,11 @@ tool_id: wechat-formatter
       border: 1px solid var(--sand);
       box-shadow: var(--shell-shadow);
       border-radius: 4px;
-      transition: font-size .15s, line-height .15s;
+      transition: width .18s ease, padding .18s ease, font-size .15s, line-height .15s;
+    }
+    .article-shell.is-narrow {
+      width: min(100%, 375px);
+      padding: 26px 18px 36px;
     }
     .phone-note {
       width: min(100%, 540px);
@@ -722,10 +783,11 @@ tool_id: wechat-formatter
       .sidebar { display: none; }
       body.view-edit .workspace {
         display: flex;
-        padding: 16px 14px 28px;
+        padding: 16px 14px 92px;
         height: auto;
         overflow: visible;
       }
+      .width-switch { display: none; }
       body.view-edit .preview-area { display: none; }
       body.view-preview .workspace { display: none; }
       body.view-preview .preview-area {
@@ -975,17 +1037,22 @@ tool_id: wechat-formatter
             <button class="tool-btn insert-btn" data-insert="---" aria-label="插入分隔线"><span>分隔线</span></button>
           </div>
           <div class="toolbar-actions" role="group" aria-label="编辑操作">
-            <button class="tool-btn utility-btn" id="sampleBtn">载入示例</button>
-            <button class="tool-btn utility-btn danger" id="clearBtn">清空</button>
+            <input type="file" id="mdFileInput" accept=".md,.markdown,.txt" hidden>
+            <button class="tool-btn utility-btn" id="importFileBtn" type="button" title="导入本地 Markdown 文件">打开 .md</button>
+            <button class="tool-btn utility-btn" id="panguBtn" type="button" title="一键在中英文、数字之间自动插入空格">中英空格</button>
+            <button class="tool-btn utility-btn" id="sampleBtn" type="button">载入示例</button>
+            <button class="tool-btn utility-btn danger" id="clearBtn" type="button">清空</button>
           </div>
         </div>
       </div>
-      <div class="editor-wrap">
+      <div class="editor-wrap" id="editorWrap">
         <textarea id="source" class="editor" spellcheck="false" aria-label="Markdown 原稿"></textarea>
       </div>
       <div class="editor-foot">
-        <span>Markdown 会实时转换</span>
-        <span>图片请用完整的 https 地址</span>
+        <span>支持拖放 .md 文件 · 自动保存 · 图片用 https 或 /assets/</span>
+        <span class="editor-foot-right">
+          <label class="sync-toggle"><input type="checkbox" id="syncScrollToggle" checked><span>同步滚动</span></label>
+        </span>
       </div>
       <button type="button" class="mobile-preview-cta" id="mobilePreviewCta">前往预览与一键复制 →</button>
     </section>
@@ -996,8 +1063,12 @@ tool_id: wechat-formatter
         <div class="preview-head">
           <span class="eyebrow">02 / 公众号预览</span>
           <div class="preview-actions">
-            <button class="button" id="downloadBtn">下载 HTML</button>
-            <button class="button primary" id="copyBtn">复制到公众号</button>
+            <div class="width-switch" id="previewWidthGroup" role="radiogroup" aria-label="预览画布宽度">
+              <button type="button" class="width-opt-btn" data-val="375px" role="radio" aria-checked="false">375px 手机</button>
+              <button type="button" class="width-opt-btn active" data-val="540px" role="radio" aria-checked="true">540px 宽幅</button>
+            </div>
+            <button type="button" class="button" id="downloadBtn">下载 HTML</button>
+            <button type="button" class="button primary" id="copyBtn">复制到公众号</button>
           </div>
         </div>
 
@@ -1071,6 +1142,14 @@ tool_id: wechat-formatter
                 <option value="minimal">极简墨线 (minimal)</option>
                 <option value="airy">柔和无边线 (airy)</option>
               </select>
+            </div>
+            <!-- 7. 外链转脚注 -->
+            <div class="tune-item">
+              <label class="tune-label">外链转文末脚注</label>
+              <div class="tune-btn-group" id="tuneLinkFootnoteGroup" role="radiogroup">
+                <button type="button" class="tune-opt-btn active" data-val="true">开启（推荐）</button>
+                <button type="button" class="tune-opt-btn" data-val="false">保留原链接</button>
+              </div>
             </div>
           </div>
           <div class="tune-foot">
@@ -1196,19 +1275,29 @@ tool_id: wechat-formatter
 
     const THEME_KEY = 'positive-ev-wechat-theme';
     const TUNING_KEY = 'positive-ev-wechat-tuning';
+    const SOURCE_KEY = 'positive-ev-wechat-source';
     const DEFAULT_TUNING = {
       customAccent: '',
       fontSize: '16px',
       lineHeight: '1.9',
       fontPair: 'auto',
       h2Style: 'auto',
-      quoteStyle: 'auto'
+      quoteStyle: 'auto',
+      previewWidth: '540px',
+      linkToFootnote: true
     };
 
-    let T = THEMES.find(t => t.id === localStorage.getItem(THEME_KEY)) || THEMES[0];
+    function safeGetStorage(key) {
+      try { return localStorage.getItem(key); } catch { return null; }
+    }
+    function safeSetStorage(key, val) {
+      try { localStorage.setItem(key, val); } catch {}
+    }
+
+    let T = THEMES.find(t => t.id === safeGetStorage(THEME_KEY)) || THEMES[0];
     let TUNING = Object.assign({}, DEFAULT_TUNING);
     try {
-      const savedTuning = JSON.parse(localStorage.getItem(TUNING_KEY));
+      const savedTuning = JSON.parse(safeGetStorage(TUNING_KEY));
       if (savedTuning && typeof savedTuning === 'object') Object.assign(TUNING, savedTuning);
     } catch {}
 
@@ -1287,24 +1376,156 @@ tool_id: wechat-formatter
     }
 
     /* ============ Markdown 解析器 ============ */
-    const esc = (text) => text.replace(/[&<>\"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
-    const inline = (text) => {
-      const C = getPalette();
-      return esc(text)
-        .replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, '<img src="$2" alt="$1" style="display:block;max-width:100%;height:auto;margin:24px auto;border-radius:2px;">')
-        .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, `<a href="$2" style="color:${C.accent};text-decoration:underline;text-underline-offset:3px;">$1</a>`)
-        .replace(/==([^=\n]+)==/g, `<span style="background:${C.mark};color:${C.markText};padding:2px 5px;border-radius:3px;">$1</span>`)
-        .replace(/\*\*([^*]+)\*\*/g, `<strong style="font-weight:650;color:${C.strong};">$1</strong>`)
-        .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em style="font-style:italic;">$2</em>')
-        .replace(/`([^`]+)`/g, `<code style="padding:2px 5px;border-radius:3px;background:${C.codeBg};color:${C.deep};font-family:ui-monospace,monospace;font-size:.9em;">$1</code>`);
-    };
+    const SITE_ORIGIN = 'https://shiliang.me';
+    const esc = (text) => String(text || '').replace(/[&<>\"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
 
-    function para(text) {
-      return `<p style="margin:0 0 20px;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};letter-spacing:.02em;${bodyFont()}">${inline(text)}</p>`;
+    function parseFrontMatter(md) {
+      const normalized = String(md || '').replace(/\r/g, '');
+      const match = normalized.match(/^---\n([\s\S]*?)\n---(?:\n|$)/);
+      if (!match) return { meta: {}, body: normalized, rawPrefix: '' };
+      const lines = match[1].split('\n');
+      const hasKeyLine = lines.some(line => /^[A-Za-z0-9_-]+\s*:/.test(line));
+      if (!hasKeyLine) return { meta: {}, body: normalized, rawPrefix: '' };
+      const meta = {};
+      lines.forEach(line => {
+        const kv = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
+        if (kv) meta[kv[1]] = kv[2].trim().replace(/^['"]|['"]$/g, '');
+      });
+      return { meta, body: normalized.slice(match[0].length), rawPrefix: match[0] };
     }
 
-    function h2Block(num, content) {
-      const t = inline(content);
+    function computeStats(md) {
+      const { body } = parseFrontMatter(md);
+      const plain = body
+        .replace(/(^|\n)```[^\n]*\n[\s\S]*?(?:\n```(?=\n|$)|$)/g, ' ')
+        .replace(/!\[([^\]]*)\]\([^)]+\)/g, ' ')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/^\[\^[^\]]+\]:.*$/gm, ' ')
+        .replace(/\[\^[^\]]+\]/g, ' ')
+        .replace(/`([^`\n]*)`/g, '$1')
+        .replace(/^\s{0,3}(?:#{1,6}\s*|>\s?|[-*]\s+|\d+\.\s+|---+\s*$)/gm, '')
+        .replace(/<br\s*\/?>/gi, ' ')
+        .replace(/[~*=|_\\]/g, ' ')
+        .replace(/https?:\/\/\S+/g, ' ');
+      const cjkCount = (plain.match(/[\u4e00-\u9fff]/g) || []).length;
+      const latinWords = (plain.replace(/[\u4e00-\u9fff]/g, ' ').match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g) || []).length;
+      const words = cjkCount + latinWords;
+      const minutes = words === 0 ? 0 : Math.max(1, Math.ceil(words / 400));
+      return { words, minutes };
+    }
+
+    function formatPangu(md) {
+      const { body, rawPrefix } = parseFrontMatter(md);
+      const protectedSpans = [];
+      const stash = (str) => {
+        const idx = protectedSpans.length;
+        protectedSpans.push(str);
+        return `\uE001PG_${idx}\uE001`;
+      };
+      let processed = body
+        .replace(/(^|\n)```[^\n]*\n[\s\S]*?(?:\n```(?=\n|$)|$)/g, m => stash(m))
+        .replace(/`[^`\n]+`/g, m => stash(m))
+        .replace(/\]\(([^)\n]+)\)/g, (_, dest) => '](' + stash(dest) + ')')
+        .replace(/https?:\/\/[^\s)<>]+/g, m => stash(m))
+        .replace(/<[^>]+>/g, m => stash(m))
+        .replace(/\[\^[^\]]+\]/g, m => stash(m));
+      processed = processed
+        .replace(/([\u4e00-\u9fff])([A-Za-z0-9])/g, '$1 $2')
+        .replace(/([A-Za-z0-9])([\u4e00-\u9fff])/g, '$1 $2');
+      processed = processed.replace(/\uE001PG_(\d+)\uE001/g, (_, idx) => protectedSpans[Number(idx)]);
+      return rawPrefix + processed;
+    }
+
+    function applyEmphasis(escapedText, C) {
+      return escapedText
+        .replace(/~~([^~\n]+)~~/g, '<del style="color:#8d8881;text-decoration:line-through;">$1</del>')
+        .replace(/==([^=\n]+)==/g, `<span style="background:${C.mark};color:${C.markText};padding:2px 5px;border-radius:3px;">$1</span>`)
+        .replace(/\*\*([^*]+)\*\*/g, `<strong style="font-weight:650;color:${C.strong};">$1</strong>`)
+        .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em style="font-style:italic;">$2</em>');
+    }
+
+    const inline = (text, ctx = null) => {
+      const C = getPalette();
+      const codes = [];
+      const images = [];
+      const links = [];
+
+      // 1. 提取行内代码与换行符，保护其中的特殊字符不被粗斜体误伤
+      let s = String(text || '')
+        .replace(/`([^`\n]+)`/g, (_, code) => {
+          const idx = codes.length;
+          codes.push(`<code style="padding:2px 5px;border-radius:3px;background:${C.codeBg};color:${C.deep};font-family:ui-monospace,monospace;font-size:.9em;">${esc(code)}</code>`);
+          return `\uE000CODE_${idx}\uE000`;
+        })
+        .replace(/<br\s*\/?>/gi, '\uE000BR\uE000');
+
+      // 2. 提取 Markdown 图片，保护 URL 中的下划线/星号，智能补全站内路径或生成占位卡
+      s = s.replace(/!\[([^\]]*)\]\(([^\s)]+)(?:\s+"[^"]*")?\)/g, (_, alt, rawSrc) => {
+        const idx = images.length;
+        let resolved = rawSrc.trim();
+        let nodeHtml = '';
+        if (/^\/assets\//i.test(resolved)) {
+          resolved = SITE_ORIGIN + resolved;
+        }
+        if (/^https?:\/\//i.test(resolved)) {
+          nodeHtml = `<img src="${esc(resolved)}" alt="${esc(alt)}" style="display:block;max-width:100%;height:auto;margin:22px auto;border-radius:4px;">`;
+        } else {
+          const altNote = alt ? `<span style="display:block;margin-top:4px;font-size:12px;color:#625f5a;">${esc(alt)}</span>` : '';
+          nodeHtml = `<span style="display:block;margin:18px 0;padding:12px 14px;border:1px dashed ${C.border};border-radius:8px;background:${C.tint};color:${C.deep};font-size:13px;line-height:1.6;"><strong>待在公众号补图：</strong>${esc(resolved)}${altNote}</span>`;
+        }
+        images.push(nodeHtml);
+        return `\uE000IMG_${idx}\uE000`;
+      });
+
+      // 3. 转义 HTML 后再解析链接、标准脚注与强调样式
+      s = esc(s);
+
+      s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g, (_, rawLabel, rawUrl) => {
+        const idx = links.length;
+        const fullUrl = rawUrl.startsWith('/') ? SITE_ORIGIN + rawUrl : rawUrl;
+        const labelHtml = applyEmphasis(rawLabel, C);
+        if (ctx && TUNING.linkToFootnote) {
+          let num = ctx.urlToNum.get(fullUrl);
+          if (!num) {
+            num = ctx.footnotes.length + 1;
+            ctx.urlToNum.set(fullUrl, num);
+            ctx.footnotes.push({ num, label: rawLabel, url: fullUrl });
+          }
+          links.push(`<span style="color:${C.accent};border-bottom:1px solid ${C.border};">${labelHtml}</span><sup style="color:${C.accent};font-size:11px;font-weight:700;margin-left:1px;">[${num}]</sup>`);
+        } else {
+          links.push(`<a href="${fullUrl}" style="color:${C.accent};text-decoration:underline;text-underline-offset:3px;">${labelHtml}</a>`);
+        }
+        return `\uE000LNK_${idx}\uE000`;
+      });
+
+      if (ctx && ctx.footnoteDefs) {
+        s = s.replace(/\[\^([^\]]+)\]/g, (full, id) => {
+          if (!(id in ctx.footnoteDefs)) return full;
+          let num = ctx.fnIdToNum.get(id);
+          if (!num) {
+            num = ctx.footnotes.length + 1;
+            ctx.fnIdToNum.set(id, num);
+            ctx.footnotes.push({ num, text: ctx.footnoteDefs[id] });
+          }
+          return `<sup style="color:${C.accent};font-size:11px;font-weight:700;margin:0 1px;">[${num}]</sup>`;
+        });
+      }
+
+      s = applyEmphasis(s, C);
+
+      return s
+        .replace(/\uE000BR\uE000/g, '<br>')
+        .replace(/\uE000LNK_(\d+)\uE000/g, (_, idx) => links[Number(idx)])
+        .replace(/\uE000IMG_(\d+)\uE000/g, (_, idx) => images[Number(idx)])
+        .replace(/\uE000CODE_(\d+)\uE000/g, (_, idx) => codes[Number(idx)]);
+    };
+
+    function para(text, ctx = null) {
+      return `<p style="margin:0 0 20px;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};letter-spacing:.02em;${bodyFont()}">${inline(text, ctx)}</p>`;
+    }
+
+    function h2Block(num, content, ctx = null) {
+      const t = inline(content, ctx);
       const vH2 = TUNING.h2Style !== 'auto' ? TUNING.h2Style : T.v.h2;
       const C = getPalette();
       const hFont = headingFont();
@@ -1317,24 +1538,61 @@ tool_id: wechat-formatter
         case 'pill': return `<h2 style="margin:42px 0 16px;font-size:${calcRelativeFont(20)};line-height:1.5;font-weight:700;color:#1E1D1B;${hFont}"><span style="display:inline-block;min-width:44px;height:26px;line-height:26px;border-radius:999px;background:${C.accent};color:#fff;font-family:Georgia,serif;font-size:13px;font-weight:700;text-align:center;padding:0 6px;margin-bottom:12px;">${num}</span><span style="display:block;">${t}</span></h2>`;
       }
     }
-    function h3Block(content) {
-      const t = inline(content);
+    function h3Block(content, ctx = null) {
+      const t = inline(content, ctx);
       const C = getPalette();
       const hFont = headingFont();
       if (T.v.h3 === 'bar') return `<h3 style="margin:27px 0 12px;padding-left:10px;border-left:3px solid ${C.accent};color:#1E1D1B;${hFont}font-size:${calcRelativeFont(17)};line-height:1.5;font-weight:650;">${t}</h3>`;
       return `<h3 style="margin:27px 0 12px;color:#1E1D1B;${hFont}font-size:${calcRelativeFont(17)};line-height:1.5;font-weight:650;">${t}</h3>`;
     }
-    function quoteBlock(content) {
-      const t = inline(content);
-      const vQuote = TUNING.quoteStyle !== 'auto' ? TUNING.quoteStyle : T.v.quote;
+    function h4Block(content, ctx = null) {
+      const t = inline(content, ctx);
       const C = getPalette();
-      switch (vQuote) {
-        case 'classic': return `<blockquote style="margin:24px 0;padding:15px 17px;border-left:3px solid ${C.accent};background:${C.tint};color:#514b44;font-size:${calcRelativeFont(15)};line-height:${TUNING.lineHeight};letter-spacing:.02em;${bodyFont()}">${t}</blockquote>`;
-        case 'minimal': return `<blockquote style="margin:26px 0;padding:2px 0 2px 16px;border-left:2px solid ${C.deep};color:#514b44;font-size:${calcRelativeFont(15)};line-height:${TUNING.lineHeight};letter-spacing:.02em;font-style:italic;${bodyFont()}">${t}</blockquote>`;
-        case 'card': {
-          return `<blockquote style="margin:26px 0;padding:20px 22px;border-radius:12px;background:${C.tint};color:#26302B;font-size:${calcRelativeFont(15.5)};line-height:${TUNING.lineHeight};font-weight:650;${bodyFont()}">${t}</blockquote>`;
+      return `<h4 style="margin:22px 0 10px;color:${C.deep};${headingFont()}font-size:${calcRelativeFont(15.5)};line-height:1.5;font-weight:650;">${t}</h4>`;
+    }
+    function formatQuoteInner(lines, ctx, C) {
+      const arr = Array.isArray(lines) ? lines : [String(lines || '')];
+      const parts = [];
+      let paraBuf = [];
+      const flushPara = (isLast) => {
+        if (!paraBuf.length) return;
+        const margin = isLast ? '0' : '0 0 8px';
+        parts.push(`<p style="margin:${margin};">${paraBuf.map(l => inline(l, ctx)).join('<br>')}</p>`);
+        paraBuf = [];
+      };
+      for (let k = 0; k < arr.length; k++) {
+        const line = arr[k].trim();
+        const isLastLine = k === arr.length - 1;
+        if (!line) {
+          flushPara(isLastLine);
+          continue;
         }
-        case 'airy': return `<blockquote style="margin:28px 0;padding:18px 22px;border-radius:10px;background:${C.tint};color:#41505F;font-size:${calcRelativeFont(15)};line-height:${TUNING.lineHeight};letter-spacing:.02em;${bodyFont()}">${t}</blockquote>`;
+        const ulMatch = line.match(/^[-*] (.+)/);
+        const olMatch = line.match(/^(\d+)\. (.+)/);
+        if (ulMatch) {
+          flushPara(false);
+          parts.push(`<p style="margin:${isLastLine ? '4px 0 0' : '4px 0'};"><span style="color:${C.accent};font-weight:700;margin-right:6px;">•</span>${inline(ulMatch[1], ctx)}</p>`);
+        } else if (olMatch) {
+          flushPara(false);
+          parts.push(`<p style="margin:${isLastLine ? '4px 0 0' : '4px 0'};"><span style="color:${C.accent};font-weight:700;margin-right:6px;">${olMatch[1]}.</span>${inline(olMatch[2], ctx)}</p>`);
+        } else {
+          paraBuf.push(line);
+        }
+      }
+      flushPara(true);
+      return parts.join('');
+    }
+    function quoteBlock(lines, ctx = null) {
+      const C = getPalette();
+      const lineArr = Array.isArray(lines) ? lines : [lines];
+      const isSimpleSingle = lineArr.length === 1 && !/^[-*] |^\d+\. /.test(lineArr[0].trim());
+      const inner = isSimpleSingle ? inline(lineArr[0], ctx) : formatQuoteInner(lineArr, ctx, C);
+      const vQuote = TUNING.quoteStyle !== 'auto' ? TUNING.quoteStyle : T.v.quote;
+      switch (vQuote) {
+        case 'classic': return `<blockquote style="margin:24px 0;padding:15px 17px;border-left:3px solid ${C.accent};background:${C.tint};color:#514b44;font-size:${calcRelativeFont(15)};line-height:${TUNING.lineHeight};letter-spacing:.02em;${bodyFont()}">${inner}</blockquote>`;
+        case 'minimal': return `<blockquote style="margin:26px 0;padding:2px 0 2px 16px;border-left:2px solid ${C.deep};color:#514b44;font-size:${calcRelativeFont(15)};line-height:${TUNING.lineHeight};letter-spacing:.02em;font-style:italic;${bodyFont()}">${inner}</blockquote>`;
+        case 'card': return `<blockquote style="margin:26px 0;padding:20px 22px;border-radius:12px;background:${C.tint};color:#26302B;font-size:${calcRelativeFont(15.5)};line-height:${TUNING.lineHeight};font-weight:600;${bodyFont()}">${inner}</blockquote>`;
+        case 'airy': return `<blockquote style="margin:28px 0;padding:18px 22px;border-radius:10px;background:${C.tint};color:#41505F;font-size:${calcRelativeFont(15)};line-height:${TUNING.lineHeight};letter-spacing:.02em;${bodyFont()}">${inner}</blockquote>`;
       }
     }
     function hrBlock() {
@@ -1348,16 +1606,37 @@ tool_id: wechat-formatter
     }
     function codeBlock(lines) {
       const C = getPalette();
-      return `<section style="margin:24px 0;padding:16px 19px;border-radius:8px;border-left:3px solid ${C.accent};background:${C.dark || T.c.dark};color:#E8E6E2;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;line-height:1.85;">` + lines.map(line => '<div style="min-height:1.85em;">' + (line.trim() ? esc(line) : '&nbsp;') + '</div>').join('') + '</section>';
+      const renderedLines = lines.map(rawLine => {
+        const expanded = rawLine.replace(/\t/g, '  ');
+        if (!expanded.trim()) return '<div style="min-height:1.85em;">&nbsp;</div>';
+        const leadMatch = expanded.match(/^ +/);
+        const nbspLead = leadMatch ? '&nbsp;'.repeat(leadMatch[0].length) : '';
+        const body = esc(leadMatch ? expanded.slice(leadMatch[0].length) : expanded);
+        return '<div style="min-height:1.85em;">' + nbspLead + body + '</div>';
+      }).join('');
+      return `<section style="margin:24px 0;padding:16px 19px;border-radius:8px;border-left:3px solid ${C.accent};background:${C.dark || T.c.dark};color:#E8E6E2;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;line-height:1.85;overflow-x:auto;white-space:pre-wrap;word-break:break-word;">${renderedLines}</section>`;
     }
-    function renderTextBlock(lines) {
+    function renderTextBlock(lines, ctx = null) {
       const C = getPalette();
-      return `<section style="margin:24px 0;padding:18px 20px;border:1px solid ${C.border};border-radius:14px;background:${C.blockBg};color:#2F2C28;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};letter-spacing:.015em;${bodyFont()}">` + lines.map(line => '<div style="min-height:1.9em;">' + (line.trim() ? inline(line) : '&nbsp;') + '</div>').join('') + '</section>';
+      return `<section style="margin:24px 0;padding:18px 20px;border:1px solid ${C.border};border-radius:14px;background:${C.blockBg};color:#2F2C28;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};letter-spacing:.015em;${bodyFont()}">` + lines.map(line => '<div style="min-height:1.9em;">' + (line.trim() ? inline(line, ctx) : '&nbsp;') + '</div>').join('') + '</section>';
+    }
+    function renderFootnotes(footnotes) {
+      if (!footnotes || !footnotes.length) return '';
+      const C = getPalette();
+      const rows = footnotes.map((item, idx) => {
+        const isLast = idx === footnotes.length - 1;
+        const margin = isLast ? '0' : '0 0 8px';
+        if (item.url) {
+          return `<p style="margin:${margin};font-size:12px;line-height:1.65;color:#5d5750;word-break:break-all;${bodyFont()}"><strong style="color:${C.accent};margin-right:4px;">[${item.num}]</strong>${inline(item.label)}: <span style="color:${C.deep};">${esc(item.url)}</span></p>`;
+        }
+        return `<p style="margin:${margin};font-size:12px;line-height:1.65;color:#5d5750;word-break:break-word;${bodyFont()}"><strong style="color:${C.accent};margin-right:4px;">[${item.num}]</strong>${inline(item.text)}</p>`;
+      }).join('');
+      return `<section style="margin:36px 0 8px;padding:16px 18px;border-top:1px solid ${C.border};background:${C.faint};border-radius:8px;${bodyFont()}"><p style="margin:0 0 10px;color:${C.accent};font-size:12px;font-weight:700;letter-spacing:.1em;">参考与注释</p>${rows}</section>`;
     }
     const isTableRow = (line) => /^\s*\|.+\|\s*$/.test(line) && (line.match(/\|/g) || []).length >= 3;
     const isTableDivider = (line) => /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
     const isDisclaimer = (line) => /本文仅为个人学习记录|不构成(?:任何)?投资建议/.test(line);
-    function renderTable(rows) {
+    function renderTable(rows, ctx = null) {
       const C = getPalette();
       const cleaned = rows.filter(line => !isTableDivider(line)).map(line => line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(cell => cell.trim()));
       if (!cleaned.length) return '';
@@ -1375,14 +1654,45 @@ tool_id: wechat-formatter
           const weight = isHead ? '650' : '400';
           const align = isHeadRow ? 'center' : (isFirstCol ? 'center' : 'left');
           const widthAttr = rowIndex === 0 ? ` width="${colWidths[cellIndex]}" style="width:${colWidths[cellIndex]};` : ' style="';
-          return `<td${widthAttr}padding:12px 10px;box-sizing:border-box;background:${bg};${border}color:#302D29;font-size:${calcRelativeFont(13)};line-height:1.7;font-weight:${weight};text-align:${align};overflow-wrap:anywhere;word-break:break-word;vertical-align:middle;${bodyFont()}">` + inline(cell) + '</td>';
+          return `<td${widthAttr}padding:12px 10px;box-sizing:border-box;background:${bg};${border}color:#302D29;font-size:${calcRelativeFont(13)};line-height:1.7;font-weight:${weight};text-align:${align};overflow-wrap:anywhere;word-break:break-word;vertical-align:middle;${bodyFont()}">` + inline(cell, ctx) + '</td>';
         }).join('');
         return '<tr>' + cells + '</tr>';
       }).join('');
       return `<section style="margin:24px 0;border:1px solid ${C.border};border-radius:6px;overflow:hidden;box-sizing:border-box;"><table style="width:100%;border-collapse:collapse;border-spacing:0;table-layout:fixed;margin:0;padding:0;background:#ffffff;box-sizing:border-box;"><tbody>${trs}</tbody></table></section>`;
     }
     function render(md) {
-      const lines = md.replace(/^---[\s\S]*?---\s*/,'').replace(/\r/g,'').split('\n');
+      const { body } = parseFrontMatter(md);
+      const rawLines = body.split('\n');
+      const footnoteDefs = Object.create(null);
+      const lines = [];
+      let scanningFence = false;
+      let activeDefId = null;
+
+      for (let idx = 0; idx < rawLines.length; idx++) {
+        const line = rawLines[idx];
+        if (/^```[^\s`]*\s*$/.test(line)) {
+          scanningFence = !scanningFence;
+          activeDefId = null;
+          lines.push(line);
+          continue;
+        }
+        if (!scanningFence) {
+          const defMatch = line.match(/^\[\^([^\]]+)\]:\s*(.*)$/);
+          if (defMatch) {
+            activeDefId = defMatch[1];
+            footnoteDefs[activeDefId] = defMatch[2].trim();
+            continue;
+          }
+          if (activeDefId !== null && /^\s{2,}\S/.test(line)) {
+            footnoteDefs[activeDefId] += ' ' + line.trim();
+            continue;
+          }
+          activeDefId = null;
+        }
+        lines.push(line);
+      }
+
+      const ctx = { footnotes: [], urlToNum: new Map(), fnIdToNum: new Map(), footnoteDefs };
       let html = '', i = 0, inList = false, listType = '', listClose = '', olNum = 0, table = [], h2Num = 0;
       const badge = T.v.list === 'badge';
       const C = getPalette();
@@ -1393,33 +1703,60 @@ tool_id: wechat-formatter
         else if (type === 'ul') { html += `<ul style="margin:0 0 20px;padding-left:1.35em;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}">`; listClose = '</ul>'; }
         else { html += `<ol style="margin:0 0 20px;padding-left:1.45em;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}">`; listClose = '</ol>'; }
       };
-      const listItem = (type, text) => {
+      const listItem = (type, text, isNested = false) => {
         if (!inList || listType !== type) { closeList(); openList(type); }
+        const nestMargin = isNested ? 'margin-left:20px;' : '';
         if (badge) {
-          if (type === 'ul') html += `<p style="margin:8px 0;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${C.accent};margin-right:11px;vertical-align:3px;"></span>${inline(text)}</p>`;
-          else { olNum++; html += `<p style="margin:9px 0;color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}"><span style="display:inline-block;width:21px;height:21px;line-height:21px;border-radius:50%;background:${C.accent};color:#fff;font-size:12px;font-weight:600;text-align:center;margin-right:10px;">${olNum}</span>${inline(text)}</p>`; }
-        } else html += `<li style="margin:5px 0;padding-left:3px;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}">${inline(text)}</li>`;
+          if (type === 'ul') html += `<p style="margin:8px 0;${nestMargin}color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}"><span style="display:inline-block;width:${isNested ? 5 : 7}px;height:${isNested ? 5 : 7}px;border-radius:50%;background:${C.accent};margin-right:11px;vertical-align:3px;"></span>${inline(text, ctx)}</p>`;
+          else { olNum++; html += `<p style="margin:9px 0;${nestMargin}color:#393632;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}"><span style="display:inline-block;width:21px;height:21px;line-height:21px;border-radius:50%;background:${C.accent};color:#fff;font-size:12px;font-weight:600;text-align:center;margin-right:10px;">${olNum}</span>${inline(text, ctx)}</p>`; }
+        } else html += `<li style="margin:5px 0;${nestMargin}padding-left:3px;font-size:${TUNING.fontSize};line-height:${TUNING.lineHeight};${bodyFont()}">${inline(text, ctx)}</li>`;
       };
-      const flushTable = () => { if (!table.length) return; html += renderTable(table); table = []; };
+      const flushTable = () => { if (!table.length) return; html += renderTable(table, ctx); table = []; };
+
       while (i < lines.length) {
         const line = lines[i];
         if (isTableRow(line)) { closeList(); table.push(line); i++; continue; }
         flushTable();
         if (!line.trim()) { closeList(); i++; continue; }
-        const fence = line.match(/^```(\w*)\s*$/);
-        if (fence) { closeList(); const block = []; i++; while (i < lines.length && !/^```\s*$/.test(lines[i])) { block.push(lines[i]); i++; } html += fence[1] === 'text' ? renderTextBlock(block) : codeBlock(block); }
-        else if (/^# (.+)/.test(line)) { closeList(); html += `<h1 style="margin:0 0 16px;color:#1E1D1B;${headingFont()}font-size:${calcRelativeFont(29)};line-height:1.32;font-weight:700;letter-spacing:.02em;">` + inline(line.slice(2)) + '</h1>'; }
-        else if (/^## (.+)/.test(line)) { closeList(); h2Num++; html += h2Block(String(h2Num).padStart(2, '0'), line.slice(3)); }
-        else if (/^### (.+)/.test(line)) { closeList(); html += h3Block(line.slice(4)); }
-        else if (/^> (.+)/.test(line)) { closeList(); html += quoteBlock(line.slice(2)); }
-        else if (/^---+$/.test(line)) { closeList(); html += hrBlock(); }
-        else if (/^[-*] (.+)/.test(line)) { listItem('ul', line.slice(2)); }
-        else if (/^\d+\. (.+)/.test(line)) { listItem('ol', line.replace(/^\d+\. /, '')); }
-        else if (isDisclaimer(line)) { closeList(); html += `<p style="margin:0 0 20px;color:#756f67;font-size:${calcRelativeFont(14)};line-height:1.85;letter-spacing:.02em;font-style:italic;${bodyFont()}">` + inline(line) + '</p>'; }
-        else { closeList(); html += para(line); }
+
+        const fence = line.match(/^```([^\s`]*)\s*$/);
+        if (fence) {
+          closeList();
+          const block = [];
+          i++;
+          while (i < lines.length && !/^```\s*$/.test(lines[i])) { block.push(lines[i]); i++; }
+          html += fence[1] === 'text' ? renderTextBlock(block, ctx) : codeBlock(block);
+        } else if (/^>\s?(.*)$/.test(line)) {
+          closeList();
+          const qLines = [];
+          while (i < lines.length && /^>\s?(.*)$/.test(lines[i])) {
+            qLines.push(lines[i].replace(/^>\s?/, ''));
+            i++;
+          }
+          html += quoteBlock(qLines, ctx);
+          continue;
+        }
+        else if (/^# (.+)/.test(line)) { closeList(); html += `<h1 style="margin:0 0 16px;color:#1E1D1B;${headingFont()}font-size:${calcRelativeFont(29)};line-height:1.32;font-weight:700;letter-spacing:.02em;">` + inline(line.slice(2), ctx) + '</h1>'; }
+        else if (/^## (.+)/.test(line)) { closeList(); h2Num++; html += h2Block(String(h2Num).padStart(2, '0'), line.slice(3), ctx); }
+        else if (/^### (.+)/.test(line)) { closeList(); html += h3Block(line.slice(4), ctx); }
+        else if (/^#### (.+)/.test(line)) { closeList(); html += h4Block(line.slice(5), ctx); }
+        else if (/^---+$/.test(line.trim())) { closeList(); html += hrBlock(); }
+        else if (/^(\s*)[-*] (.+)/.test(line)) {
+          const m = line.match(/^(\s*)[-*] (.+)/);
+          listItem('ul', m[2], m[1].length >= 2);
+        } else if (/^(\s*)\d+\. (.+)/.test(line)) {
+          const m = line.match(/^(\s*)\d+\. (.+)/);
+          listItem('ol', m[2], m[1].length >= 2);
+        } else if (/^\*(图注[：:].+)\*$/.test(line.trim())) {
+          closeList();
+          const cap = line.trim().slice(1, -1);
+          html += `<p style="margin:-10px 0 22px;color:#756f67;font-size:${calcRelativeFont(13)};line-height:1.65;text-align:center;${bodyFont()}">${inline(cap, ctx)}</p>`;
+        } else if (isDisclaimer(line)) { closeList(); html += `<p style="margin:0 0 20px;color:#756f67;font-size:${calcRelativeFont(14)};line-height:1.85;letter-spacing:.02em;font-style:italic;${bodyFont()}">` + inline(line, ctx) + '</p>'; }
+        else { closeList(); html += para(line, ctx); }
         i++;
       }
       closeList(); flushTable();
+      html += renderFootnotes(ctx.footnotes);
       return html || '<p style="color:#8D8881;font-size:15px;line-height:1.8;">从左侧开始写，右侧会实时预览。</p>';
     }
 
@@ -1431,25 +1768,72 @@ tool_id: wechat-formatter
           : "-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif";
       }
       preview.innerHTML = render(source.value);
-      const count = (source.value.replace(/\s/g,'').length || 0) + ' 字';
-      $('#wordCount').textContent = count;
-      $('#mobileWordCount').textContent = count;
-      localStorage.setItem('positive-ev-wechat-source', source.value);
+      const stats = computeStats(source.value);
+      const desktopLabel = stats.words > 0 ? `约 ${stats.words} 字 · ${stats.minutes} 分钟` : '0 字 · 0 分钟';
+      const mobileLabel = stats.words > 0 ? `${stats.words} 字 · ${stats.minutes}分` : '0 字';
+      $('#wordCount').textContent = desktopLabel;
+      $('#mobileWordCount').textContent = mobileLabel;
+      safeSetStorage(SOURCE_KEY, source.value);
     }
+
+    let toastTimer = null;
+    let lastToastMsg = '';
     function notice(msg) {
-      toast.textContent = msg;
+      if (!toast) return;
+      clearTimeout(toastTimer);
+      let spoken = msg;
+      if (spoken === lastToastMsg) spoken += '\u00A0';
+      lastToastMsg = msg;
+      toast.textContent = spoken;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2300);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2300);
     }
+
+    function applyWrapOrInsert(text) {
+      const start = source.selectionStart ?? source.value.length;
+      const end = source.selectionEnd ?? source.value.length;
+      const selected = source.value.slice(start, end);
+      let insertion = '';
+
+      if (selected) {
+        if (text.startsWith('==')) {
+          insertion = `==${selected}==`;
+        } else if (text.startsWith('> ')) {
+          insertion = selected.split('\n').map(l => `> ${l}`).join('\n');
+        } else if (text.startsWith('- ')) {
+          insertion = selected.split('\n').map(l => `- ${l}`).join('\n');
+        } else if (text.startsWith('```')) {
+          insertion = `\`\`\`\n${selected}\n\`\`\``;
+        } else if (text.startsWith('## ')) {
+          insertion = `## ${selected}`;
+        } else {
+          insertion = (start && source.value[start - 1] !== '\n' ? '\n\n' : '') + text + '\n';
+        }
+      } else {
+        insertion = (start && source.value[start - 1] !== '\n' ? '\n\n' : '') + text + '\n';
+      }
+
+      source.focus();
+      let insertedViaCmd = false;
+      try {
+        if (typeof document.execCommand === 'function') {
+          insertedViaCmd = document.execCommand('insertText', false, insertion) === true;
+        }
+      } catch {
+        insertedViaCmd = false;
+      }
+      if (!insertedViaCmd && typeof source.setRangeText === 'function') {
+        source.setRangeText(insertion, start, end, 'end');
+      }
+    }
+
     function insert(text) {
       window.toolAnalytics?.action('insert');
-      const start = source.selectionStart, end = source.selectionEnd;
-      source.setRangeText((start && source.value[start-1] !== '\n' ? '\n\n' : '') + text + '\n', start, end, 'end');
-      source.focus();
+      applyWrapOrInsert(text);
       update();
     }
     function saveTuning() {
-      localStorage.setItem(TUNING_KEY, JSON.stringify(TUNING));
+      safeSetStorage(TUNING_KEY, JSON.stringify(TUNING));
     }
 
     /* ============ 主题渲染与切换 ============ */
@@ -1463,10 +1847,16 @@ tool_id: wechat-formatter
       pill.addEventListener('click', () => {
         window.toolAnalytics?.action('theme');
         T = t;
-        localStorage.setItem(THEME_KEY, t.id);
+        safeSetStorage(THEME_KEY, t.id);
+        const clearedCustom = Boolean(TUNING.customAccent);
+        if (clearedCustom) {
+          TUNING.customAccent = '';
+          saveTuning();
+        }
         themeRow.querySelectorAll('.theme-pill').forEach(p => p.classList.toggle('active', p.dataset.theme === t.id));
         syncTuningUI();
         update();
+        if (clearedCustom) notice(`已切换至「${t.name}」并恢复主题预设色`);
       });
       themeRow.appendChild(pill);
     });
@@ -1503,6 +1893,17 @@ tool_id: wechat-formatter
       document.querySelectorAll('#tuneLineHeightGroup .tune-opt-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.val === TUNING.lineHeight);
       });
+      document.querySelectorAll('#tuneLinkFootnoteGroup .tune-opt-btn').forEach(btn => {
+        btn.classList.toggle('active', (btn.dataset.val === 'true') === Boolean(TUNING.linkToFootnote));
+      });
+      document.querySelectorAll('#previewWidthGroup .width-opt-btn').forEach(btn => {
+        const active = btn.dataset.val === TUNING.previewWidth;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-checked', String(active));
+      });
+      if (preview && preview.classList) {
+        preview.classList.toggle('is-narrow', TUNING.previewWidth === '375px');
+      }
 
       tuneH2Select.value = TUNING.h2Style;
       tuneQuoteSelect.value = TUNING.quoteStyle;
@@ -1545,6 +1946,21 @@ tool_id: wechat-formatter
         syncTuningUI();
         saveTuning();
         update();
+      });
+    });
+    document.querySelectorAll('#tuneLinkFootnoteGroup .tune-opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        TUNING.linkToFootnote = btn.dataset.val === 'true';
+        syncTuningUI();
+        saveTuning();
+        update();
+      });
+    });
+    document.querySelectorAll('#previewWidthGroup .width-opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        TUNING.previewWidth = btn.dataset.val;
+        syncTuningUI();
+        saveTuning();
       });
     });
 
@@ -1619,41 +2035,191 @@ tool_id: wechat-formatter
       mobileDrawerArrow.textContent = open ? '↑' : '↓';
     });
 
-    /* ============ 编辑器与操作 ============ */
-    source.value = localStorage.getItem('positive-ev-wechat-source') || sample;
+    /* ============ 编辑器、文件导入与快捷操作 ============ */
+    const savedSource = safeGetStorage(SOURCE_KEY);
+    source.value = savedSource !== null ? savedSource : sample;
     source.addEventListener('input', () => { window.toolAnalytics?.action('edit'); update(); });
     document.querySelectorAll('[data-insert]').forEach(b => b.addEventListener('click', () => insert(b.dataset.insert)));
-    $('#sampleBtn').addEventListener('click', () => { source.value = sample; update(); notice('已载入示例原稿'); });
-    $('#clearBtn').addEventListener('click', () => { if (source.value && !confirm('清空当前编辑内容？')) return; source.value = ''; update(); source.focus(); });
+
+    const mdFileInput = $('#mdFileInput');
+    const importFileBtn = $('#importFileBtn');
+    const editorWrap = $('#editorWrap');
+    const panguBtn = $('#panguBtn');
+    const syncScrollToggle = $('#syncScrollToggle');
+
+    function loadMarkdownFile(file) {
+      if (!file) return;
+      if (source.value.trim() && source.value !== sample) {
+        if (!confirm(`导入「${file.name}」将覆盖当前编辑内容，是否继续？`)) return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        source.value = String(reader.result || '');
+        window.toolAnalytics?.action('import_md');
+        update();
+        notice(`已载入 ${file.name}`);
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    if (importFileBtn && mdFileInput) {
+      importFileBtn.addEventListener('click', () => mdFileInput.click());
+      mdFileInput.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file) loadMarkdownFile(file);
+        e.target.value = '';
+      });
+    }
+    if (editorWrap) {
+      editorWrap.addEventListener('dragover', (e) => {
+        if (e.dataTransfer?.types?.includes('Files')) {
+          e.preventDefault();
+          editorWrap.classList.add('is-dragover');
+        }
+      });
+      editorWrap.addEventListener('dragleave', () => {
+        editorWrap.classList.remove('is-dragover');
+      });
+      editorWrap.addEventListener('drop', (e) => {
+        editorWrap.classList.remove('is-dragover');
+        const file = e.dataTransfer?.files?.[0];
+        if (file) {
+          e.preventDefault();
+          loadMarkdownFile(file);
+        }
+      });
+    }
+
+    if (panguBtn) {
+      panguBtn.addEventListener('click', () => {
+        const formatted = formatPangu(source.value);
+        if (formatted === source.value) {
+          notice('中英文与数字间距已规范，无需调整');
+          return;
+        }
+        source.value = formatted;
+        window.toolAnalytics?.action('format_pangu');
+        update();
+        notice('已自动优化中英文与数字间距');
+      });
+    }
+
+    $('#sampleBtn').addEventListener('click', () => {
+      if (source.value.trim() && source.value !== sample) {
+        if (!confirm('载入示例将覆盖当前正在编辑的内容，是否继续？')) return;
+      }
+      source.value = sample;
+      update();
+      notice('已载入示例原稿');
+    });
+    $('#clearBtn').addEventListener('click', () => {
+      if (source.value && !confirm('清空当前编辑内容？')) return;
+      source.value = '';
+      update();
+      source.focus();
+    });
 
     /* ============ 复制与导出 ============ */
-    async function handleCopy() {
-      window.toolAnalytics?.action('copy_rich');
-      const html = `<section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:0;color:#393632;${bodyFont()}">` + preview.innerHTML + '</section>';
-      try {
-        await navigator.clipboard.write([new ClipboardItem({
-          'text/html': new Blob([html], { type: 'text/html' }),
-          'text/plain': new Blob([preview.innerText], { type: 'text/plain' })
-        })]);
-        window.toolAnalytics?.complete('copy_rich');
-        notice('已复制富文本，可粘贴进公众号');
-      } catch {
-        try {
-          await navigator.clipboard.writeText(preview.innerText);
-          window.toolAnalytics?.complete('copy_text');
-          notice('浏览器限制：已复制纯文字');
-        } catch {
-          notice('复制失败，请手动选择预览文字');
-        }
+    const copyBtnTimers = new WeakMap();
+    function reportCopyBtn(btn, ok, copiedLabel = '已复制 ✓') {
+      if (!btn) return;
+      if (!btn.dataset) btn.dataset = {};
+      if (!btn.dataset.defaultLabel) btn.dataset.defaultLabel = btn.textContent || '复制到公众号';
+      clearTimeout(copyBtnTimers.get(btn));
+      btn.removeAttribute?.('data-copied');
+      btn.removeAttribute?.('data-failed');
+      btn.setAttribute?.(ok ? 'data-copied' : 'data-failed', '');
+      btn.textContent = ok ? copiedLabel : '复制失败';
+      copyBtnTimers.set(btn, setTimeout(() => {
+        btn.removeAttribute?.('data-copied');
+        btn.removeAttribute?.('data-failed');
+        btn.textContent = btn.dataset.defaultLabel;
+      }, 2000));
+    }
+
+    function extractPlainText(htmlStr) {
+      if (preview && preview.innerText && (!preview.style || preview.offsetParent !== null)) {
+        return preview.innerText;
       }
+      if (typeof document.createElement === 'function') {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = htmlStr.replace(/<(?:br|\/p|\/div|\/h[1-6]|\/li|\/blockquote|\/tr)[^>]*>/gi, '\n');
+        return (tmp.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+      }
+      return preview.innerText || '';
+    }
+
+    function legacyRichCopy(wrappedHtml) {
+      if (typeof document.createElement !== 'function' || !document.body || typeof window.getSelection !== 'function') {
+        return false;
+      }
+      const host = document.createElement('div');
+      host.setAttribute('contenteditable', 'true');
+      host.style.cssText = 'position:fixed;inset-block-start:0;inset-inline-start:0;opacity:0;pointer-events:none;';
+      host.innerHTML = wrappedHtml;
+      document.body.appendChild(host);
+      try {
+        const range = document.createRange();
+        range.selectNodeContents(host);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        return document.execCommand('copy') === true;
+      } catch {
+        return false;
+      } finally {
+        host.remove();
+      }
+    }
+
+    async function handleCopy(e) {
+      const triggerBtn = e?.currentTarget || $('#copyBtn');
+      window.toolAnalytics?.action('copy_rich');
+      const wrappedHtml = `<section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:0;color:#393632;${bodyFont()}">` + preview.innerHTML + '</section>';
+      const plainText = extractPlainText(preview.innerHTML);
+
+      try {
+        if (navigator.clipboard && typeof navigator.clipboard.write === 'function' && typeof ClipboardItem === 'function') {
+          await navigator.clipboard.write([new ClipboardItem({
+            'text/html': new Blob([wrappedHtml], { type: 'text/html' }),
+            'text/plain': new Blob([plainText], { type: 'text/plain' })
+          })]);
+          window.toolAnalytics?.complete('copy_rich');
+          reportCopyBtn(triggerBtn, true, '已复制 ✓');
+          notice('已复制富文本，可粘贴进公众号');
+          return;
+        }
+      } catch {}
+
+      if (legacyRichCopy(wrappedHtml)) {
+        window.toolAnalytics?.complete('copy_rich');
+        reportCopyBtn(triggerBtn, true, '已复制 ✓');
+        notice('已复制富文本，可粘贴进公众号');
+        return;
+      }
+
+      try {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+          await navigator.clipboard.writeText(plainText);
+          window.toolAnalytics?.complete('copy_text');
+          reportCopyBtn(triggerBtn, true, '已复制文字');
+          notice('浏览器限制：已复制纯文字');
+          return;
+        }
+      } catch {}
+
+      reportCopyBtn(triggerBtn, false);
+      notice('复制失败，请手动选择预览文字');
     }
 
     function handleDownload() {
       window.toolAnalytics?.action('download_html');
-      const html = `<!doctype html><meta charset="utf-8"><title>公众号文章</title><body style="margin:0;background:#fff;"><section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:28px 22px;color:#393632;${bodyFont()}">` + preview.innerHTML + '</section></body>';
+      const { meta } = parseFrontMatter(source.value);
+      const safeTitle = (meta.title || '正EV-公众号排版').replace(/[\\/:*?"<>|]/g, '-').slice(0, 60);
+      const html = `<!doctype html><meta charset="utf-8"><title>${esc(meta.title || '公众号文章')}</title><body style="margin:0;background:#fff;"><section style="box-sizing:border-box;max-width:677px;margin:0 auto;padding:28px 22px;color:#393632;${bodyFont()}">` + preview.innerHTML + '</section></body>';
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-      a.download = '正EV-公众号排版.html';
+      a.download = `${safeTitle}.html`;
       a.click();
       URL.revokeObjectURL(a.href);
       window.toolAnalytics?.complete('download_html');
@@ -1664,6 +2230,19 @@ tool_id: wechat-formatter
     $('#mobileCopyBtn').addEventListener('click', handleCopy);
     $('#downloadBtn').addEventListener('click', handleDownload);
     $('#mobileDownloadBtn').addEventListener('click', handleDownload);
+
+    // 桌面端编辑区与预览区按比例同步滚动
+    const previewArea = document.querySelector('.preview-area');
+    if (source && previewArea && typeof source.addEventListener === 'function') {
+      source.addEventListener('scroll', () => {
+        if (syncScrollToggle && !syncScrollToggle.checked) return;
+        if ((window.innerWidth || 1200) < 900) return;
+        const maxSrc = source.scrollHeight - source.clientHeight;
+        const maxPrev = previewArea.scrollHeight - previewArea.clientHeight;
+        if (maxSrc <= 0 || maxPrev <= 0) return;
+        previewArea.scrollTop = (source.scrollTop / maxSrc) * maxPrev;
+      }, { passive: true });
+    }
 
     // 在原稿工作区顶部工具栏滚动滚轮时，转发滚动至 source textarea
     const wsHeader = document.querySelector('.workspace-sticky-header');
