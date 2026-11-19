@@ -1,6 +1,6 @@
 ---
 title: "投资决策检查清单"
-description: "用 EV、SIZE、EXIT 三步记录投资理由、投入尺度与退出条件。支持本机保存、复制和打印，填写内容留在浏览器本地。"
+description: "下单前 90 秒风险算账与决策门禁：用 EV、SIZE、EXIT 算清真实最大亏损与总净值冲击，写下核心命题与退出条件，纯浏览器本地运行。"
 tool_id: investment-checklist
 ---
 <!doctype html>
@@ -14,24 +14,27 @@ tool_id: investment-checklist
       --paper: #0e1013;
       --ink: #e6e8eb;
       --body: #b6bcc6;
-      --muted: #8b929e;
+      --muted: #858c96;
       --red: #e5715f;
       --red-soft: rgba(229, 113, 95, 0.14);
       --sand: #262b33;
       --divider: #20252d;
-      --card: #171a1f;
       --white: #15181d;
       --soft: #1b1f26;
       --input-bg: #111419;
-      --mode-bg: #15181d;
-      --mode-active: rgba(229, 113, 95, 0.18);
-      --badge-warn-bg: rgba(229, 113, 95, 0.16);
-      --badge-warn-fg: #f08e7e;
-      --badge-ok-bg: rgba(74, 181, 129, 0.15);
-      --badge-ok-fg: #6fd3a2;
-      --step-bg: rgba(21, 24, 29, 0.7);
-      --subhead-bg: rgba(229, 113, 95, 0.16);
-      --shadow-subtle: rgba(0, 0, 0, 0.28);
+      --step-bg: rgba(21, 24, 29, 0.72);
+      --chip-bg: #191d24;
+      --chip-active-bg: rgba(229, 113, 95, 0.18);
+      --ok-fg: #6fd3a2;
+      --ok-bg: rgba(74, 181, 129, 0.13);
+      --ok-border: rgba(74, 181, 129, 0.36);
+      --warn-fg: #f0b865;
+      --warn-bg: rgba(240, 184, 101, 0.13);
+      --warn-border: rgba(240, 184, 101, 0.38);
+      --danger-fg: #f08e7e;
+      --danger-bg: rgba(229, 113, 95, 0.15);
+      --danger-border: rgba(229, 113, 95, 0.45);
+      --shadow-subtle: rgba(0, 0, 0, 0.32);
       --font-brand: "Space Grotesk", "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     }
     :root:has(> head > meta[name="color-scheme"][content="light"]) {
@@ -43,22 +46,32 @@ tool_id: investment-checklist
       --red-soft: rgba(182, 75, 59, 0.1);
       --sand: #d9cfc3;
       --divider: #e7ded4;
-      --card: #eee6dc;
       --white: #fffdf9;
       --soft: #f2ece3;
       --input-bg: #fffefa;
-      --mode-bg: rgba(255, 255, 255, 0.56);
-      --mode-active: #f0e2d8;
-      --badge-warn-bg: #fae8e5;
-      --badge-warn-fg: #b64b3b;
-      --badge-ok-bg: #e2ede5;
-      --badge-ok-fg: #2d6a4f;
-      --step-bg: rgba(255, 255, 255, 0.42);
-      --subhead-bg: #f1e4da;
+      --step-bg: rgba(255, 255, 255, 0.56);
+      --chip-bg: #f6f0e8;
+      --chip-active-bg: #f4dfd8;
+      --ok-fg: #1f6b47;
+      --ok-bg: #e5f3ec;
+      --ok-border: #9bd1b5;
+      --warn-fg: #9a5d10;
+      --warn-bg: #fdf2e0;
+      --warn-border: #e7c083;
+      --danger-fg: #a93b2c;
+      --danger-bg: #fae9e6;
+      --danger-border: #e5a399;
       --shadow-subtle: rgba(30, 29, 27, 0.07);
     }
-    * { box-sizing:border-box; }
-    body { margin:0; color:var(--ink); background:var(--paper); font-family:"Inter","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
     .sr-only {
       position: absolute;
       width: 1px;
@@ -70,8 +83,27 @@ tool_id: investment-checklist
       white-space: nowrap;
       border: 0;
     }
-    .page { width:min(100%, 1080px); margin:0 auto; padding:26px 28px 64px; }
-    .tool-topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 18px; }
+    .page {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      padding: 24px 28px 64px;
+    }
+    .tool-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 16px;
+    }
+    .back-link {
+      display: inline-block;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .back-link:hover { color: var(--red); }
     .tool-theme-toggle {
       display: inline-flex;
       align-items: center;
@@ -85,9 +117,9 @@ tool_id: investment-checklist
       border: 1px solid var(--sand);
       border-radius: 999px;
       cursor: pointer;
-      transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+      transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
     }
-    .tool-theme-toggle:hover { color: var(--red); border-color: var(--red); opacity: 1; }
+    .tool-theme-toggle:hover { color: var(--red); border-color: var(--red); }
     .theme-opt { align-items: center; justify-content: center; }
     .theme-opt-to-light { display: inline-flex; }
     .theme-opt-to-dark { display: none; }
@@ -95,134 +127,773 @@ tool_id: investment-checklist
     :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-opt-to-dark { display: none; }
     :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-opt-to-light { display: none; }
     :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-opt-to-dark { display: inline-flex; }
-    .masthead { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--sand); padding-bottom:24px; }
-    .brand { display:flex; gap:12px; align-items:center; }
-    .tool-brand-mark { display:block; flex-shrink:0; color:var(--ink); }
-    h1 { margin:0; font-family:var(--font-brand); font-size:31px; font-weight:600; line-height:1.25; letter-spacing:0.01em; }
-    .kicker { margin:6px 0 0; color:var(--muted); font-size:12px; letter-spacing:.08em; }
-    .edition { color:var(--muted); font:13px Georgia,serif; letter-spacing:.06em; }
-    .intro { max-width:760px; margin:38px 0 28px; }
-    .intro h2 { margin:0 0 12px; font-family:"Newsreader","Songti SC","STSong",serif; font-size:27px; line-height:1.45; }
-    .intro p { margin:0; color:var(--body); font-size:15px; line-height:1.85; }
-    .mode-toggle { display:inline-flex; padding:3px; border:1px solid var(--sand); border-radius:7px; background:var(--mode-bg); }
-    .mode-button { min-width:94px; border:0; border-radius:4px; padding:8px 11px; color:var(--muted); background:transparent; font-size:13px; }
-    .mode-button small { display:block; margin-top:2px; font-size:10px; font-weight:400; }
-    .mode-button[aria-pressed="true"] { color:var(--ink); background:var(--mode-active); box-shadow:0 1px 2px var(--shadow-subtle); }
-    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:26px 0 14px; }
-    .step { padding:13px 15px; border:1px solid var(--sand); border-radius:5px; color:var(--muted); background:var(--step-bg); font-size:13px; }
-    .step strong { display:block; margin-bottom:3px; color:var(--ink); font-family:Georgia,serif; font-size:15px; }
-    #simpleChecklist { display:none; }
-    body[data-mode="simple"] #simpleChecklist { display:grid; gap:16px; }
-    body[data-mode="simple"] #fullChecklist { display:none; }
-    body[data-mode="full"] #fullChecklist { display:grid; gap:16px; }
-    .simple-upgrade { margin:0; padding:14px 16px; border:1px dashed var(--sand); border-radius:6px; color:var(--body); background:var(--step-bg); font-size:13px; line-height:1.75; }
-    .simple-upgrade strong { color:var(--red); }
-    form { display:grid; gap:16px; }
-    .panel { padding:26px; border:1px solid var(--sand); border-radius:8px; background:var(--white); }
-    .panel-head { display:flex; align-items:baseline; gap:12px; margin-bottom:12px; }
-    .panel-num { color:var(--red); font:700 15px Georgia,serif; }
-    .panel h3 { margin:0; font-family:"Newsreader","Songti SC","STSong",serif; font-size:23px; }
-    .panel-note { margin:0 0 22px; color:var(--muted); font-size:13px; line-height:1.7; }
-    .subsection { margin-top:24px; padding-top:22px; border-top:1px solid var(--divider); }
-    .subsection:first-of-type { margin-top:0; padding-top:0; border-top:0; }
-    .subhead { display:flex; align-items:center; gap:9px; margin:0 0 14px; font-size:15px; font-weight:650; }
-    .subhead span { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%; color:var(--red); background:var(--subhead-bg); font:700 12px Georgia,serif; }
-    .hint { margin:-5px 0 15px; color:var(--muted); font-size:12px; line-height:1.7; }
-    .fields { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-    label { display:flex; flex-direction:column; gap:7px; color:var(--body); font-size:13px; line-height:1.5; }
-    label.full { grid-column:1 / -1; }
-    textarea, input, select { width:100%; border:1px solid var(--sand); border-radius:4px; outline:0; padding:11px 12px; color:var(--ink); background:var(--input-bg); font:14px/1.7 "Inter","PingFang SC","Microsoft YaHei",sans-serif; }
-    textarea { min-height:102px; resize:vertical; }
-    textarea.compact { min-height:74px; }
-    input:focus, textarea:focus, select:focus { border-color:var(--red); box-shadow:0 0 0 3px var(--red-soft); }
-    .five-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .three-pillars { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-    .numbered { position:relative; }
-    .numbered b { position:absolute; left:10px; top:11px; color:var(--red); font:700 12px Georgia,serif; }
-    .numbered textarea { padding-left:34px; }
-    .numbered.wide { grid-column:1 / -1; }
-    .risk-hard-cap { display:grid; grid-template-columns:1fr 1.15fr 1.15fr; gap:14px; }
-    .samples-bar { display:flex; align-items:center; gap:12px; margin:22px 0 6px; padding:12px 16px; border:1px solid var(--sand); border-radius:7px; background:var(--step-bg); }
-    .samples-label { color:var(--muted); font-size:12px; white-space:nowrap; letter-spacing:.04em; }
-    .samples-buttons { display:flex; gap:10px; flex-wrap:wrap; }
-    .sample-btn { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--sand); border-radius:5px; padding:7px 12px; background:var(--white); cursor:pointer; font-size:12px; text-align:left; transition:all .15s ease; color:var(--ink); }
-    .sample-btn:hover { border-color:var(--red); box-shadow:0 2px 6px var(--shadow-subtle); transform:translateY(-1px); }
-    .sample-btn strong { font-weight:650; color:var(--ink); font-size:13px; }
-    .sample-btn small { color:var(--muted); font-size:11px; margin-left:2px; }
-    .sample-badge { display:inline-block; border-radius:3px; padding:2px 6px; font-size:10px; font-weight:600; letter-spacing:.04em; }
-    .sample-badge.warn { background:var(--badge-warn-bg); color:var(--badge-warn-fg); }
-    .sample-badge.success { background:var(--badge-ok-bg); color:var(--badge-ok-fg); }
-    .plan { display:grid; gap:8px; }
-    .plan-row { display:grid; grid-template-columns:110px 1.25fr 1.35fr .8fr; gap:8px; align-items:start; }
-    .plan-row.head { color:var(--muted); font-size:11px; padding:0 4px 3px; }
-    .plan-row input { min-width:0; }
-    .exit-row { display:grid; grid-template-columns:1.15fr 1.3fr .85fr; gap:8px; }
-    .check-row { display:flex; flex-wrap:wrap; gap:14px 20px; margin-top:18px; }
-    .check { display:flex; flex-direction:row; align-items:center; gap:7px; font-size:13px; }
-    .check input { width:auto; accent-color:var(--red); }
-    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:4px; }
-    button { border:1px solid var(--sand); border-radius:4px; padding:11px 15px; color:var(--ink); background:var(--soft); cursor:pointer; font:inherit; font-size:13px; transition:border-color .15s ease, opacity .15s ease; }
-    button:hover { border-color:var(--red); opacity:.92; }
-    button.primary { border-color:var(--red); color:#fff; background:var(--red); }
-    button.primary:hover { opacity:.9; }
+
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      border-bottom: 1px solid var(--sand);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+    .brand { display: flex; gap: 12px; align-items: center; min-width: 0; }
+    .tool-brand-mark { display: block; flex-shrink: 0; color: var(--ink); }
+    h1 {
+      margin: 0;
+      font-family: var(--font-brand);
+      font-size: 31px;
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: 0.01em;
+    }
+    .kicker {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      letter-spacing: 0.04em;
+    }
+    .samples-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .samples-label {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .sample-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--sand);
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: var(--white);
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--ink);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    .sample-btn:hover { border-color: var(--red); transform: translateY(-1px); }
+    .sample-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sample-dot.warn { background: var(--red); }
+    .sample-dot.success { background: var(--ok-fg); }
+
+    /* Desktop 2-column workbench */
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+    .flow-column {
+      display: grid;
+      gap: 16px;
+      min-width: 0;
+    }
+    .panel {
+      padding: 22px 24px;
+      border: 1px solid var(--sand);
+      border-radius: 10px;
+      background: var(--white);
+    }
+    .panel-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .panel-title-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      min-width: 0;
+    }
+    .panel-num {
+      color: var(--red);
+      font: 700 13px Georgia, serif;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .panel h2 {
+      margin: 0;
+      font-family: "Newsreader", "Songti SC", "STSong", serif;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .panel-note {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .fields-size {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      color: var(--body);
+      font-size: 13px;
+      line-height: 1.45;
+      min-width: 0;
+    }
+    label.full { grid-column: 1 / -1; }
+    .label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    textarea, input, select {
+      width: 100%;
+      border: 1px solid var(--sand);
+      border-radius: 6px;
+      outline: 0;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: var(--input-bg);
+      font: 14px/1.65 "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    input[type="number"] {
+      font-variant-numeric: tabular-nums;
+    }
+    textarea { min-height: 82px; resize: vertical; }
+    textarea.compact { min-height: 68px; }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px var(--red-soft);
+    }
+
+    .input-with-prefix {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--sand);
+      border-radius: 6px;
+      background: var(--input-bg);
+      overflow: hidden;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .input-with-prefix:focus-within {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px var(--red-soft);
+    }
+    .input-with-prefix input {
+      border: 0;
+      box-shadow: none !important;
+      border-radius: 0;
+      background: transparent;
+      flex: 1;
+      min-width: 0;
+    }
+    .currency-btn {
+      border: 0;
+      border-right: 1px solid var(--sand);
+      border-radius: 0;
+      padding: 0 11px;
+      background: var(--soft);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .currency-btn:hover { color: var(--red); background: var(--chip-bg); }
+    .input-suffix {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 11px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--soft);
+      border-left: 1px solid var(--sand);
+      user-select: none;
+    }
+
+    /* Quick selector chips & Emotion tags */
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .quick-chip,
+    .emotion-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid var(--sand);
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: var(--chip-bg);
+      color: var(--body);
+      font-size: 12px;
+      line-height: 1.4;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: border-color 0.14s ease, color 0.14s ease, background-color 0.14s ease;
+    }
+    .quick-chip:hover,
+    .emotion-chip:hover {
+      border-color: var(--red);
+      color: var(--ink);
+    }
+    .quick-chip[aria-pressed="true"] {
+      border-color: var(--red);
+      background: var(--chip-active-bg);
+      color: var(--red);
+      font-weight: 600;
+    }
+    .emotion-chip[aria-pressed="true"][data-tone="ok"] {
+      border-color: var(--ok-border);
+      background: var(--ok-bg);
+      color: var(--ok-fg);
+      font-weight: 600;
+    }
+    .emotion-chip[aria-pressed="true"][data-tone="warn"] {
+      border-color: var(--warn-border);
+      background: var(--warn-bg);
+      color: var(--warn-fg);
+      font-weight: 600;
+    }
+    .emotion-chip[aria-pressed="true"][data-tone="danger"] {
+      border-color: var(--danger-border);
+      background: var(--danger-bg);
+      color: var(--danger-fg);
+      font-weight: 600;
+    }
+    .emotion-section {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--divider);
+    }
+    .emotion-heading {
+      margin: 0 0 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--body);
+    }
+
+    /* 4-card risk readout strip */
+    .calc-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0 14px;
+    }
+    .calc-metric {
+      padding: 11px 12px;
+      border: 1px solid var(--sand);
+      border-radius: 8px;
+      background: var(--soft);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .calc-metric[data-tone="ok"] {
+      border-color: var(--ok-border);
+      background: var(--ok-bg);
+    }
+    .calc-metric[data-tone="warn"] {
+      border-color: var(--warn-border);
+      background: var(--warn-bg);
+    }
+    .calc-metric[data-tone="danger"] {
+      border-color: var(--danger-border);
+      background: var(--danger-bg);
+    }
+    .calc-label {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .calc-value {
+      font-family: var(--font-brand);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+    .calc-metric[data-tone="ok"] .calc-value { color: var(--ok-fg); }
+    .calc-metric[data-tone="warn"] .calc-value { color: var(--warn-fg); }
+    .calc-metric[data-tone="danger"] .calc-value { color: var(--danger-fg); }
+    .calc-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.3;
+    }
+
+    /* Optional deep research accordion */
+    .deep-notes {
+      border: 1px solid var(--sand);
+      border-radius: 10px;
+      background: var(--white);
+      padding: 0;
+      overflow: hidden;
+    }
+    .deep-notes summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 22px;
+      cursor: pointer;
+      list-style: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      user-select: none;
+    }
+    .deep-notes summary::-webkit-details-marker { display: none; }
+    .deep-notes summary:hover { color: var(--red); }
+    .deep-summary-sub {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .deep-body {
+      padding: 4px 22px 22px;
+      border-top: 1px solid var(--divider);
+      display: grid;
+      gap: 18px;
+    }
+    .subsection {
+      padding-top: 14px;
+      border-top: 1px solid var(--divider);
+    }
+    .subsection:first-child { border-top: 0; padding-top: 10px; }
+    .subhead {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 12px;
+      font-size: 13.5px;
+      font-weight: 650;
+      color: var(--ink);
+    }
+    .three-pillars {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .numbered { position: relative; }
+    .numbered b {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      color: var(--red);
+      font: 700 12px Georgia, serif;
+    }
+    .numbered textarea { padding-left: 32px; }
+    .plan { display: grid; gap: 8px; }
+    .plan-row {
+      display: grid;
+      grid-template-columns: 96px 1.2fr 0.7fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .plan-tag {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--body);
+      white-space: nowrap;
+    }
+
+    /* Sticky Right Sidebar: Decision Gate Card */
+    .gate-sidebar {
+      position: sticky;
+      top: 20px;
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+    .gate-card {
+      padding: 18px 18px 16px;
+      border: 1px solid var(--sand);
+      border-radius: 10px;
+      background: var(--white);
+      box-shadow: 0 6px 22px var(--shadow-subtle);
+      display: grid;
+      gap: 14px;
+    }
+    .gate-banner {
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--sand);
+      background: var(--soft);
+    }
+    .gate-banner[data-status="hold"] {
+      border-color: var(--danger-border);
+      background: var(--danger-bg);
+    }
+    .gate-banner[data-status="caution"] {
+      border-color: var(--warn-border);
+      background: var(--warn-bg);
+    }
+    .gate-banner[data-status="ready"] {
+      border-color: var(--ok-border);
+      background: var(--ok-bg);
+    }
+    .gate-pill-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .gate-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .gate-banner[data-status="hold"] .gate-badge,
+    .gate-banner[data-status="hold"] .gate-title { color: var(--danger-fg); }
+    .gate-banner[data-status="caution"] .gate-badge,
+    .gate-banner[data-status="caution"] .gate-title { color: var(--warn-fg); }
+    .gate-banner[data-status="ready"] .gate-badge,
+    .gate-banner[data-status="ready"] .gate-title { color: var(--ok-fg); }
+    .gate-title {
+      margin: 0 0 6px;
+      font-family: var(--font-brand);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .gate-reasons {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--body);
+    }
+    .gate-reasons li + li { margin-top: 3px; }
+
+    .gate-checks {
+      display: grid;
+      gap: 7px;
+      padding: 0 2px;
+    }
+    .gate-check-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      padding: 6px 9px;
+      border-radius: 6px;
+      background: var(--soft);
+      border: 1px solid var(--divider);
+    }
+    .gate-check-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--ink);
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .gate-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+    }
+    .gate-check-item[data-state="ok"] .gate-dot { background: var(--ok-fg); }
+    .gate-check-item[data-state="warn"] .gate-dot { background: var(--warn-fg); }
+    .gate-check-item[data-state="danger"] .gate-dot { background: var(--danger-fg); }
+    .gate-check-note {
+      font-size: 11.5px;
+      color: var(--muted);
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .gate-check-item[data-state="danger"] .gate-check-note { color: var(--danger-fg); font-weight: 600; }
+    .gate-check-item[data-state="warn"] .gate-check-note { color: var(--warn-fg); font-weight: 500; }
+    .gate-check-item[data-state="ok"] .gate-check-note { color: var(--ok-fg); }
+
+    .actions {
+      display: grid;
+      gap: 8px;
+    }
+    .actions-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .actions-row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+    .btn {
+      border: 1px solid var(--sand);
+      border-radius: 6px;
+      padding: 9px 12px;
+      color: var(--ink);
+      background: var(--soft);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
+      transition: border-color 0.15s ease, opacity 0.15s ease, background-color 0.15s ease;
+    }
+    .btn:hover { border-color: var(--red); }
+    .btn.primary {
+      border-color: var(--red);
+      color: #fff;
+      background: var(--red);
+      font-weight: 600;
+      padding: 10px 14px;
+    }
+    .btn.primary:hover { opacity: 0.9; }
+    .btn.sm {
+      padding: 7px 8px;
+      font-size: 12px;
+      color: var(--body);
+      background: transparent;
+    }
+    .btn.sm:hover { color: var(--ink); background: var(--soft); }
+    .saved {
+      margin: 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11.5px;
+      line-height: 1.4;
+    }
+
+    /* Handoff card to ThesisSee */
+    .handoff-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 15px;
+      border: 1px solid var(--sand);
+      border-radius: 10px;
+      background: var(--step-bg);
+      color: inherit;
+      text-decoration: none;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    .handoff-card:hover {
+      text-decoration: none;
+      border-color: var(--red);
+      background: var(--white);
+    }
+    .handoff-copy { min-width: 0; }
+    .handoff-kicker {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 2px;
+    }
+    .handoff-title {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+    .handoff-desc {
+      display: block;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+    .handoff-arrow {
+      flex-shrink: 0;
+      font-size: 14px;
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    /* Footer sections */
+    .tool-related-posts {
+      margin-top: 44px;
+      padding-top: 28px;
+      border-top: 1px solid var(--sand);
+    }
+    .tool-section-head { margin-bottom: 16px; }
+    .tool-section-kicker {
+      color: var(--red);
+      font: 700 11px Georgia, serif;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .tool-section-title {
+      margin: 4px 0 0;
+      font-family: "Newsreader", "Songti SC", "STSong", serif;
+      font-size: 21px;
+    }
+    .tool-posts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .tool-post-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 18px 20px;
+      border: 1px solid var(--sand);
+      border-radius: 10px;
+      background: var(--white);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .tool-post-card:hover {
+      border-color: var(--red);
+      box-shadow: 0 4px 14px var(--shadow-subtle);
+      text-decoration: none;
+    }
+    .tool-post-kicker { color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
+    .tool-post-title {
+      margin: 0;
+      font-family: "Newsreader", "Songti SC", "STSong", serif;
+      font-size: 18px;
+      line-height: 1.4;
+      color: var(--ink);
+    }
+    .tool-post-desc { margin: 0; flex: 1; color: var(--body); font-size: 13px; line-height: 1.7; }
+    .tool-post-link { color: var(--red); font-size: 13px; font-weight: 600; margin-top: 4px; }
+
+    .tool-subscribe-card {
+      margin-top: 20px;
+      padding: 28px 24px;
+      border: 1px solid var(--sand);
+      border-radius: 10px;
+      background: var(--soft);
+      text-align: center;
+    }
+    .tool-subscribe-kicker {
+      color: var(--red);
+      font: 700 11px Georgia, serif;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .tool-subscribe-title {
+      margin: 4px 0 6px;
+      font-family: "Newsreader", "Songti SC", "STSong", serif;
+      font-size: 21px;
+    }
+    .tool-subscribe-desc { margin: 0 0 16px; color: var(--muted); font-size: 13px; }
+    .tool-subscribe-card .subscribe-form {
+      display: flex;
+      gap: 10px;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .tool-subscribe-card input[type="email"] {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 14px;
+      border: 1px solid var(--sand);
+      border-radius: 6px;
+      background: var(--input-bg);
+      font-size: 14px;
+      color: var(--ink);
+    }
+    .tool-subscribe-card button[type="submit"] {
+      padding: 10px 18px;
+      border: 1px solid var(--red);
+      border-radius: 6px;
+      background: var(--red);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tool-subscribe-card button[type="submit"]:hover { opacity: 0.9; }
+    .bottom-note {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+      font-style: italic;
+    }
+
     button:focus-visible,
     input:focus-visible,
     textarea:focus-visible,
     select:focus-visible,
-    a:focus-visible {
+    a:focus-visible,
+    summary:focus-visible {
       outline: 2px solid var(--red);
       outline-offset: 2px;
     }
-    .saved { margin-left:auto; color:var(--muted); font-size:12px; align-self:center; }
-    .bottom-note { margin-top:34px; color:var(--muted); font-size:12px; line-height:1.8; font-style:italic; }
-    @media (max-width:760px) {
-      .page { padding:18px 16px 44px; }
-      .masthead { gap:16px; }
-      h1 { font-size:26px; }
-      .mode-toggle { flex:0 0 auto; }
-      .mode-button { min-width:74px; padding:7px 8px; font-size:12px; }
-      .mode-button small { display:none; }
-      .samples-bar { flex-direction:column; align-items:flex-start; gap:9px; padding:12px 14px; }
-      .samples-buttons { width:100%; flex-direction:column; gap:8px; }
-      .sample-btn { width:100%; justify-content:flex-start; }
-      .steps { gap:6px; }
-      .step { padding:11px 9px; font-size:11px; }
-      .step strong { font-size:13px; }
-      .panel { padding:20px 15px; }
-      .fields, .five-grid, .three-pillars, .risk-hard-cap { grid-template-columns:1fr; }
-      label.full, .numbered.wide { grid-column:auto; }
-      .plan-row, .exit-row { grid-template-columns:1fr; padding:13px; border:1px solid var(--divider); border-radius:5px; background:var(--soft); }
-      .plan-row.head { display:none; }
-      .plan-row input::placeholder { color:var(--muted); }
-      .saved { width:100%; margin-left:0; }
-      .tool-posts-grid { grid-template-columns:1fr; }
-      .tool-subscribe-card { padding:24px 16px; }
-      .tool-subscribe-card .subscribe-form { flex-direction:column; }
-      .tool-subscribe-card button[type="submit"] { width:100%; }
-    }
-    .back-link { display:inline-block; margin:0; color:var(--muted); font-size:13px; text-decoration:none; letter-spacing:.02em; }
-    .back-link:hover { color:var(--red); }
-    .tool-related-posts { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--sand); }
-    .tool-section-head { margin-bottom: 18px; }
-    .tool-section-kicker { color: var(--red); font: 700 11px Georgia, serif; letter-spacing: .12em; text-transform: uppercase; }
-    .tool-section-title { margin: 4px 0 0; font-family: "Newsreader", "Songti SC", "STSong", serif; font-size: 22px; }
-    .tool-posts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .tool-post-card { display: flex; flex-direction: column; gap: 8px; padding: 20px 22px; border: 1px solid var(--sand); border-radius: 8px; background: var(--white); text-decoration: none; color: inherit; transition: border-color .15s, box-shadow .15s; }
-    .tool-post-card:hover { border-color: var(--red); box-shadow: 0 4px 14px var(--shadow-subtle); text-decoration: none; }
-    .tool-post-kicker { color: var(--muted); font-size: 11px; letter-spacing: .06em; }
-    .tool-post-title { margin: 0; font-family: "Newsreader", "Songti SC", "STSong", serif; font-size: 18px; line-height: 1.4; color: var(--ink); }
-    .tool-post-desc { margin: 0; flex: 1; color: var(--body); font-size: 13px; line-height: 1.7; }
-    .tool-post-link { color: var(--red); font-size: 13px; font-weight: 600; margin-top: 6px; }
 
-    .tool-subscribe-card { margin-top: 24px; padding: 32px 24px; border: 1px solid var(--sand); border-radius: 8px; background: var(--soft); text-align: center; }
-    .tool-subscribe-kicker { color: var(--red); font: 700 11px Georgia, serif; letter-spacing: .12em; text-transform: uppercase; }
-    .tool-subscribe-title { margin: 4px 0 6px; font-family: "Newsreader", "Songti SC", "STSong", serif; font-size: 22px; }
-    .tool-subscribe-desc { margin: 0 0 18px; color: var(--muted); font-size: 13px; }
-    .tool-subscribe-card .subscribe-form { display: flex; gap: 10px; max-width: 420px; margin: 0 auto; }
-    .tool-subscribe-card input[type="email"] { flex: 1; min-width: 0; padding: 10px 14px; border: 1px solid var(--sand); border-radius: 4px; background: var(--input-bg); font-size: 14px; color: var(--ink); }
-    .tool-subscribe-card input[type="email"]:focus { border-color: var(--red); outline: none; }
-    .tool-subscribe-card button[type="submit"] { padding: 10px 20px; border: 1px solid var(--red); border-radius: 4px; background: var(--red); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-    .tool-subscribe-card button[type="submit"]:hover { opacity: .88; }
+    @media (max-width: 920px) {
+      .workbench { grid-template-columns: 1fr; }
+      .gate-sidebar { position: static; }
+      .masthead {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+      .samples-header { justify-content: flex-start; }
+    }
+    @media (max-width: 600px) {
+      .page { padding: 18px 16px 44px; }
+      h1 { font-size: 25px; }
+      .panel { padding: 18px 15px; }
+      .fields, .fields-size, .three-pillars, .plan-row, .tool-posts-grid { grid-template-columns: 1fr; }
+      .calc-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .deep-notes summary { padding: 14px 15px; flex-direction: column; align-items: flex-start; gap: 2px; }
+      .deep-body { padding: 4px 15px 18px; }
+      .tool-subscribe-card { padding: 22px 16px; }
+      .tool-subscribe-card .subscribe-form { flex-direction: column; }
+      .tool-subscribe-card button[type="submit"] { width: 100%; }
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -238,223 +909,350 @@ tool_id: investment-checklist
         --white: #fff;
         --soft: #fff;
         --input-bg: #fff;
+        --chip-bg: #fff;
         --ink: #111;
         --body: #333;
         --muted: #555;
         --sand: #ccc;
         --divider: #ddd;
       }
-      body { background:#fff; color:#111; }
-      .actions, .steps, .tool-topbar, .tool-related-posts, .tool-subscribe-card { display:none; }
-      .page { width:100%; padding:0; }
-      .panel { break-inside:avoid; }
-      textarea, input, select { border-color:#ddd; background:#fff; color:#111; }
+      body { background: #fff; color: #111; }
+      .tool-topbar, .samples-header, .chip-row, .actions, .handoff-card, .tool-related-posts, .tool-subscribe-card { display: none; }
+      .workbench { grid-template-columns: 1fr; }
+      .gate-sidebar { position: static; }
+      .page { width: 100%; padding: 0; }
+      .panel, .gate-card { break-inside: avoid; box-shadow: none; }
+      textarea, input, select { border-color: #ddd; background: #fff; color: #111; }
     }
   </style>
 </head>
-<body data-mode="simple" data-content-slug="investment-checklist">
+<body data-content-slug="investment-checklist">
   <main class="page">
     <div class="tool-topbar">
       <a class="back-link" href="/tools/">← 返回工具</a>
       {% include tool-theme-toggle.html %}
     </div>
+
     <header class="masthead">
-      <div class="brand">{% include tool-brand-mark.html size=28 %}<div><h1>投资决策检查清单</h1><p class="kicker">正EV实验 · EV · SIZE · EXIT</p></div></div>
-      <div class="mode-toggle" role="group" aria-label="检查清单版本">
-        <button type="button" class="mode-button" data-mode="simple" aria-pressed="true">简单版<small>先写三段</small></button>
-        <button type="button" class="mode-button" data-mode="full" aria-pressed="false">完整版<small>完整研究</small></button>
+      <div class="brand">
+        {% include tool-brand-mark.html size=28 %}
+        <div>
+          <h1>投资决策检查清单</h1>
+          <p class="kicker">正EV实验 · 下单前 90 秒风险算账与决策门禁</p>
+        </div>
+      </div>
+      <div class="samples-header" role="region" aria-label="实战范例载入">
+        <span class="samples-label">实战示例：</span>
+        <button type="button" class="sample-btn" id="loadPaypalSampleBtn" data-sample="paypal">
+          <span class="sample-dot warn" aria-hidden="true"></span>
+          <span>反面 · PayPal</span>
+        </button>
+        <button type="button" class="sample-btn" id="loadLiteSampleBtn" data-sample="lite">
+          <span class="sample-dot success" aria-hidden="true"></span>
+          <span>正面 · LITE</span>
+        </button>
       </div>
     </header>
 
-    <section class="intro">
-      <h2 id="introTitle">在按下买入前，先留下三段不容易被情绪改写的话。</h2>
-    </section>
-
-    <div class="samples-bar" role="region" aria-label="实战范例载入">
-      <span class="samples-label">官方实战范例：</span>
-      <div class="samples-buttons">
-        <button type="button" class="sample-btn" id="loadPaypalSampleBtn" data-sample="paypal">
-          <span class="sample-badge warn">反面教材</span>
-          <strong>PayPal 价值陷阱</strong>
-          <small>便宜 ≠ 安全 · 缺乏 EXIT</small>
-        </button>
-        <button type="button" class="sample-btn" id="loadLiteSampleBtn" data-sample="lite">
-          <span class="sample-badge success">正面示范</span>
-          <strong>LITE 小仓试错</strong>
-          <small>FOMO 情绪下的仓位克制</small>
-        </button>
-      </div>
-    </div>
-
-    <div class="steps"><div class="step"><strong>01 · EV</strong>命题与三大支柱</div><div class="step"><strong>02 · SIZE</strong>角色、硬顶与亏损预算</div><div class="step"><strong>03 · EXIT</strong>失效出场、削峰与冷静</div></div>
-
-    <form id="checklist">
-      <div id="simpleChecklist">
+    <form id="checklist" class="workbench">
+      <div class="flow-column">
+        <!-- 00 / CONTEXT -->
         <section class="panel">
-          <div class="panel-head"><span class="panel-num">00 / CONTEXT</span><h3>先记下当时的自己</h3></div>
-          <p class="panel-note">留一点背景，避免以后只用结果改写记忆。</p>
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <span class="panel-num">00 / CONTEXT</span>
+              <h2>标的与仓位角色</h2>
+            </div>
+          </div>
+          <p class="panel-note">写清要参与谁、用什么角色参与，别把所有仓位买成一个尺度。</p>
           <div class="fields">
-            <label>记录日期<input type="date" data-bind="context_date"></label>
-            <label>标的 / 机会<input data-bind="context_asset" placeholder="代码或名称，例如：NVDA / 腾讯"></label>
+            <label>标的 / 代码
+              <input name="context_asset" placeholder="例如：NVDA / PayPal (PYPL) / 腾讯">
+            </label>
+            <label>决策日期
+              <input type="date" name="context_date">
+            </label>
+            <label class="full">仓位角色
+              <input name="size_role" list="role-options" placeholder="例如：试错仓 / 战术进攻 / 核心底仓 / 防守对冲">
+              <div class="chip-row" aria-label="快速选定仓位角色">
+                <button type="button" class="quick-chip role-chip" data-role="观察试错仓" data-suggest-cap="3">试错仓 · 建议 ≤3%</button>
+                <button type="button" class="quick-chip role-chip" data-role="战术进攻仓" data-suggest-cap="8">进攻仓 · 建议 5–10%</button>
+                <button type="button" class="quick-chip role-chip" data-role="核心底仓" data-suggest-cap="15">核心仓 · 建议 10–15%</button>
+                <button type="button" class="quick-chip role-chip" data-role="防守对冲仓" data-suggest-cap="5">防守对冲 · 建议 ≤5%</button>
+              </div>
+            </label>
           </div>
         </section>
 
+        <!-- 01 / EV -->
         <section class="panel">
-          <div class="panel-head"><span class="panel-num">01 / EV</span><h3>核心命题</h3></div>
-          <p class="panel-note">写可以被推翻的命题，愿望不算论据。</p>
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <span class="panel-num">01 / EV</span>
+              <h2>一句话命题与情绪自检</h2>
+            </div>
+          </div>
+          <p class="panel-note">用能被未来财报/事实验证的话写清为什么值得出手，并诚实扫描此刻的情绪状态。</p>
           <div class="fields">
-            <label class="full">我的一句话核心命题<textarea data-bind="ev_judgement" placeholder="写成可以被未来证据推翻的一句话，不写“长期看好”。"></textarea></label>
+            <label class="full">一句话核心命题（必须可被推翻，不写“长期看好”）
+              <textarea name="ev_judgement" placeholder="例如：受益于 800G 需求与战略采购绑定，未来 4 季度营收与营业利润率将维持 30%+ 兑现。"></textarea>
+            </label>
+          </div>
+          <div class="emotion-section">
+            <p class="emotion-heading">此刻状态自检（可多选，诚实点按）：</p>
+            <div class="chip-row" id="emotionGroup" role="group" aria-label="下单前情绪状态自检">
+              <button type="button" class="emotion-chip" data-emotion="calm" data-tone="ok" aria-pressed="false">平静 / 按既定计划</button>
+              <button type="button" class="emotion-chip" data-emotion="fomo" data-tone="warn" aria-pressed="false">怕踏空 (FOMO)</button>
+              <button type="button" class="emotion-chip" data-emotion="averaging" data-tone="danger" aria-pressed="false">跌了不甘 / 想补仓摊薄</button>
+              <button type="button" class="emotion-chip" data-emotion="tip" data-tone="danger" aria-pressed="false">刚看新闻 / 听消息冲动</button>
+              <button type="button" class="emotion-chip" data-emotion="revenge" data-tone="danger" aria-pressed="false">急于回本翻盘</button>
+            </div>
+            <label class="full" style="margin-top:12px;">情绪补充备注（可选）
+              <input name="exit_emotion" placeholder="例如：板块连涨三天容易上头，只允许小仓试错，禁止盘中追加">
+            </label>
           </div>
         </section>
 
+        <!-- 02 / SIZE -->
         <section class="panel">
-          <div class="panel-head"><span class="panel-num">02 / SIZE</span><h3>仓位硬顶与最大容忍亏损</h3></div>
-          <p class="panel-note">看好不等于重仓。先锁定亏损上限，再谈盈利可能。</p>
-          <div class="fields risk-hard-cap">
-            <label>仓位角色<input data-bind="size_role" list="role-options" placeholder="例如：核心 / 进攻 / 试错 / 防守"></label>
-            <label>仓位硬顶上限 (Hard Cap)<input data-bind="size_hard_cap" placeholder="例如：总资金严卡 5% 上限"></label>
-            <label>最大容忍亏损 (Max Pain)<input data-bind="size_max_pain" placeholder="例如：跌超 15% 或亏损达 ¥20,000"></label>
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <span class="panel-num">02 / SIZE</span>
+              <h2>真实资金风险算账</h2>
+            </div>
+          </div>
+          <p class="panel-note">不把抽象百分比当安全感。直接算出真金白银的最大亏损额与对总账户净值的冲击。</p>
+          <div class="fields-size">
+            <label>总账户资金（换标的清空时保留）
+              <div class="input-with-prefix">
+                <button type="button" class="currency-btn" id="currencyToggleBtn" title="切换币种 ($ / ¥)" aria-label="切换币种">$</button>
+                <input type="number" step="1000" min="0" name="calc_portfolio" placeholder="例如：100000" inputmode="decimal">
+              </div>
+              <input type="hidden" name="calc_currency" value="$">
+            </label>
+
+            <label>预期上涨空间（可选 · 算赔率）
+              <div class="input-with-prefix">
+                <input type="number" step="1" min="0" max="1000" name="calc_upside_pct" placeholder="例如：45" inputmode="decimal">
+                <span class="input-suffix">%</span>
+              </div>
+            </label>
+
+            <label>目标仓位硬顶 (Hard Cap)
+              <div class="input-with-prefix">
+                <input type="number" step="0.5" min="0" max="100" name="size_hard_cap" placeholder="例如：5" inputmode="decimal">
+                <span class="input-suffix">%</span>
+              </div>
+              <div class="chip-row" aria-label="快捷设定仓位硬顶">
+                <button type="button" class="quick-chip cap-chip" data-cap="3">3%</button>
+                <button type="button" class="quick-chip cap-chip" data-cap="5">5%</button>
+                <button type="button" class="quick-chip cap-chip" data-cap="10">10%</button>
+                <button type="button" class="quick-chip cap-chip" data-cap="15">15%</button>
+              </div>
+            </label>
+
+            <label>证伪止损幅度 (Stop Loss)
+              <div class="input-with-prefix">
+                <input type="number" step="1" min="0" max="99" name="calc_stop_pct" placeholder="例如：18" inputmode="decimal">
+                <span class="input-suffix">%</span>
+              </div>
+              <div class="chip-row" aria-label="快捷设定止损幅度">
+                <button type="button" class="quick-chip stop-chip" data-stop="10">-10%</button>
+                <button type="button" class="quick-chip stop-chip" data-stop="15">-15%</button>
+                <button type="button" class="quick-chip stop-chip" data-stop="20">-20%</button>
+                <button type="button" class="quick-chip stop-chip" data-stop="25">-25%</button>
+              </div>
+            </label>
+          </div>
+
+          <div class="calc-strip" aria-label="实时风险量化读数">
+            <div class="calc-metric" id="metricCardPosition">
+              <span class="calc-label">拟投入金额</span>
+              <span class="calc-value" id="metricPosition">—</span>
+              <span class="calc-sub" id="metricPositionSub">输入资金与仓位后计算</span>
+            </div>
+            <div class="calc-metric" id="metricCardMaxPain">
+              <span class="calc-label">最大痛感亏损</span>
+              <span class="calc-value" id="metricMaxPain">—</span>
+              <span class="calc-sub" id="metricMaxPainSub">触及止损真实浮亏额</span>
+            </div>
+            <div class="calc-metric" id="metricCardImpact">
+              <span class="calc-label">总净值冲击</span>
+              <span class="calc-value" id="metricImpact">—</span>
+              <span class="calc-sub" id="metricImpactSub">稳健参考 ≤ 1.5% / 红线 > 3%</span>
+            </div>
+            <div class="calc-metric" id="metricCardRecovery">
+              <span class="calc-label">回本涨幅 / 赔率</span>
+              <span class="calc-value" id="metricRecovery">—</span>
+              <span class="calc-sub" id="metricRecoverySub">止损后回本与 R:R 比</span>
+            </div>
+          </div>
+
+          <div class="fields">
+            <label class="full">最大容忍亏损备注 (Max Pain · 可选，留空按上方金额记录)
+              <input name="size_max_pain" placeholder="例如：跌破前低或绝对亏损超上限无条件减仓">
+            </label>
           </div>
         </section>
 
+        <!-- 03 / EXIT -->
         <section class="panel">
-          <div class="panel-head"><span class="panel-num">03 / EXIT</span><h3>逻辑失效与出场约束</h3></div>
-          <p class="panel-note">退出由逻辑和纪律决定，不由肉体痛感决定。</p>
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <span class="panel-num">03 / EXIT</span>
+              <h2>证伪退出与复核底线</h2>
+            </div>
+          </div>
+          <p class="panel-note">退出由客观事实和纪律决定，不由盘中痛苦度临时决定。</p>
           <div class="fields">
-            <label class="full">出现什么反向信号，我必须立即离场？<textarea data-bind="exit_invalidated" placeholder="写业务/财务恶化的客观事实，不只写跌幅。出现时坚决认错出场。"></textarea></label>
-            <label class="full">我不想被什么情绪牵着走？<textarea data-bind="exit_emotion" placeholder="怕错过主线（FOMO）、不甘心认错、急于回本、越跌越补……"></textarea></label>
+            <label class="full">出现什么客观事实，说明核心命题已失效必须离场？
+              <textarea name="exit_invalidated" placeholder="写明营业指标、毛利率、市占率等硬指标底线，而不只是写“股价不能再跌”。"></textarea>
+            </label>
+            <label class="full">固定复核节奏
+              <input name="exit_review" placeholder="例如：每季度财报后 / 重大产品节点">
+              <div class="chip-row" aria-label="快捷选择复核节奏">
+                <button type="button" class="quick-chip review-chip" data-review="每季度财报后">每季度财报后</button>
+                <button type="button" class="quick-chip review-chip" data-review="每月跟踪一次">每月跟踪一次</button>
+                <button type="button" class="quick-chip review-chip" data-review="关键催化事件落地后">关键事件落地后</button>
+              </div>
+            </label>
           </div>
         </section>
 
-        <p class="simple-upgrade"><strong>什么时候切到完整版？</strong>当你打算正式建仓或做深入研究，想把 3 大支柱事实、估值透支核对、两段式建仓加仓纪律与削峰规则写完整时，再切过去。</p>
+        <!-- Optional deep research accordion -->
+        <details class="deep-notes" id="deepNotesDetails">
+          <summary>
+            <span>进阶研究补充（可选）</span>
+            <span class="deep-summary-sub">三大事实支柱 · 市场预期差 · 估值与两段建仓计划</span>
+          </summary>
+          <div class="deep-body">
+            <div class="subsection">
+              <h3 class="subhead">A. 预期差与 3 条硬事实支柱</h3>
+              <div class="fields" style="margin-bottom:12px;">
+                <label>市场当前已定价了什么共识？
+                  <textarea class="compact" name="ev_market_knows" placeholder="当前价格反映了哪些已知消息？"></textarea>
+                </label>
+                <label>我的差异判断是什么？
+                  <textarea class="compact" name="ev_difference" placeholder="我与市场共识的关键分歧在哪里？"></textarea>
+                </label>
+              </div>
+              <div class="three-pillars">
+                <label class="numbered"><b>01</b><textarea class="compact" name="reason_1" placeholder="支柱一：需求 / 行业周期事实"></textarea></label>
+                <label class="numbered"><b>02</b><textarea class="compact" name="reason_2" placeholder="支柱二：壁垒 / 竞争格局事实"></textarea></label>
+                <label class="numbered"><b>03</b><textarea class="compact" name="reason_3" placeholder="支柱三：财务兑现 / 现金流事实"></textarea></label>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <h3 class="subhead">B. 估值体感与削峰规则</h3>
+              <div class="fields">
+                <label>当前估值体感
+                  <select name="valuation_level">
+                    <option value="">请选择</option>
+                    <option>明显偏贵</option>
+                    <option>中性偏贵</option>
+                    <option>大致合理</option>
+                    <option>中性偏低</option>
+                    <option>明显偏低</option>
+                    <option>暂时无法判断</option>
+                  </select>
+                </label>
+                <label>超涨削峰纪律（可选）
+                  <input name="profit_rule_1" placeholder="例如：估值 > 40x PE 时被动削减 1/2 仓位">
+                </label>
+                <label class="full">价格大概透支了什么乐观假设？
+                  <textarea class="compact" name="valuation_priced_in" placeholder="市场是否已计入最乐观情景？"></textarea>
+                </label>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <h3 class="subhead">C. 两段式建仓计划（加仓须有新证据且 ≤ Hard Cap）</h3>
+              <div class="plan">
+                <div class="plan-row">
+                  <span class="plan-tag">第一笔 · 试探</span>
+                  <input name="entry_1_trigger" placeholder="触发条件（如：回调企稳 / 公告确认）" aria-label="第一笔触发条件">
+                  <input name="entry_1_size" placeholder="目标仓位（如 2%）" aria-label="第一笔仓位">
+                </div>
+                <div class="plan-row">
+                  <span class="plan-tag">第二笔 · 追加</span>
+                  <input name="entry_2_trigger" placeholder="新证据验证条件（严禁纯因下跌补仓）" aria-label="第二笔追加条件">
+                  <input name="entry_2_size" placeholder="上限仓位（≤ Hard Cap）" aria-label="第二笔上限仓位">
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
       </div>
 
-      <div id="fullChecklist">
-      <section class="panel">
-        <div class="panel-head"><span class="panel-num">00 / CONTEXT</span><h3>这次决定发生在什么背景下？</h3></div>
-        <p class="panel-note">记录当时的时间和情景，避免以后用结果改写记忆。</p>
-        <div class="fields">
-          <label>记录日期<input type="date" name="context_date"></label>
-          <label>标的 / 机会<input name="context_asset" placeholder="可以写代码，也可以写匿名名称"></label>
-          <label>计划持有周期<input name="context_horizon" placeholder="例如：事件观察 / 中期趋势 / 长期核心"></label>
-          <label>当时的市场情景与自身情绪<input name="context_market" placeholder="例如：板块火热怕踏空，或暴跌后觉得便宜想抄底"></label>
-        </div>
-      </section>
+      <!-- Sticky Right Column: Real-Time Gate & Actions -->
+      <aside class="gate-sidebar" aria-label="实时决策门禁与导出">
+        <div class="gate-card">
+          <div class="gate-banner" id="gateBanner" data-status="hold" aria-live="polite">
+            <div class="gate-pill-row">
+              <span class="gate-badge" id="gateBadge">HOLD · 门禁未通过</span>
+            </div>
+            <h2 class="gate-title" id="gateTitle">暂缓下单</h2>
+            <ul class="gate-reasons" id="gateReasons">
+              <li>请先写下一句话可证伪的核心命题</li>
+            </ul>
+          </div>
 
-      <section class="panel">
-        <div class="panel-head"><span class="panel-num">01 / EV</span><h3>这件事为什么值得参与？（命题与事实）</h3></div>
-        <p class="panel-note">核心命题与支柱事实缺一不可。愿望不算论据，客观才能保命。</p>
+          <div class="gate-checks" aria-label="门禁四项自动核对">
+            <div class="gate-check-item" id="checkEv" data-state="danger">
+              <span class="gate-check-name"><i class="gate-dot" aria-hidden="true"></i>EV 命题</span>
+              <span class="gate-check-note" id="checkEvNote">待填写</span>
+            </div>
+            <div class="gate-check-item" id="checkSize" data-state="danger">
+              <span class="gate-check-name"><i class="gate-dot" aria-hidden="true"></i>SIZE 风控</span>
+              <span class="gate-check-note" id="checkSizeNote">待设定仓位与止损</span>
+            </div>
+            <div class="gate-check-item" id="checkExit" data-state="danger">
+              <span class="gate-check-name"><i class="gate-dot" aria-hidden="true"></i>EXIT 底线</span>
+              <span class="gate-check-note" id="checkExitNote">待填写</span>
+            </div>
+            <div class="gate-check-item" id="checkEmotion" data-state="pending">
+              <span class="gate-check-name"><i class="gate-dot" aria-hidden="true"></i>情绪体温</span>
+              <span class="gate-check-note" id="checkEmotionNote">待自检</span>
+            </div>
+          </div>
 
-        <div class="subsection">
-          <h4 class="subhead"><span>A</span>一句话核心命题与预期差</h4>
-          <div class="fields">
-            <label class="full">如果只能留一句话，我在判断什么？<textarea name="ev_judgement" placeholder="写成可以被未来证据推翻的一句话，不写“长期看好”。"></textarea></label>
-            <label>市场当前已经知道了什么？<textarea name="ev_market_knows" placeholder="价格为什么处在当前位置？市场在担心或期待什么？"></textarea></label>
-            <label>我的差异判断是什么？<textarea name="ev_difference" placeholder="我与当前市场共识真正不同的地方在哪里？为什么市场可能看错？"></textarea></label>
+          <div class="actions">
+            <button type="button" class="btn primary" id="copyMdBtn">复制 Markdown</button>
+            <div class="actions-row-2">
+              <button type="button" class="btn" id="downloadMdBtn">下载 .md</button>
+              <button type="button" class="btn" id="copyBtn">复制纯文本</button>
+            </div>
+            <div class="actions-row-3">
+              <button type="button" class="btn sm" id="saveBtn">手动保存</button>
+              <button type="button" class="btn sm" id="printBtn">打印 / PDF</button>
+              <button type="button" class="btn sm" id="resetBtn">清空</button>
+            </div>
+            <p class="saved" id="savedState">输入自动暂存当前浏览器</p>
           </div>
         </div>
 
-        <div class="subsection">
-          <h4 class="subhead"><span>B</span>3 条不可替代的支柱事实</h4>
-          <p class="hint">优先写硬核事实、数据与订单验证。多于 3 条大多是在换皮重复同一论据。</p>
-          <div class="three-pillars reason-fields">
-            <label class="numbered"><b>01</b><textarea class="compact" name="reason_1" placeholder="支柱一：需求扩张 / 产业周期硬事实"></textarea></label>
-            <label class="numbered"><b>02</b><textarea class="compact" name="reason_2" placeholder="支柱二：竞争壁垒 / 不可替代性证据"></textarea></label>
-            <label class="numbered"><b>03</b><textarea class="compact" name="reason_3" placeholder="支柱三：财务真实兑现 / 自由现金流支撑"></textarea></label>
+        <a class="handoff-card" href="https://thesisee.com" target="_blank" rel="noopener" data-track-cta data-cta-type="external_project" data-placement="checklist_gate_handoff">
+          <div class="handoff-copy">
+            <span class="handoff-kicker">下单后全周期追踪</span>
+            <strong class="handoff-title">决定参与后，转入「持见」持续跟踪</strong>
+            <span class="handoff-desc">用 90 秒门禁守住风控；长期假设验证、财报与退出提醒交由 thesisee.com 追踪。</span>
           </div>
-        </div>
-
-        <div class="subsection">
-          <h4 class="subhead"><span>C</span>估值透支与安全边际核对</h4>
-          <p class="hint">估值不是精确目标价。记录价格透支了多少乐观预期，以及怎样的经营逆风会击穿底线。</p>
-          <div class="fields">
-            <label>当前估值体感<select name="valuation_level"><option value="">请选择</option><option>明显偏贵</option><option>中性偏贵</option><option>大致合理</option><option>中性偏低</option><option>明显偏低</option><option>暂时无法判断</option></select></label>
-            <label>参考估值指标<input name="valuation_metrics" placeholder="例如：PE / PS / P-FCF / FCF yield / EV-EBITDA / 同业对比"></label>
-            <label>当前价格大概透支了什么超级预期？<textarea name="valuation_priced_in" placeholder="市场已经提前计入了几年翻倍增长、怎样的利润率提升或垄断份额？"></textarea></label>
-            <label>什么样的经营逆风会击穿安全边际？<textarea name="valuation_support" placeholder="写具体经营底线条件，不只写“股价不能跌”。"></textarea></label>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head"><span class="panel-num">02 / SIZE</span><h3>组合角色与硬纪律边界</h3></div>
-        <p class="panel-note">看好不等于重仓。用硬顶上限（Hard Cap）和最大容忍亏损约束贪婪，严禁越跌越买。</p>
-        <div class="fields risk-hard-cap">
-          <label>仓位角色<input name="size_role" list="role-options" placeholder="核心底仓 / 战术进攻 / 观察试错 / 防守对冲"></label>
-          <label>仓位硬顶上限 (Hard Cap)<input name="size_hard_cap" placeholder="例如：无论多看好，总仓位严卡 5% 上限"></label>
-          <label>最大容忍亏损 (Max Pain)<input name="size_max_pain" placeholder="例如：跌超 18% 或亏损达 ¥20,000 触发终局止损"></label>
-        </div>
-        <div class="fields" style="margin-top:14px;">
-          <label>为什么不是更多？<textarea name="size_not_more" placeholder="哪些不可控的不确定性或行业周期限制了仓位？"></textarea></label>
-          <label>为什么不是更少或不参与？<textarea name="size_not_less" placeholder="为什么值得保留一定比例的参与权与跟踪权？"></textarea></label>
-          <label class="full">最坏情况下，我需要承受什么？<textarea name="size_downside" placeholder="资金回撤、流动性冻结、心理压力以及对其他持仓的影响分别是什么？"></textarea></label>
-        </div>
-
-        <div class="subsection">
-          <h4 class="subhead"><span>A</span>务实的两段式建仓与加仓纪律</h4>
-          <p class="hint">严禁纯因“股价下跌”而盲目加仓补仓。加仓必须满足：有新证据进一步强化逻辑，且加仓后绝不突破 Hard Cap。</p>
-          <div class="plan">
-            <div class="plan-row head"><span>阶段</span><span>价格 / 事件触发条件</span><span>必须验证的基本面事实与动作</span><span>阶段后仓位 (≤ Hard Cap)</span></div>
-            <div class="plan-row"><input name="entry_1_name" value="首笔试探" aria-label="首笔阶段名称"><input name="entry_1_trigger" placeholder="触发条件（如：公告落地 / 回调到合理估值）" aria-label="首笔触发条件"><input name="entry_1_action" placeholder="轻仓介入，核对财报与关键数据" aria-label="首笔动作"><input name="entry_1_size" placeholder="目标仓位（如 2%）" aria-label="首笔后仓位"></div>
-            <div class="plan-row"><input name="entry_2_name" value="强化追加" aria-label="追加阶段名称"><input name="entry_2_trigger" placeholder="新证据强化条件（严禁纯因下跌而补）" aria-label="追加触发条件"><input name="entry_2_action" placeholder="逻辑被新数据验证后，补齐至上限，锁死不再加" aria-label="追加动作"><input name="entry_2_size" placeholder="上限仓位（如 5%）" aria-label="追加后仓位"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head"><span class="panel-num">03 / EXIT</span><h3>什么新证据会让我行动？（出场与冷静）</h3></div>
-        <p class="panel-note">把逻辑退出、削峰再平衡和情绪预警分开。价格触发复核，基本面决定动作。</p>
-
-        <div class="subsection">
-          <h4 class="subhead"><span>A</span>复核与逻辑退出（止损底线）</h4>
-          <div class="fields">
-            <label>固定复核时间点<input name="exit_review" placeholder="例如：每季度财报后 / 客户开发者大会后 / 某个固定日期"></label>
-            <label>关键复核事件<input name="exit_event" placeholder="例如：订单指引更新、产品交付节点、毛利率变动"></label>
-            <label class="full">什么证据说明原核心命题已不成立？<textarea name="exit_invalidated" placeholder="写客观业务事实或数据反转，不只写跌幅。"></textarea></label>
-            <label class="full">逻辑不成立时的果断动作<textarea name="exit_logic_action" placeholder="果断清仓认错 / 降级为观察仓 / 绝不补仓找借口"></textarea></label>
-          </div>
-        </div>
-
-        <div class="subsection">
-          <h4 class="subhead"><span>B</span>止盈 / 削峰再平衡纪律</h4>
-          <p class="hint">止盈不等于猜顶部。当估值严重透支，或暴涨导致持仓市值被动突破 Hard Cap 时，按规则削峰。</p>
-          <div class="fields">
-            <label>估值透支削峰规则<textarea name="profit_rule_1" placeholder="例如：估值涨至 35x PE 以上削峰 1/2，收回全部本金，剩余利润奔跑。"></textarea></label>
-            <label>仓位超限削峰规则<textarea name="profit_rule_2" placeholder="例如：单标的因暴涨市值占比突破 8% 时，被动削减至 5% 上限，再平衡至防守资产。"></textarea></label>
-          </div>
-        </div>
-
-        <div class="subsection">
-          <h4 class="subhead"><span>C</span>情绪自省与物理降温</h4>
-          <div class="fields">
-            <label class="full">买入前强制自问：我最容易被什么冲动情绪牵着走？<textarea name="exit_emotion" placeholder="怕错过主线（FOMO）、跌了不甘心想摊薄成本、急于回本、想证明自己比市场聪明……"></textarea></label>
-          </div>
-        </div>
-
-        <div class="check-row">
-          <label class="check"><input type="checkbox" name="done_hypothesis"> 我写出了可被证伪的核心命题，而非空洞“长期看好”</label>
-          <label class="check"><input type="checkbox" name="done_hard_cap"> 我锁死了仓位硬顶上限（Hard Cap）与最大容忍亏损</label>
-          <label class="check"><input type="checkbox" name="done_no_averaging_down"> 我确立了加仓纪律，绝不纯因股价下跌而盲目补仓</label>
-          <label class="check"><input type="checkbox" name="done_exit"> 我写清了退出条件，给未来的情绪冲动立下了硬规矩</label>
-        </div>
-      </section>
-      </div>
-
-      <datalist id="role-options"><option value="核心"><option value="防守"><option value="进攻"><option value="观察"><option value="小仓试错"></datalist>
-      <div class="actions">
-        <button type="button" class="primary" id="saveBtn">保存这次检查</button>
-        <button type="button" id="copyMdBtn">复制 Markdown</button>
-        <button type="button" id="downloadMdBtn">下载 .md</button>
-        <button type="button" id="copyBtn">复制纯文本</button>
-        <button type="button" id="printBtn">打印 / 存为 PDF</button>
-        <button type="button" id="resetBtn">清空</button>
-        <span class="saved" id="savedState">仅保存在当前浏览器</span>
-      </div>
+          <span class="handoff-arrow" aria-hidden="true">↗</span>
+        </a>
+      </aside>
     </form>
+
+    <datalist id="role-options">
+      <option value="观察试错仓">
+      <option value="战术进攻仓">
+      <option value="核心底仓">
+      <option value="防守对冲仓">
+    </datalist>
 
     <section class="tool-related-posts" aria-label="相关思考与方法论">
       <div class="tool-section-head">
-        <span class="tool-section-kicker">BACKGROUND & ESSAYS</span>
+        <span class="tool-section-kicker">BACKGROUND &amp; ESSAYS</span>
         <h3 class="tool-section-title">工具背后的思考</h3>
       </div>
       <div class="tool-posts-grid">
@@ -495,18 +1293,44 @@ tool_id: investment-checklist
   <script>
     const form = document.querySelector('#checklist');
     const state = document.querySelector('#savedState');
-    const introTitle = document.querySelector('#introTitle');
-    const modeButtons = [...document.querySelectorAll('.mode-button')];
-    const KEY = 'positive-ev-investment-checklist-v4';
-    const MODE_KEY = 'positive-ev-investment-checklist-mode';
+    const KEY = 'positive-ev-investment-checklist-v5';
+    const PORTFOLIO_KEY = 'positive-ev-portfolio-pref-v1';
+    const LEGACY_V4_KEY = 'positive-ev-investment-checklist-v4';
     const LEGACY_V3_KEY = 'positive-ev-investment-checklist-v3';
     const LEGACY_V2_KEY = 'positive-ev-investment-checklist-v2';
     const LEGACY_V1_KEY = 'positive-ev-investment-checklist-v1';
-    let mode = localStorage.getItem(MODE_KEY) === 'full' ? 'full' : 'simple';
-    const elements = () => [...form.querySelectorAll('input[name], textarea[name], select[name]')];
-    const simpleElements = () => [...document.querySelectorAll('[data-bind]')];
-    const fields = () => Object.fromEntries(elements().map(el => [el.name, el.type === 'checkbox' ? el.checked : el.value]));
-    const value = (data, name) => String(data[name] || '').trim();
+
+    const EMOTION_META = {
+      calm: { label: '平静 / 按既定计划', tone: 'ok' },
+      fomo: { label: '怕踏空 (FOMO)', tone: 'warn' },
+      averaging: { label: '跌了不甘 / 想补仓摊薄', tone: 'danger' },
+      tip: { label: '刚看新闻 / 听消息冲动', tone: 'danger' },
+      revenge: { label: '急于回本翻盘', tone: 'danger' }
+    };
+    const DANGER_EMOTIONS = new Set(['averaging', 'tip', 'revenge']);
+    let selectedEmotions = new Set();
+    let autosaveTimer = null;
+
+    const elements = () => form ? [...form.querySelectorAll('input[name], textarea[name], select[name]')] : [];
+    const fields = () => {
+      const data = Object.fromEntries(elements().map(el => [el.name, el.value]));
+      data.emotion_flags = [...selectedEmotions];
+      return data;
+    };
+    const value = (data, name) => String((data && data[name]) || '').trim();
+    const parseNum = raw => {
+      if (raw === null || raw === undefined) return null;
+      const cleaned = String(raw).replace(/,/g, '').trim();
+      if (!cleaned) return null;
+      const match = cleaned.match(/-?\d+(?:\.\d+)?/);
+      if (!match) return null;
+      const num = parseFloat(match[0]);
+      return Number.isFinite(num) ? num : null;
+    };
+    const formatInt = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const formatMoney = (amount, currency) => `${currency === '¥' ? '¥' : '$'}${formatInt(Math.abs(amount))}`;
+    const formatPct = (pct, digits = 1) => `${Number(pct.toFixed(digits))}%`;
+
     const trackToolStart = () => {
       window.toolAnalytics?.action('edit');
     };
@@ -515,434 +1339,556 @@ tool_id: investment-checklist
       return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
     };
     const ensureCurrentDate = () => {
-      const date = form.querySelector('[name="context_date"]');
+      const date = form?.querySelector('[name="context_date"]');
       if (date && !date.value) date.value = today();
     };
     const readStorage = key => {
       try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
     };
-    const restoreData = data => {
-      if (!data) return;
-      for (const el of elements()) {
-        if (!Object.prototype.hasOwnProperty.call(data, el.name)) continue;
-        el.type === 'checkbox' ? (el.checked = !!data[el.name]) : (el.value = data[el.name]);
+
+    const calculateRisk = d => {
+      const currency = value(d, 'calc_currency') === '¥' ? '¥' : '$';
+      const portfolio = parseNum(d.calc_portfolio);
+      const hardCap = parseNum(d.size_hard_cap);
+      const stopPct = parseNum(d.calc_stop_pct);
+      const upsidePct = parseNum(d.calc_upside_pct);
+
+      const hasPortfolio = portfolio !== null && portfolio > 0;
+      const hasCap = hardCap !== null && hardCap > 0;
+      const hasStop = stopPct !== null && stopPct > 0;
+      const hasUpside = upsidePct !== null && upsidePct > 0;
+
+      const positionAmount = (hasPortfolio && hasCap) ? (portfolio * hardCap / 100) : null;
+      const maxPainAmount = (positionAmount !== null && hasStop) ? (positionAmount * stopPct / 100) : null;
+      const portfolioImpactPct = (hasCap && hasStop) ? (hardCap * stopPct / 100) : null;
+      const breakevenPct = (hasStop && stopPct < 100) ? (stopPct / (100 - stopPct)) * 100 : null;
+      const rrRatio = (hasUpside && hasStop) ? (upsidePct / stopPct) : null;
+
+      let impactLevel = 'pending';
+      if ((hasCap && hardCap > 20) || (portfolioImpactPct !== null && portfolioImpactPct > 3)) {
+        impactLevel = 'danger';
+      } else if ((hasCap && hardCap > 12) || (portfolioImpactPct !== null && portfolioImpactPct > 1.5)) {
+        impactLevel = 'warn';
+      } else if (hasCap && hasStop && portfolioImpactPct !== null) {
+        impactLevel = 'ok';
       }
+
+      return {
+        currency, portfolio, hardCap, stopPct, upsidePct,
+        hasPortfolio, hasCap, hasStop, hasUpside,
+        positionAmount, maxPainAmount, portfolioImpactPct,
+        breakevenPct, rrRatio, impactLevel
+      };
     };
-    const syncSimpleFromFull = () => {
-      for (const simple of simpleElements()) {
-        const target = form.querySelector(`[name="${simple.dataset.bind}"]`);
-        if (target) simple.value = target.value;
+
+    const evaluateGate = (d, calc = calculateRisk(d)) => {
+      const evText = value(d, 'ev_judgement');
+      const exitText = value(d, 'exit_invalidated');
+      const flags = Array.isArray(d.emotion_flags) ? d.emotion_flags : [];
+      const hasDangerEmotion = flags.some(f => DANGER_EMOTIONS.has(f));
+      const hasFomo = flags.includes('fomo');
+      const hasCalm = flags.includes('calm');
+
+      const checks = {
+        ev: {
+          state: evText.length >= 6 ? 'ok' : 'danger',
+          note: evText.length >= 6 ? '已写清核心命题' : (evText ? '命题过短，请写清可证伪条件' : '待填写命题')
+        },
+        size: {
+          state: (!calc.hasCap || !calc.hasStop)
+            ? 'danger'
+            : (calc.impactLevel === 'danger' ? 'danger' : (calc.impactLevel === 'warn' || !calc.hasPortfolio ? 'warn' : 'ok')),
+          note: (!calc.hasCap || !calc.hasStop)
+            ? '待设定仓位与止损'
+            : (calc.maxPainAmount !== null
+              ? `净值 -${calc.portfolioImpactPct.toFixed(2)}% / -${formatMoney(calc.maxPainAmount, calc.currency)}`
+              : `净值冲击 -${calc.portfolioImpactPct.toFixed(2)}%`)
+        },
+        exit: {
+          state: exitText.length >= 4 ? 'ok' : 'danger',
+          note: exitText.length >= 4 ? '已写清证伪底线' : '待填写离场条件'
+        },
+        emotion: {
+          state: hasDangerEmotion ? 'danger' : (hasFomo ? 'warn' : (hasCalm ? 'ok' : 'pending')),
+          note: hasDangerEmotion
+            ? '命中高危冲动信号'
+            : (hasFomo ? '存在踏空焦虑 (FOMO)' : (hasCalm ? '状态冷静' : '建议点选情绪自检'))
+        }
+      };
+
+      const reasons = [];
+      let status = 'ready';
+
+      if (checks.ev.state === 'danger') {
+        status = 'hold';
+        reasons.push(evText ? '核心命题过于简短，请补全可验证逻辑' : '缺少一句话可证伪的核心命题');
       }
-    };
-    const setModeCopy = () => {
-      const isSimple = mode === 'simple';
-      introTitle.textContent = isSimple ? '在按下买入前，先留下三段不容易被情绪改写的话。' : '把一笔“我想参与”，写成一套可以复核的计划。';
-    };
-    const setMode = (nextMode, savePreference = true) => {
-      mode = nextMode;
-      document.body.dataset.mode = mode;
-      modeButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
-      setModeCopy();
-      syncSimpleFromFull();
-      if (savePreference) localStorage.setItem(MODE_KEY, mode);
+      if (!calc.hasCap || !calc.hasStop) {
+        status = 'hold';
+        reasons.push('请设定目标仓位 (Hard Cap %) 与止损幅度 (%)');
+      } else {
+        if (calc.hardCap > 20) {
+          status = 'hold';
+          reasons.push(`单标的仓位 ${formatPct(calc.hardCap)} 超过 20% 集中度红线`);
+        }
+        if (calc.portfolioImpactPct > 3) {
+          status = 'hold';
+          reasons.push(`止损将拖累总净值 -${calc.portfolioImpactPct.toFixed(2)}%（突破 3% 硬红线）`);
+        }
+      }
+      if (checks.exit.state === 'danger') {
+        status = 'hold';
+        reasons.push('未写清逻辑失效的客观离场条件 (EXIT)');
+      }
+      if (hasDangerEmotion) {
+        status = 'hold';
+        const hitLabels = flags.filter(f => DANGER_EMOTIONS.has(f)).map(f => EMOTION_META[f]?.label || f);
+        reasons.push(`触发高危冲动警报（${hitLabels.join('、')}），建议强制冷静 24 小时`);
+      }
+
+      if (status !== 'hold') {
+        if (calc.hardCap > 12) {
+          status = 'caution';
+          reasons.push(`仓位 ${formatPct(calc.hardCap)} 偏重，确认具备最高确定性再执行`);
+        }
+        if (calc.portfolioImpactPct > 1.5 && calc.portfolioImpactPct <= 3) {
+          status = 'caution';
+          reasons.push(`单笔净值冲击 -${calc.portfolioImpactPct.toFixed(2)}% 偏高（稳健区间 ≤1.5%）`);
+        }
+        if (!calc.hasPortfolio) {
+          status = 'caution';
+          reasons.push('未填账户总额，建议填入以直观感知最大真实亏损金额');
+        }
+        if (hasFomo) {
+          status = 'caution';
+          reasons.push('存在怕踏空情绪 (FOMO)，建议仅以小仓试错切入，禁追高加仓');
+        }
+        if (calc.hasUpside && calc.rrRatio !== null && calc.rrRatio < 1.5) {
+          status = 'caution';
+          reasons.push(`预期盈亏比仅 ${calc.rrRatio.toFixed(1)}x（低于 1.5x），赔率偏薄`);
+        }
+      }
+
+      const titles = {
+        hold: { badge: 'HOLD · 门禁拦截', title: '暂缓下单' },
+        caution: { badge: 'CAUTION · 带约束执行', title: '谨慎试错 / 控制尺度' },
+        ready: { badge: 'READY · 纪律齐备', title: '可按计划执行' }
+      };
+
+      if (reasons.length === 0) {
+        reasons.push('命题清晰、最大净值冲击在稳健边界内，情绪平静且已预设退出底线。');
+      }
+
+      return {
+        status,
+        badge: titles[status].badge,
+        title: titles[status].title,
+        reasons: reasons.slice(0, 3),
+        checks
+      };
     };
 
     const SAMPLES = {
       paypal: {
         __title: 'PayPal 价值陷阱（反面教材）',
-        context_date: '2026-07-15',
         context_asset: 'PayPal (PYPL)',
-        context_horizon: '中期价值修复（预设）',
-        context_market: '股价较历史高点回撤超 70%，市场极度悲观甚至出现 dead company 叙事；我觉得估值总该修复。',
-        ev_judgement: '【反思教训】当时仅凭“都跌成这样了还能差到哪儿去”买入，把低估值误当成安全边际，缺乏真正的证伪意识。',
-        ev_market_knows: 'Apple Pay 等快捷结账持续侵蚀市场份额；Braintree 非品牌处理量占比高但费率极低；活跃用户增速停滞。',
-        ev_difference: '【误判点】当时误以为品牌双边网络与 4 亿活跃账户具有永久护城河，低估了移动端无感结账对独立按钮的替代速度。',
-        reason_1: '全球双边网络，活跃账户数超 4 亿，海外独立站与商户覆盖深度仍处头部。',
-        reason_2: '年产生 40-50 亿美元真实自由现金流，账面现金充裕，管理层持续进行大额回购。',
-        reason_3: 'P/E 与 P/FCF 估值落入历史最低 5% 分位数，看似赔率极佳。',
+        context_date: '2026-07-15',
+        size_role: '核心底仓（错误重仓）',
+        calc_currency: '$',
+        calc_portfolio: '100000',
+        size_hard_cap: '15',
+        calc_stop_pct: '35',
+        calc_upside_pct: '30',
+        ev_judgement: '【反面复盘】当时仅凭“股价跌超 70% 已跌透”抄底，把低估值当安全边际，未建立竞争止血的证伪标准。',
+        emotion_flags: ['averaging'],
+        exit_emotion: '越跌越不甘心，每次下跌都想通过加仓补低成本，幻想均值回归。',
+        size_max_pain: '当时未设硬止损，被动套牢承受超 40% 回撤后心态崩溃割肉。',
+        exit_invalidated: '核心品牌结账份额加速流失、交易净费率 (Take Rate) 连续恶化',
+        exit_review: '每季度财报后',
+        ev_market_knows: 'Apple Pay 侵蚀结账份额，Braintree 低毛利拉低整体费率，活跃账户增长停滞。',
+        ev_difference: '当时误判双边网络仍牢不可破，低估无感支付替代速度。',
+        reason_1: '全球双边网络，活跃账户数超 4 亿，商户覆盖仍处头部。',
+        reason_2: '年产生 40-50 亿美元自由现金流与持续股份回购。',
+        reason_3: 'P/E 与 P/FCF 落入历史最低 5% 分位数。',
         valuation_level: '明显偏低',
-        valuation_metrics: 'P/FCF < 12x, EV/EBITDA < 9x',
-        valuation_priced_in: '计入了零增长、长期份额流失与利润率永久受损。',
-        valuation_support: '必须有扎实证据表明核心品牌结账量企稳且交易净费率停止恶化。',
-        size_role: '核心底仓（错误配置）',
-        size_hard_cap: '当时未设硬顶，越跌越买加至 15%+（正确做法：严卡 5% 上限）',
-        size_max_pain: '当时无止损预算，最终承受 >40% 痛苦浮亏（正确做法：设 15% 终局止损）',
-        size_not_more: '当时完全被低估值冲昏头脑，未把竞争格局的动态演化当成限制仓位的边界。',
-        size_not_less: '觉得太便宜，舍不得少买，误把贪婪当成贪便宜。',
-        size_downside: '不仅承受大幅本金亏损，还长期套牢流动性，导致错失其他优质机会，心态彻底失衡。',
-        entry_1_name: '首笔试探',
-        entry_1_trigger: '$70-$75 区间草率建仓',
-        entry_1_action: '在未确认竞争止血的前提下，凭借“便宜”即大仓位进场',
-        entry_1_size: '初始即达 8%（严重超标）',
-        entry_2_name: '错误补仓',
-        entry_2_trigger: '股价跌至 $60, $55 时越跌越买',
-        entry_2_action: '每跌一段就给自己的错误找借口：品牌还在、总会反弹',
-        entry_2_size: '被动加仓至 15%+',
-        exit_review: '当时未设定固定复核周期，完全由账户肉体痛感驱动',
-        exit_event: '季度财报中品牌结账量与毛利率变动',
-        exit_invalidated: '核心品牌结账份额加速流失，商业模式遭遇不可逆侵蚀',
-        exit_logic_action: '最终在情绪扛不住时痛感割肉（教训：本应在证据转坏时坚决出场）',
-        profit_rule_1: '当时只幻想估值修复至历史中枢，未制定任何削峰锁定本金计划',
-        profit_rule_2: '无',
-        exit_emotion: '【贪婪与不甘】把便宜当安全；深套后心存侥幸不肯认错；总想靠加仓拉低成本迅速回本。',
-        done_hypothesis: false,
-        done_hard_cap: false,
-        done_no_averaging_down: false,
-        done_exit: false
+        valuation_priced_in: '市场定价零增长与利润率长期受压。',
+        entry_1_trigger: '$70-$75 未确认竞争止血即草率大仓建仓',
+        entry_1_size: '8%',
+        entry_2_trigger: '跌至 $60/$55 时越跌越买被动补仓',
+        entry_2_size: '15%',
+        profit_rule_1: '当时未制定削峰纪律'
       },
       lite: {
-        __title: 'LITE 小仓试错（正面示范）',
-        context_date: '2026-07-15',
+        __title: 'Lumentum 小仓试错（正面示范）',
         context_asset: 'Lumentum (LITE)',
-        context_horizon: '中期趋势观察 / 小仓试错',
-        context_market: 'AI 光通信板块极其火热，自身出现明显 FOMO（害怕错过主线）情绪。',
-        ev_judgement: 'Lumentum 受益于 800G/1.6T 光互连需求放量，NVIDIA 战略协议将锁定未来 4-6 季度业绩高增长。',
-        ev_market_knows: 'AI 数据中心光互连需求爆发已获市场充分共识，股价短期自低位翻倍，估值已透支乐观预期。',
-        ev_difference: '市场担忧非英伟达客户资本开支波动，但我认为战略合作中的联合投资与产能绑定具备极高的业绩确定性。',
-        reason_1: '产业合作硬事实：NVIDIA 与 Lumentum 宣布多年战略合作，包含明确的采购承诺与联合投资安排。',
-        reason_2: '真实财务兑现：FY2026 Q3 收入达 8.084 亿美元（同比 +90.1%），Non-GAAP 营业利润率达 32.2%，高增长在报表中兑现。',
-        reason_3: '核心器件壁垒：在高端 EML / CW 光源芯片领域具备稀缺产能与工艺护城河。',
+        context_date: '2026-07-15',
+        size_role: '观察试错仓',
+        calc_currency: '$',
+        calc_portfolio: '100000',
+        size_hard_cap: '3',
+        calc_stop_pct: '18',
+        calc_upside_pct: '45',
+        ev_judgement: '受益于 800G/1.6T 光互连需求放量，NVIDIA 战略采购协议锁定未来 4-6 季度高确定性业绩兑现。',
+        emotion_flags: ['fomo'],
+        exit_emotion: '行业热潮明显出现怕踏空 (FOMO) 情绪，故主动用 3% 硬顶锁死试错仓，绝不盘中重仓追涨。',
+        size_max_pain: '单笔最大浮亏严卡 18%（总净值回撤 ≤ 0.54%），触线无条件出场。',
+        exit_invalidated: '光芯片毛利率跌破 25% 或大客户采购协议执行出现实质性松动',
+        exit_review: '每季度财报后',
+        ev_market_knows: 'AI 光通信高景气已成市场共识，股价短期翻倍，估值偏贵。',
+        ev_difference: '市场担忧扩产周期波动，但联合投资与长期产能绑定提供高于同业的业绩可见度。',
+        reason_1: '产业合作硬事实：NVIDIA 宣布多年战略合作与明确采购承诺。',
+        reason_2: '真实财务兑现：FY26 Q3 营收 8.084 亿美元（同比 +90.1%），营业利润率 32.2%。',
+        reason_3: '核心器件壁垒：高端 EML/CW 光芯片稀缺产能。',
         valuation_level: '中性偏贵',
-        valuation_metrics: '动态 PE > 28x, PS > 6x',
-        valuation_priced_in: '已提前透支未来 1 年产能拉满、单价坚挺的最乐观场景。',
-        valuation_support: '季度收入必须保持环比增长且营业利润率维持在 30% 以上。',
-        size_role: '观察试错仓（Test Position）',
-        size_hard_cap: '总资金严卡 3% 上限（绝不因 FOMO 或短期暴涨加成重仓）',
-        size_max_pain: '最大容忍浮亏 18% 或绝对金额不超过 ¥15,000，触及无条件止损',
-        size_not_more: '估值偏高、客户集中度高、周期波动大，任何经营微瑕都会引发剧烈杀估值。',
-        size_not_less: '具备硬事实与真实业绩兑现的主线机会，值得保留少量筹码保持敏感度。',
-        size_downside: '即便遭遇 20% 极端跌幅，对总账户净值影响仅约 0.5%，完全不伤筋骨，心态平和。',
-        entry_1_name: '首笔试探',
-        entry_1_trigger: '约 $900 附近（战略合作公告发布后）',
-        entry_1_action: '轻仓试探介入，建立跟踪链接，等待 Q3 真实财报验证',
+        valuation_priced_in: '已提前计入未来 1 年产能满载与单价坚挺预期。',
+        entry_1_trigger: '$900 附近小仓试探介入，等待季度数据核对',
         entry_1_size: '1.5%',
-        entry_2_name: '强化追加',
-        entry_2_trigger: '价格回调至约 $800，且 Q3 财报确认利润率超预期达 32.2%',
-        entry_2_action: '业绩兑现得到新数据验证后，小幅补齐至上限，随后锁死不再加仓',
-        entry_2_size: '3.0%（已达 Hard Cap）',
-        exit_review: '每季度财报后及主要客户重大发布会节点',
-        exit_event: '季度出货指引及光芯片综合毛利率变动',
-        exit_invalidated: '毛利率跌破 25% 或战略采购协议执行出现松动',
-        exit_logic_action: '果断清仓离场，绝不以“AI 长期前景好”为借口死扛',
-        profit_rule_1: '若股价短期再涨 40% 导致动态 PE > 40x，削峰减持 1/2 收回本金',
-        profit_rule_2: '若单标的因暴涨市值占比突破 4.5%，被动削减至 3% 试错上限，再平衡至现金',
-        exit_emotion: '【FOMO 与自满】警惕在行业最火热时把试探仓擅自加成重仓；警惕涨起来后误以为自己懂光芯片。',
-        done_hypothesis: true,
-        done_hard_cap: true,
-        done_no_averaging_down: true,
-        done_exit: true
+        entry_2_trigger: '回踩 $800 且营业利润率稳居 30%+ 后补齐至上限并锁死',
+        entry_2_size: '3.0%',
+        profit_rule_1: '若动态 PE > 40x，削峰减持 1/2 收回本金'
       }
     };
 
     const migrateData = data => {
       if (!data) return {};
-      if (data.__version === 4) return data;
-      const migrated = { ...data, __version: 4 };
-      if (!migrated.size_hard_cap && data.size_limit) {
-        migrated.size_hard_cap = data.size_limit;
+      if (data.__version === 5) return data;
+      const migrated = { ...data, __version: 5 };
+      const rawCap = data.size_hard_cap || data.size_limit || '';
+      if (rawCap && parseNum(rawCap) !== null) {
+        const strCap = String(parseNum(rawCap));
+        if (String(rawCap).trim() !== strCap && !migrated.size_max_pain_legacy) {
+          migrated.size_max_pain = migrated.size_max_pain || String(rawCap).trim();
+        }
+        migrated.size_hard_cap = strCap;
       }
       if (!migrated.entry_1_trigger && data.stage_1_trigger) {
-        migrated.entry_1_name = data.stage_1_name || '首笔试探';
         migrated.entry_1_trigger = data.stage_1_trigger;
-        migrated.entry_1_action = data.stage_1_action;
         migrated.entry_1_size = data.stage_1_size;
       }
       if (!migrated.entry_2_trigger && data.stage_2_trigger) {
-        migrated.entry_2_name = data.stage_2_name || '强化追加';
         migrated.entry_2_trigger = data.stage_2_trigger;
-        migrated.entry_2_action = data.stage_2_action;
         migrated.entry_2_size = data.stage_2_size;
       }
       if (!migrated.profit_rule_1 && data.profit_1_trigger) {
         migrated.profit_rule_1 = `${data.profit_1_trigger || ''} ｜ 动作：${data.profit_1_action || ''} ｜ 保留：${data.profit_1_keep || ''}`.trim();
       }
+      if (!Array.isArray(migrated.emotion_flags)) {
+        migrated.emotion_flags = [];
+      }
       return migrated;
     };
 
-    const isDirty = () => {
-      const f = fields();
-      return Object.entries(f).some(([k, v]) => {
-        if (k === 'context_date') return false;
-        if (typeof v === 'boolean') return v;
-        return String(v).trim().length > 0;
+    const syncEmotionButtonsUI = () => {
+      document.querySelectorAll('.emotion-chip[data-emotion]').forEach(btn => {
+        btn.setAttribute('aria-pressed', String(selectedEmotions.has(btn.dataset.emotion)));
       });
     };
 
-    const loadSample = (sampleKey) => {
+    const syncCurrencyUI = currency => {
+      const btn = document.querySelector('#currencyToggleBtn');
+      const hidden = form?.querySelector('[name="calc_currency"]');
+      const next = currency === '¥' ? '¥' : '$';
+      if (btn) btn.textContent = next;
+      if (hidden) hidden.value = next;
+    };
+
+    const syncQuickChipsUI = d => {
+      const role = value(d, 'size_role');
+      const cap = value(d, 'size_hard_cap');
+      const stop = value(d, 'calc_stop_pct');
+      const review = value(d, 'exit_review');
+
+      document.querySelectorAll('.role-chip').forEach(btn => {
+        btn.setAttribute('aria-pressed', String(btn.dataset.role === role));
+      });
+      document.querySelectorAll('.cap-chip').forEach(btn => {
+        btn.setAttribute('aria-pressed', String(btn.dataset.cap === cap));
+      });
+      document.querySelectorAll('.stop-chip').forEach(btn => {
+        btn.setAttribute('aria-pressed', String(btn.dataset.stop === stop));
+      });
+      document.querySelectorAll('.review-chip').forEach(btn => {
+        btn.setAttribute('aria-pressed', String(btn.dataset.review === review));
+      });
+    };
+
+    const renderRiskAndGate = () => {
+      const d = fields();
+      const calc = calculateRisk(d);
+      const gate = evaluateGate(d, calc);
+
+      const posEl = document.querySelector('#metricPosition');
+      const posSubEl = document.querySelector('#metricPositionSub');
+      const painEl = document.querySelector('#metricMaxPain');
+      const painSubEl = document.querySelector('#metricMaxPainSub');
+      const impactEl = document.querySelector('#metricImpact');
+      const impactSubEl = document.querySelector('#metricImpactSub');
+      const recEl = document.querySelector('#metricRecovery');
+      const recSubEl = document.querySelector('#metricRecoverySub');
+
+      const cardPos = document.querySelector('#metricCardPosition');
+      const cardPain = document.querySelector('#metricCardMaxPain');
+      const cardImpact = document.querySelector('#metricCardImpact');
+
+      if (posEl) posEl.textContent = calc.positionAmount !== null ? formatMoney(calc.positionAmount, calc.currency) : '—';
+      if (posSubEl) posSubEl.textContent = calc.hasCap ? `占总资金 ${formatPct(calc.hardCap)}` : '输入资金与仓位后计算';
+
+      if (painEl) painEl.textContent = calc.maxPainAmount !== null ? `-${formatMoney(calc.maxPainAmount, calc.currency)}` : '—';
+      if (painSubEl) painSubEl.textContent = calc.hasStop ? `触发 -${formatPct(calc.stopPct)} 止损预算` : '触及止损真实浮亏额';
+      if (cardPain) cardPain.dataset.tone = calc.impactLevel === 'danger' ? 'danger' : (calc.impactLevel === 'warn' ? 'warn' : 'neutral');
+
+      if (impactEl) impactEl.textContent = calc.portfolioImpactPct !== null ? `-${calc.portfolioImpactPct.toFixed(2)}%` : '—';
+      if (impactSubEl) {
+        impactSubEl.textContent = calc.portfolioImpactPct === null
+          ? '稳健 ≤ 1.5% / 红线 > 3%'
+          : (calc.impactLevel === 'danger'
+            ? '超出风控红线，请降仓或收紧止损'
+            : (calc.impactLevel === 'warn' ? '中等偏重，注意控制尺度' : '稳健可承受范围 (≤ 1.5%)'));
+      }
+      if (cardImpact) cardImpact.dataset.tone = calc.impactLevel;
+      if (cardPos) cardPos.dataset.tone = (calc.hasCap && calc.hardCap > 20) ? 'danger' : 'neutral';
+
+      if (recEl) {
+        const recText = calc.breakevenPct !== null ? `+${calc.breakevenPct.toFixed(1)}%` : '—';
+        const rrText = calc.rrRatio !== null ? `${calc.rrRatio.toFixed(1)}x` : '';
+        recEl.textContent = rrText ? `${recText} · ${rrText}` : recText;
+      }
+      if (recSubEl) {
+        recSubEl.textContent = calc.rrRatio !== null
+          ? `回本涨幅 ${calc.breakevenPct.toFixed(1)}% · 赔率 ${calc.rrRatio.toFixed(1)}x`
+          : '止损后回本所需涨幅与赔率';
+      }
+
+      const banner = document.querySelector('#gateBanner');
+      const badge = document.querySelector('#gateBadge');
+      const title = document.querySelector('#gateTitle');
+      const reasonsUl = document.querySelector('#gateReasons');
+      if (banner) banner.dataset.status = gate.status;
+      if (badge) badge.textContent = gate.badge;
+      if (title) title.textContent = gate.title;
+      if (reasonsUl) {
+        reasonsUl.textContent = '';
+        gate.reasons.forEach(text => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          reasonsUl.appendChild(li);
+        });
+      }
+
+      const checkMap = [
+        ['checkEv', 'checkEvNote', gate.checks.ev],
+        ['checkSize', 'checkSizeNote', gate.checks.size],
+        ['checkExit', 'checkExitNote', gate.checks.exit],
+        ['checkEmotion', 'checkEmotionNote', gate.checks.emotion]
+      ];
+      checkMap.forEach(([rowId, noteId, info]) => {
+        const row = document.getElementById(rowId);
+        const note = document.getElementById(noteId);
+        if (row) row.dataset.state = info.state;
+        if (note) note.textContent = info.note;
+      });
+
+      syncQuickChipsUI(d);
+    };
+
+    const persistPortfolioPref = () => {
+      const currency = value(fields(), 'calc_currency') || '$';
+      const portfolio = value(fields(), 'calc_portfolio');
+      try {
+        localStorage.setItem(PORTFOLIO_KEY, JSON.stringify({ calc_currency: currency, calc_portfolio: portfolio }));
+      } catch {}
+    };
+
+    const restoreData = (data, opts = {}) => {
+      if (!data) return;
+      for (const el of elements()) {
+        if (opts.preservePortfolio && (el.name === 'calc_portfolio' || el.name === 'calc_currency')) continue;
+        if (Object.prototype.hasOwnProperty.call(data, el.name)) {
+          el.value = data[el.name] ?? '';
+        } else {
+          el.value = '';
+        }
+      }
+      selectedEmotions = new Set(Array.isArray(data.emotion_flags) ? data.emotion_flags : []);
+      syncCurrencyUI(value(fields(), 'calc_currency') || '$');
+      syncEmotionButtonsUI();
+      renderRiskAndGate();
+    };
+
+    const saveDraftToStorage = (manual = false) => {
+      try {
+        localStorage.setItem(KEY, JSON.stringify({ __version: 5, ...fields() }));
+      } catch {}
+      if (manual) {
+        window.toolAnalytics?.action('save');
+        window.toolAnalytics?.complete('save');
+        if (state) state.textContent = '已手动保存 · 仅在本机';
+        setTimeout(() => { if (state) state.textContent = '输入自动暂存当前浏览器'; }, 2200);
+      } else if (state) {
+        state.textContent = '已自动暂存当前浏览器';
+      }
+    };
+
+    const scheduleAutosave = () => {
+      window.clearTimeout(autosaveTimer);
+      autosaveTimer = window.setTimeout(() => saveDraftToStorage(false), 400);
+    };
+
+    const isDirty = () => {
+      const d = fields();
+      if (selectedEmotions.size > 0) return true;
+      return Object.entries(d).some(([k, v]) => {
+        if (k === 'context_date' || k === 'calc_currency' || k === 'calc_portfolio' || k === 'emotion_flags') return false;
+        return String(v || '').trim().length > 0;
+      });
+    };
+
+    const loadSample = sampleKey => {
       const sample = SAMPLES[sampleKey];
       if (!sample) return;
       if (isDirty()) {
-        if (!confirm(`载入【${sample.__title}】将覆盖当前正在编辑的内容，是否继续？`)) return;
+        if (!confirm(`载入【${sample.__title}】将覆盖当前正在编辑的标的分析，是否继续？`)) return;
       }
       window.toolAnalytics?.action('load_sample');
       trackToolStart();
       restoreData(sample);
       ensureCurrentDate();
-      syncSimpleFromFull();
-      state.textContent = `已载入：${sample.__title}`;
-      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2500);
+      saveDraftToStorage(false);
+      if (state) {
+        state.textContent = `已载入：${sample.__title}`;
+        setTimeout(() => { if (state) state.textContent = '已自动暂存当前浏览器'; }, 2600);
+      }
     };
 
     const restore = () => {
+      const portfolioPref = readStorage(PORTFOLIO_KEY);
       const current = readStorage(KEY);
       if (current) {
         restoreData(current);
-        if (!current.__cleared) state.textContent = '已恢复上次草稿';
+        if (!current.__cleared && state) state.textContent = '已恢复上次草稿';
       } else {
-        const v3 = readStorage(LEGACY_V3_KEY);
-        const v2 = readStorage(LEGACY_V2_KEY);
-        const v1 = readStorage(LEGACY_V1_KEY);
-        if (v3) {
-          restoreData(migrateData(v3));
-          state.textContent = '已自动升级 v3 草稿';
-        } else if (v2) {
-          restoreData(migrateData(v2));
-          state.textContent = '已导入旧版草稿';
-        } else if (v1) {
-          restoreData(migrateData({
-            context_date: v1.context_date || '',
-            context_asset: v1.context_asset || '',
-            ev_judgement: v1.ev_judgement || '',
-            reason_1: v1.ev_evidence || '',
-            exit_invalidated: v1.ev_invalidated || '',
-            size_role: v1.size_role || '',
-            size_not_more: v1.size_reason || '',
-            size_downside: v1.size_downside || '',
-            exit_review: v1.exit_review || '',
-            exit_logic_action: v1.exit_logic || '',
-            exit_emotion: v1.exit_emotion || ''
-          }));
-          state.textContent = '已导入极简版旧草稿';
+        const legacy = readStorage(LEGACY_V4_KEY) || readStorage(LEGACY_V3_KEY) || readStorage(LEGACY_V2_KEY) || readStorage(LEGACY_V1_KEY);
+        if (legacy) {
+          restoreData(migrateData(legacy));
+          if (state) state.textContent = '已平滑升级旧版草稿';
         }
       }
-      ensureCurrentDate();
-      syncSimpleFromFull();
-      setMode(mode, false);
-    };
-
-    const save = () => {
-      window.toolAnalytics?.action('save');
-      localStorage.setItem(KEY, JSON.stringify({__version:4, ...fields()}));
-      window.toolAnalytics?.complete('save');
-      state.textContent = '已保存 · 仅在本机';
-      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2200);
-    };
-
-    const buildFullText = () => {
-      const d = fields();
-      return [
-        '投资决策检查清单｜完整研究版', '',
-        '00 / CONTEXT｜决策背景',
-        `记录日期：${value(d, 'context_date') || '（未填写）'}`,
-        `标的 / 机会：${value(d, 'context_asset') || '（未填写）'}`,
-        `计划持有周期：${value(d, 'context_horizon') || '（未填写）'}`,
-        `市场情景与自身情绪：${value(d, 'context_market') || '（未填写）'}`, '',
-        '01 / EV｜核心命题与三大支柱',
-        `一句话核心命题：${value(d, 'ev_judgement') || '（未填写）'}`,
-        `市场已知：${value(d, 'ev_market_knows') || '（未填写）'}`,
-        `差异判断：${value(d, 'ev_difference') || '（未填写）'}`,
-        `支柱一（需求扩张/周期）：${value(d, 'reason_1') || '（未填写）'}`,
-        `支柱二（竞争壁垒/护城河）：${value(d, 'reason_2') || '（未填写）'}`,
-        `支柱三（真实兑现/现金流）：${value(d, 'reason_3') || '（未填写）'}`,
-        `估值体感：${value(d, 'valuation_level') || '（未填写）'}`,
-        `参考指标：${value(d, 'valuation_metrics') || '（未填写）'}`,
-        `价格已计入预期：${value(d, 'valuation_priced_in') || '（未填写）'}`,
-        `击穿安全边际逆风：${value(d, 'valuation_support') || '（未填写）'}`, '',
-        '02 / SIZE｜组合角色与硬纪律边界',
-        `仓位角色：${value(d, 'size_role') || '（未填写）'}`,
-        `🔥 仓位硬顶上限 (Hard Cap)：${value(d, 'size_hard_cap') || '（未填写）'}`,
-        `🔥 最大容忍亏损 (Max Pain)：${value(d, 'size_max_pain') || '（未填写）'}`,
-        `为什么不是更多：${value(d, 'size_not_more') || '（未填写）'}`,
-        `为什么不是更少或不买：${value(d, 'size_not_less') || '（未填写）'}`,
-        `最坏情况下承受：${value(d, 'size_downside') || '（未填写）'}`,
-        `建仓 1（${value(d, 'entry_1_name') || '首笔试探'}）：条件：${value(d, 'entry_1_trigger') || '-'}｜动作：${value(d, 'entry_1_action') || '-'}｜仓位：${value(d, 'entry_1_size') || '-'}`,
-        `加仓 2（${value(d, 'entry_2_name') || '强化追加'}）：条件：${value(d, 'entry_2_trigger') || '-'}｜动作：${value(d, 'entry_2_action') || '-'}｜仓位：${value(d, 'entry_2_size') || '-'}`, '',
-        '03 / EXIT｜出场、削峰与冷静纪律',
-        `固定复核时间：${value(d, 'exit_review') || '（未填写）'}`,
-        `关键复核事件：${value(d, 'exit_event') || '（未填写）'}`,
-        `核心命题失效证据：${value(d, 'exit_invalidated') || '（未填写）'}`,
-        `逻辑失效动作：${value(d, 'exit_logic_action') || '（未填写）'}`,
-        `估值透支削峰规则：${value(d, 'profit_rule_1') || '（未填写）'}`,
-        `仓位超限削峰规则：${value(d, 'profit_rule_2') || '（未填写）'}`,
-        `买入前冲动情绪警惕：${value(d, 'exit_emotion') || '（未填写）'}`, '',
-        '本文工具仅为个人学习记录与决策练习，不构成投资建议。'
-      ].join('\n');
-    };
-
-    const buildSimpleText = () => {
-      const d = fields();
-      return [
-        '投资决策检查清单｜60 秒极速防冲动版', '',
-        '00 / CONTEXT｜决策背景',
-        `记录日期：${value(d, 'context_date') || '（未填写）'}`,
-        `标的 / 机会：${value(d, 'context_asset') || '（未填写）'}`, '',
-        '01 / EV｜核心命题',
-        `一句话核心命题：${value(d, 'ev_judgement') || '（未填写）'}`, '',
-        '02 / SIZE｜仓位硬顶与最大容忍亏损',
-        `仓位角色：${value(d, 'size_role') || '（未填写）'}`,
-        `🔥 仓位硬顶上限 (Hard Cap)：${value(d, 'size_hard_cap') || '（未填写）'}`,
-        `🔥 最大容忍亏损 (Max Pain)：${value(d, 'size_max_pain') || '（未填写）'}`, '',
-        '03 / EXIT｜出场约束与情绪冷静',
-        `逻辑失效出场信号：${value(d, 'exit_invalidated') || '（未填写）'}`,
-        `不想被什么情绪牵着走：${value(d, 'exit_emotion') || '（未填写）'}`, '',
-        '本文工具仅为个人学习记录与决策练习，不构成投资建议。'
-      ].join('\n');
-    };
-
-    const buildText = () => mode === 'simple' ? buildSimpleText() : buildFullText();
-
-    const copy = async () => {
-      window.toolAnalytics?.action('copy_text');
-      const text = buildText();
-      let copied = false;
-      try {
-        await navigator.clipboard.writeText(text);
-        copied = true;
-        state.textContent = '已复制为文字';
-      } catch {
-        const helper = document.createElement('textarea');
-        helper.value = text; helper.style.position = 'fixed'; helper.style.opacity = '0';
-        document.body.appendChild(helper); helper.select();
-        const ok = document.execCommand('copy'); helper.remove();
-        copied = ok;
-        state.textContent = ok ? '已复制为文字' : '复制失败，请手动选择';
+      if (portfolioPref) {
+        const portInput = form?.querySelector('[name="calc_portfolio"]');
+        if (portInput && !portInput.value && portfolioPref.calc_portfolio) {
+          portInput.value = portfolioPref.calc_portfolio;
+        }
+        if (!current && portfolioPref.calc_currency) syncCurrencyUI(portfolioPref.calc_currency);
       }
-      if (copied) window.toolAnalytics?.complete('copy_text');
-      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2200);
+      ensureCurrentDate();
+      renderRiskAndGate();
     };
 
-    const buildFullMarkdown = () => {
+    const buildMarkdown = () => {
       const d = fields();
+      const calc = calculateRisk(d);
+      const gate = evaluateGate(d, calc);
       const asset = value(d, 'context_asset');
       const date = value(d, 'context_date') || today();
-      const horizon = value(d, 'context_horizon');
-      const role = value(d, 'size_role');
-      const hardCap = value(d, 'size_hard_cap');
-      const maxPain = value(d, 'size_max_pain');
+      const role = value(d, 'size_role') || '未设定';
       const title = asset ? `投资决策检查清单 - ${asset}` : '投资决策检查清单';
+      const emotions = gate.checks.emotion.state === 'pending'
+        ? '未标记'
+        : [...selectedEmotions].map(f => EMOTION_META[f]?.label || f).join('、');
+
+      const painLine = calc.maxPainAmount !== null
+        ? `-${formatMoney(calc.maxPainAmount, calc.currency)}`
+        : (value(d, 'size_max_pain') || '未设定');
+      const impactLine = calc.portfolioImpactPct !== null ? `-${calc.portfolioImpactPct.toFixed(2)}%` : '未测算';
+      const rrLine = calc.rrRatio !== null ? `${calc.rrRatio.toFixed(1)}x` : '未填写预期涨幅';
 
       const frontMatter = [
         '---',
         `title: "${title.replace(/"/g, '\\"')}"`,
         `date: "${date}"`,
         `asset: "${asset.replace(/"/g, '\\"')}"`,
-        `horizon: "${horizon.replace(/"/g, '\\"')}"`,
         `role: "${role.replace(/"/g, '\\"')}"`,
-        `hard_cap: "${hardCap.replace(/"/g, '\\"')}"`,
-        `max_pain: "${maxPain.replace(/"/g, '\\"')}"`,
+        `verdict: "${gate.status}"`,
+        `hard_cap_pct: "${calc.hasCap ? calc.hardCap : ''}"`,
+        `stop_pct: "${calc.hasStop ? calc.stopPct : ''}"`,
+        `max_pain_amount: "${calc.maxPainAmount !== null ? formatMoney(calc.maxPainAmount, calc.currency) : ''}"`,
+        `portfolio_impact_pct: "${calc.portfolioImpactPct !== null ? calc.portfolioImpactPct.toFixed(2) : ''}"`,
+        `rr_ratio: "${calc.rrRatio !== null ? calc.rrRatio.toFixed(2) : ''}"`,
         'type: "investment-checklist"',
-        'mode: "full"',
         'source: "https://shiliang.me/tools/investment-checklist/"',
         '---',
         ''
       ].join('\n');
 
-      const body = [
-        `# ${title}（完整研究版）`, '',
-        '> 在按下买入前，先留下不容易被情绪改写的逻辑、尺度与退出条件。', '',
-        '## 00 / CONTEXT 决策背景',
-        `- **记录日期**：${date}`,
+      const sections = [
+        `# ${title}（90 秒风控门禁记录）`, '',
+        `> **门禁结论：${gate.title}**（${gate.reasons.join('；')}）`, '',
+        '## 00 / CONTEXT 标的与角色',
+        `- **决策日期**：${date}`,
         `- **标的 / 机会**：${asset || '（未填写）'}`,
-        `- **计划持有周期**：${horizon || '（未填写）'}`,
-        `- **当时市场情景与自身情绪**：${value(d, 'context_market') || '（未填写）'}`, '',
-        '## 01 / EV 核心命题与三大支柱',
-        '### 一句话核心命题',
-        `> ${value(d, 'ev_judgement') || '（未填写核心判断）'}`, '',
-        '### 认知与预期差',
-        `- **市场当前已经知道了什么**：${value(d, 'ev_market_knows') || '（未填写）'}`,
-        `- **我的差异判断是什么**：${value(d, 'ev_difference') || '（未填写）'}`, '',
-        '### 3 条不可替代的支柱事实',
-        `1. **需求扩张 / 产业周期硬事实**：${value(d, 'reason_1') || '（未填写）'}`,
-        `2. **竞争壁垒 / 不可替代性证据**：${value(d, 'reason_2') || '（未填写）'}`,
-        `3. **财务真实兑现 / 现金流支撑**：${value(d, 'reason_3') || '（未填写）'}`, '',
-        '### 估值透支与安全边际核对',
-        `- **当前估值体感**：${value(d, 'valuation_level') || '（未选择）'}`,
-        `- **参考估值指标**：${value(d, 'valuation_metrics') || '（未填写）'}`,
-        `- **当前价格大概透支了什么超级预期**：${value(d, 'valuation_priced_in') || '（未填写）'}`,
-        `- **什么样的经营逆风会击穿安全边际**：${value(d, 'valuation_support') || '（未填写）'}`, '',
-        '## 02 / SIZE 组合角色与硬纪律边界',
-        `- **仓位角色**：${role || '（未填写）'}`,
-        `- **🔥 仓位硬顶上限 (Hard Cap)**：${hardCap || '（未设定硬顶，存在爆仓风险）'}`,
-        `- **🔥 最大容忍亏损 (Max Pain)**：${maxPain || '（未设定最大容忍额）'}`,
-        `- **为什么不是更多（不确定性约束）**：${value(d, 'size_not_more') || '（未填写）'}`,
-        `- **为什么不是更少或不买**：${value(d, 'size_not_less') || '（未填写）'}`,
-        `- **最坏情况下，我需要承受什么**：${value(d, 'size_downside') || '（未填写）'}`, '',
-        '### 务实的两段式建仓与加仓纪律',
-        '| 阶段 | 触发条件 | 必须验证的基本面事实与动作 | 阶段后仓位 (≤ Hard Cap) |',
-        '|---|---|---|---|',
-        `| ${value(d, 'entry_1_name') || '首笔试探'} | ${value(d, 'entry_1_trigger') || '-'} | ${value(d, 'entry_1_action') || '-'} | ${value(d, 'entry_1_size') || '-'} |`,
-        `| ${value(d, 'entry_2_name') || '强化追加'} | ${value(d, 'entry_2_trigger') || '-'} | ${value(d, 'entry_2_action') || '-'} | ${value(d, 'entry_2_size') || '-'} |`, '',
-        '## 03 / EXIT 出场、削峰与冷静纪律',
-        '### 复核与逻辑退出（止损底线）',
-        `- **固定复核时间点**：${value(d, 'exit_review') || '（未填写）'}`,
-        `- **关键复核事件**：${value(d, 'exit_event') || '（未填写）'}`,
-        `- **核心命题失效证据**：${value(d, 'exit_invalidated') || '（未填写）'}`,
-        `- **逻辑失效时的果断动作**：${value(d, 'exit_logic_action') || '（未填写）'}`, '',
-        '### 止盈 / 削峰再平衡纪律',
-        `- **估值透支削峰规则**：${value(d, 'profit_rule_1') || '（未填写）'}`,
-        `- **仓位超限削峰规则**：${value(d, 'profit_rule_2') || '（未填写）'}`, '',
-        '### 情绪自省与物理降温',
-        `- **买入前情绪警惕**：${value(d, 'exit_emotion') || '（未填写）'}`, '',
-        '### 买入前底线核对项',
-        `- [${d.done_hypothesis ? 'x' : ' '}] 我写出了可被证伪的核心命题，而非空洞“长期看好”`,
-        `- [${d.done_hard_cap ? 'x' : ' '}] 我锁死了仓位硬顶上限（Hard Cap）与最大容忍亏损`,
-        `- [${d.done_no_averaging_down ? 'x' : ' '}] 我确立了加仓纪律，绝不纯因股价下跌而盲目补仓`,
-        `- [${d.done_exit ? 'x' : ' '}] 我写清了退出条件，给未来的情绪冲动立下了硬规矩`, '',
-        '---',
-        '*声明：本文工具仅为个人学习记录与决策练习，不构成任何投资建议。投资有风险，决策需独立。*'
-      ].join('\n');
+        `- **仓位角色**：${role}`, '',
+        '## 01 / EV 核心命题与情绪自检',
+        `> ${value(d, 'ev_judgement') || '（未填写核心命题）'}`, '',
+        `- **情绪体温**：${emotions}`,
+        value(d, 'exit_emotion') ? `- **情绪备注**：${value(d, 'exit_emotion')}` : null,
+        '',
+        '## 02 / SIZE 真实资金风险算账',
+        '| 维度 | 测算结果 |',
+        '|---|---|',
+        `| 账户总资金 | ${calc.hasPortfolio ? formatMoney(calc.portfolio, calc.currency) : '未填写'} |`,
+        `| 仓位硬顶 (Hard Cap) | ${calc.hasCap ? formatPct(calc.hardCap) : '未设定'} |`,
+        `| 拟投入金额 | ${calc.positionAmount !== null ? formatMoney(calc.positionAmount, calc.currency) : '—'} |`,
+        `| 止损幅度 / 回本所需涨幅 | ${calc.hasStop ? `-${formatPct(calc.stopPct)} / +${calc.breakevenPct.toFixed(1)}%` : '未设定'} |`,
+        `| **🔥 最大痛感亏损 (Max Pain)** | **${painLine}** |`,
+        `| **🔥 总净值回撤冲击** | **${impactLine}** |`,
+        `| 预期赔率 (R:R) | ${rrLine} |`,
+        value(d, 'size_max_pain') ? `\n- **风控备注**：${value(d, 'size_max_pain')}` : null,
+        '',
+        '## 03 / EXIT 证伪退出与复核底线',
+        `- **逻辑失效离场信号**：${value(d, 'exit_invalidated') || '（未填写）'}`,
+        `- **固定复核节奏**：${value(d, 'exit_review') || '（未填写）'}`, ''
+      ].filter(line => line !== null);
 
-      return frontMatter + body;
+      const deepFields = [
+        ['市场共识已知', value(d, 'ev_market_knows')],
+        ['我的差异判断', value(d, 'ev_difference')],
+        ['支柱一（需求/周期）', value(d, 'reason_1')],
+        ['支柱二（竞争壁垒）', value(d, 'reason_2')],
+        ['支柱三（财务/现金流）', value(d, 'reason_3')],
+        ['估值体感', value(d, 'valuation_level')],
+        ['市场透支假设', value(d, 'valuation_priced_in')],
+        ['第一笔试探计划', (value(d, 'entry_1_trigger') || value(d, 'entry_1_size')) ? `${value(d, 'entry_1_trigger') || '-'}（仓位 ${value(d, 'entry_1_size') || '-'}）` : ''],
+        ['第二笔追加计划', (value(d, 'entry_2_trigger') || value(d, 'entry_2_size')) ? `${value(d, 'entry_2_trigger') || '-'}（上限 ${value(d, 'entry_2_size') || '-'}）` : ''],
+        ['超涨削峰纪律', value(d, 'profit_rule_1')]
+      ].filter(([, val]) => val);
+
+      if (deepFields.length > 0) {
+        sections.push('## 进阶研究附表');
+        deepFields.forEach(([label, val]) => sections.push(`- **${label}**：${val}`));
+        sections.push('');
+      }
+
+      sections.push('---', '*声明：本文工具仅为个人学习记录与决策练习，不构成任何投资建议。后续持仓假设追踪可转入持见（thesisee.com）。*');
+      return frontMatter + sections.join('\n');
     };
 
-    const buildSimpleMarkdown = () => {
+    const buildText = () => {
       const d = fields();
-      const asset = value(d, 'context_asset');
-      const date = value(d, 'context_date') || today();
-      const role = value(d, 'size_role');
-      const hardCap = value(d, 'size_hard_cap');
-      const maxPain = value(d, 'size_max_pain');
-      const title = asset ? `投资决策检查清单 - ${asset}` : '投资决策检查清单';
-
-      const frontMatter = [
-        '---',
-        `title: "${title.replace(/"/g, '\\"')}"`,
-        `date: "${date}"`,
-        `asset: "${asset.replace(/"/g, '\\"')}"`,
-        `role: "${role.replace(/"/g, '\\"')}"`,
-        `hard_cap: "${hardCap.replace(/"/g, '\\"')}"`,
-        `max_pain: "${maxPain.replace(/"/g, '\\"')}"`,
-        'type: "investment-checklist"',
-        'mode: "simple"',
-        'source: "https://shiliang.me/tools/investment-checklist/"',
-        '---',
-        ''
-      ].join('\n');
-
-      const body = [
-        `# ${title}（极简防冲动版）`, '',
-        '> 在按下买入前，先留下三段不容易被情绪改写的话。', '',
-        '## 00 / CONTEXT 决策背景',
-        `- **记录日期**：${date}`,
-        `- **标的 / 机会**：${asset || '（未填写）'}`, '',
-        '## 01 / EV 核心命题',
-        '### 一句话核心命题',
-        `> ${value(d, 'ev_judgement') || '（未填写核心判断）'}`, '',
-        '## 02 / SIZE 仓位硬顶与最大容忍亏损',
-        `- **仓位角色**：${role || '（未填写）'}`,
-        `- **🔥 仓位硬顶上限 (Hard Cap)**：${hardCap || '（未设定）'}`,
-        `- **🔥 最大容忍亏损 (Max Pain)**：${maxPain || '（未设定）'}`, '',
-        '## 03 / EXIT 逻辑失效与出场约束',
-        `- **逻辑失效出场信号**：${value(d, 'exit_invalidated') || '（未填写）'}`,
-        `- **我不想被什么冲动情绪牵着走**：${value(d, 'exit_emotion') || '（未填写）'}`, '',
-        '---',
-        '*声明：本文工具仅为个人学习记录与决策练习，不构成任何投资建议。投资有风险，决策需独立。*'
-      ].join('\n');
-
-      return frontMatter + body;
+      const calc = calculateRisk(d);
+      const gate = evaluateGate(d, calc);
+      const lines = [
+        `投资决策检查清单｜${gate.title}`,
+        `决策日期：${value(d, 'context_date') || today()}`,
+        `标的 / 角色：${value(d, 'context_asset') || '（未填写）'} / ${value(d, 'size_role') || '未设定'}`, '',
+        `01 / EV 核心命题：${value(d, 'ev_judgement') || '（未填写）'}`,
+        `情绪状态：${[...selectedEmotions].map(f => EMOTION_META[f]?.label || f).join('、') || '未标记'}`, '',
+        `02 / SIZE 风险算账：仓位 ${calc.hasCap ? formatPct(calc.hardCap) : '-'}｜止损 ${calc.hasStop ? `-${formatPct(calc.stopPct)}` : '-'}｜Max Pain ${calc.maxPainAmount !== null ? `-${formatMoney(calc.maxPainAmount, calc.currency)}` : '-'}｜总净值冲击 ${calc.portfolioImpactPct !== null ? `-${calc.portfolioImpactPct.toFixed(2)}%` : '-'}`, '',
+        `03 / EXIT 离场信号：${value(d, 'exit_invalidated') || '（未填写）'}`,
+        `复核节奏：${value(d, 'exit_review') || '（未填写）'}`, '',
+        `门禁提醒：${gate.reasons.join('；')}`
+      ];
+      return lines.join('\n');
     };
-
-    const buildMarkdown = () => mode === 'simple' ? buildSimpleMarkdown() : buildFullMarkdown();
 
     const getFilename = () => {
       const d = fields();
@@ -951,24 +1897,27 @@ tool_id: investment-checklist
       return asset ? `投资检查清单-${asset}-${date}.md` : `投资检查清单-${date}.md`;
     };
 
-    const copyMarkdown = async () => {
-      window.toolAnalytics?.action('copy_markdown');
-      const md = buildMarkdown();
+    const copyContent = async (text, actionName, okLabel) => {
+      window.toolAnalytics?.action(actionName);
       let copied = false;
       try {
-        await navigator.clipboard.writeText(md);
+        await navigator.clipboard.writeText(text);
         copied = true;
-        state.textContent = '已复制 Markdown';
       } catch {
         const helper = document.createElement('textarea');
-        helper.value = md; helper.style.position = 'fixed'; helper.style.opacity = '0';
-        document.body.appendChild(helper); helper.select();
-        const ok = document.execCommand('copy'); helper.remove();
-        copied = ok;
-        state.textContent = ok ? '已复制 Markdown' : '复制失败，请手动选择';
+        helper.value = text;
+        helper.style.position = 'fixed';
+        helper.style.opacity = '0';
+        document.body.appendChild(helper);
+        helper.select();
+        copied = document.execCommand('copy');
+        helper.remove();
       }
-      if (copied) window.toolAnalytics?.complete('copy_markdown');
-      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2200);
+      if (copied) window.toolAnalytics?.complete(actionName);
+      if (state) {
+        state.textContent = copied ? okLabel : '复制失败，请手动选择';
+        setTimeout(() => { if (state) state.textContent = '输入自动暂存当前浏览器'; }, 2200);
+      }
     };
 
     const downloadMarkdown = () => {
@@ -981,50 +1930,129 @@ tool_id: investment-checklist
       a.click();
       URL.revokeObjectURL(a.href);
       window.toolAnalytics?.complete('download_markdown');
-      state.textContent = '已发起 Markdown 下载';
-      setTimeout(() => state.textContent = '仅保存在当前浏览器', 2200);
+      if (state) {
+        state.textContent = '已发起 Markdown 下载';
+        setTimeout(() => { if (state) state.textContent = '输入自动暂存当前浏览器'; }, 2200);
+      }
     };
 
-    const syncBoundField = event => {
-      const target = form.querySelector(`[name="${event.currentTarget.dataset.bind}"]`);
-      if (!target) return;
-      target.value = event.currentTarget.value;
+    const handleFieldChange = event => {
+      const target = event?.target;
+      if (target?.name) {
+        trackToolStart();
+        if (target.name === 'calc_portfolio' || target.name === 'calc_currency') {
+          persistPortfolioPref();
+        }
+        renderRiskAndGate();
+        scheduleAutosave();
+      }
     };
-    simpleElements().forEach(element => {
-      element.addEventListener('input', syncBoundField);
-      element.addEventListener('change', syncBoundField);
+
+    form?.addEventListener('input', handleFieldChange);
+    form?.addEventListener('change', handleFieldChange);
+
+    document.querySelector('#currencyToggleBtn')?.addEventListener('click', () => {
+      const current = value(fields(), 'calc_currency') || '$';
+      syncCurrencyUI(current === '$' ? '¥' : '$');
+      persistPortfolioPref();
+      trackToolStart();
+      renderRiskAndGate();
+      scheduleAutosave();
     });
-    form.addEventListener('input', event => {
-      if (event.target.name || event.target.dataset.bind) {
+
+    document.querySelectorAll('.emotion-chip[data-emotion]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.emotion;
+        if (!key) return;
+        if (key === 'calm') {
+          if (selectedEmotions.has('calm')) {
+            selectedEmotions.delete('calm');
+          } else {
+            selectedEmotions = new Set(['calm']);
+          }
+        } else {
+          selectedEmotions.delete('calm');
+          selectedEmotions.has(key) ? selectedEmotions.delete(key) : selectedEmotions.add(key);
+        }
         trackToolStart();
-        syncSimpleFromFull();
-      }
+        syncEmotionButtonsUI();
+        renderRiskAndGate();
+        scheduleAutosave();
+      });
     });
-    form.addEventListener('change', event => {
-      if (event.target.name || event.target.dataset.bind) {
+
+    document.querySelectorAll('.role-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const roleInput = form?.querySelector('[name="size_role"]');
+        const capInput = form?.querySelector('[name="size_hard_cap"]');
+        if (roleInput) roleInput.value = btn.dataset.role || '';
+        if (capInput && !String(capInput.value || '').trim() && btn.dataset.suggestCap) {
+          capInput.value = btn.dataset.suggestCap;
+        }
         trackToolStart();
-        syncSimpleFromFull();
-      }
+        renderRiskAndGate();
+        scheduleAutosave();
+      });
     });
-    modeButtons.forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
+
+    document.querySelectorAll('.cap-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const capInput = form?.querySelector('[name="size_hard_cap"]');
+        if (capInput) capInput.value = btn.dataset.cap || '';
+        trackToolStart();
+        renderRiskAndGate();
+        scheduleAutosave();
+      });
+    });
+
+    document.querySelectorAll('.stop-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const stopInput = form?.querySelector('[name="calc_stop_pct"]');
+        if (stopInput) stopInput.value = btn.dataset.stop || '';
+        trackToolStart();
+        renderRiskAndGate();
+        scheduleAutosave();
+      });
+    });
+
+    document.querySelectorAll('.review-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const revInput = form?.querySelector('[name="exit_review"]');
+        if (revInput) revInput.value = btn.dataset.review || '';
+        trackToolStart();
+        renderRiskAndGate();
+        scheduleAutosave();
+      });
+    });
+
     document.querySelector('#loadPaypalSampleBtn')?.addEventListener('click', () => loadSample('paypal'));
     document.querySelector('#loadLiteSampleBtn')?.addEventListener('click', () => loadSample('lite'));
-    document.querySelector('#saveBtn').addEventListener('click', save);
-    document.querySelector('#copyMdBtn').addEventListener('click', copyMarkdown);
-    document.querySelector('#downloadMdBtn').addEventListener('click', downloadMarkdown);
-    document.querySelector('#copyBtn').addEventListener('click', copy);
-    document.querySelector('#printBtn').addEventListener('click', () => {
+    document.querySelector('#saveBtn')?.addEventListener('click', () => saveDraftToStorage(true));
+    document.querySelector('#copyMdBtn')?.addEventListener('click', () => copyContent(buildMarkdown(), 'copy_markdown', '已复制 Markdown'));
+    document.querySelector('#downloadMdBtn')?.addEventListener('click', downloadMarkdown);
+    document.querySelector('#copyBtn')?.addEventListener('click', () => copyContent(buildText(), 'copy_text', '已复制纯文本'));
+    document.querySelector('#printBtn')?.addEventListener('click', () => {
       window.toolAnalytics?.action('print');
       window.print();
     });
-    document.querySelector('#resetBtn').addEventListener('click', () => {
-      if (!confirm('确认清空这次检查吗？')) return;
-      form.reset();
+    document.querySelector('#resetBtn')?.addEventListener('click', () => {
+      if (!confirm('确认清空当前标的记录吗？（账户总资金将为你保留）')) return;
+      const savedPortfolio = value(fields(), 'calc_portfolio');
+      const savedCurrency = value(fields(), 'calc_currency') || '$';
+      form?.reset();
+      const portInput = form?.querySelector('[name="calc_portfolio"]');
+      if (portInput) portInput.value = savedPortfolio;
+      syncCurrencyUI(savedCurrency);
+      selectedEmotions.clear();
+      syncEmotionButtonsUI();
       ensureCurrentDate();
-      localStorage.setItem(KEY, JSON.stringify({__version:4, __cleared:true}));
-      syncSimpleFromFull();
-      state.textContent = '已清空';
+      renderRiskAndGate();
+      try {
+        localStorage.setItem(KEY, JSON.stringify({ __version: 5, __cleared: true, calc_portfolio: savedPortfolio, calc_currency: savedCurrency }));
+      } catch {}
+      if (state) state.textContent = '已清空当前标的';
     });
+
     restore();
   </script>
 </body>
