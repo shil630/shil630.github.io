@@ -46,48 +46,33 @@
   }
   applyLang(getLang());
 
-  /* ---------- Color scheme toggle (light / dark / system) ---------- */
+  /* ---------- Color scheme toggle (Dark Instrument default, Light Paper optional) ---------- */
   var SCHEME_KEY = "color-scheme";
   var schemeMeta = document.querySelector('meta[name="color-scheme"]');
+  var themeColorMeta = document.querySelector('meta[name="theme-color"]');
   var themeToggle = document.getElementById("theme-toggle");
-  var darkMedia = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
-
-  function getStoredScheme() {
-    try {
-      var val = localStorage.getItem(SCHEME_KEY);
-      return (val === "light" || val === "dark") ? val : null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function getSystemScheme() {
-    return (darkMedia && darkMedia.matches) ? "dark" : "light";
-  }
 
   function isDarkSchemeActive() {
-    var content = schemeMeta ? schemeMeta.getAttribute("content") : "";
-    if (content === "dark") return true;
-    if (content === "light") return false;
-    return getSystemScheme() === "dark";
+    var content = schemeMeta ? schemeMeta.getAttribute("content") : "dark";
+    return content !== "light";
   }
 
   function applySchemeMeta(val) {
-    if (schemeMeta) schemeMeta.setAttribute("content", val || "light dark");
+    var scheme = val === "light" ? "light" : "dark";
+    if (schemeMeta) schemeMeta.setAttribute("content", scheme);
+    if (themeColorMeta) themeColorMeta.setAttribute("content", scheme === "light" ? "#faf7f2" : "#0e1013");
   }
 
   var onThemeChangeHooks = [];
 
   function toggleTheme() {
-    var current = getStoredScheme() || getSystemScheme();
-    var target = current === "dark" ? "light" : "dark";
-    if (target !== getSystemScheme()) {
-      try { localStorage.setItem(SCHEME_KEY, target); } catch (e) {}
-      applySchemeMeta(target);
+    var target = isDarkSchemeActive() ? "light" : "dark";
+    if (target === "light") {
+      try { localStorage.setItem(SCHEME_KEY, "light"); } catch (e) {}
     } else {
       try { localStorage.removeItem(SCHEME_KEY); } catch (e) {}
-      applySchemeMeta("light dark");
     }
+    applySchemeMeta(target);
     onThemeChangeHooks.forEach(function (fn) { fn(); });
   }
 
@@ -97,16 +82,10 @@
 
   window.addEventListener("storage", function (e) {
     if (e.key === SCHEME_KEY) {
-      applySchemeMeta((e.newValue === "light" || e.newValue === "dark") ? e.newValue : "light dark");
+      applySchemeMeta(e.newValue === "light" ? "light" : "dark");
       onThemeChangeHooks.forEach(function (fn) { fn(); });
     }
   });
-
-  if (darkMedia && darkMedia.addEventListener) {
-    darkMedia.addEventListener("change", function () {
-      onThemeChangeHooks.forEach(function (fn) { fn(); });
-    });
-  }
 
   /* ---------- Hero Option 1: Interactive Magnetic Vector Field ---------- */
   var vectorCanvas = document.getElementById("hero-vector-field");
@@ -209,7 +188,10 @@
           var dxText = (x - width * 0.5) / (width < 640 ? 150 : 280);
           var dyText = (y - height * 0.5) / 64;
           var textMask = 1 - 0.68 * Math.exp(-(dxText * dxText + dyText * dyText));
-          var edgeFade = Math.max(0.15, Math.min(edgeV, edgeH)) * textMask;
+          var dxCue = (x - width * 0.5) / 44;
+          var dyCue = (y - (height - 46)) / 34;
+          var cueMask = 1 - 0.85 * Math.exp(-(dxCue * dxCue + dyCue * dyCue));
+          var edgeFade = Math.max(0.15, Math.min(edgeV, edgeH)) * textMask * cueMask;
           cells.push({
             x: x,
             y: y,

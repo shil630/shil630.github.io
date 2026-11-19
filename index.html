@@ -26,8 +26,11 @@ image: "/assets/images/blog-home-og-1200x630.png"
     </div>
   </div>
   <a class="hero-scroll-cue" href="#articles">
-    <span data-en="Featured essays" data-zh="精选导读">精选导读</span>
-    <span class="hero-scroll-arrow" aria-hidden="true">↓</span>
+    <span class="sr-only" data-en="Scroll to featured essays" data-zh="向下浏览精选导读">向下浏览精选导读</span>
+    <svg class="hero-scroll-arrow" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="12" y1="5" x2="12" y2="18"/>
+      <polyline points="7 13.5 12 18.5 17 13.5"/>
+    </svg>
   </a>
 </section>
 {% else %}
