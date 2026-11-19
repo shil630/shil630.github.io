@@ -5,7 +5,8 @@
 
 :root {
   color-scheme: dark;
-  --max-width: 720px;
+  --max-width: 960px;
+  --reading-width: 740px;
   --font-serif: "Newsreader", Georgia, "Songti SC", "Noto Serif SC", serif;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
     "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -106,6 +107,7 @@ body {
 }
 
 .wrap { width: 100%; max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+.post.wrap { max-width: var(--reading-width); }
 
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -526,7 +528,7 @@ img { max-width: 100%; height: auto; }
   letter-spacing: -0.01em;
 }
 .section-heading > p,
-.section-heading-side { max-width: 390px; }
+.section-heading-side { max-width: 460px; }
 .section-heading > p,
 .section-heading-side p {
   margin: 0;
@@ -2248,7 +2250,7 @@ ul.resume-timeline {
 .tool-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: 16px;
+  column-gap: 20px;
   row-gap: 0;
 }
 .tool-thumb {
@@ -2418,7 +2420,7 @@ a.text-cta:hover { text-decoration: underline; }
 .home-tool-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: 16px;
+  column-gap: 20px;
   row-gap: 0;
 }
 .home-tool-card {
@@ -2979,9 +2981,8 @@ dialog.lightbox-dialog[open]:where(:not([data-closing]))::backdrop {
   object-fit: contain;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 781px) {
   .work-item-media {
-    margin-inline: -94px;
     border-radius: 14px;
   }
 }
@@ -3218,6 +3219,32 @@ dialog.cmd-dialog[open]:where(:not([data-closing]))::backdrop {
 }
 
 /* ---------- Responsive ---------- */
+@media (max-width: 780px) {
+  .tool-grid,
+  .home-tool-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+    row-gap: 16px;
+  }
+  .tool-card,
+  .home-tool-card {
+    grid-row: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .about-focus-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 14px;
+  }
+  .about-focus-card {
+    grid-row: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
 @media (max-width: 600px) {
   body { font-size: 16px; }
   .site-main { padding: 36px 0 56px; }
