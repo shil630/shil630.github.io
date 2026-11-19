@@ -19,12 +19,12 @@ preflop-range:
   title_en: "Preflop Opening Range"
   eyebrow_zh: "德州工具"
   eyebrow_en: "Poker Tool"
-  desc_zh: "查看、自定义并一键复制各位置首次入池（RFI）范围矩阵（8人桌/200BB+）。"
-  desc_en: "View, edit and copy position-based opening ranges for a no-limped pot."
+  desc_zh: "查看、对比位置增量/基准偏移、导入并复制 8 人桌 200BB+ 各位置翻前开池（RFI）范围矩阵。"
+  desc_en: "Inspect, diff against position/baseline, import, and copy 8-max 200BB+ RFI preflop opening ranges."
   cta_zh: "打开范围工具"
   cta_en: "Open tool"
   application_category: "GameApplication"
-  feature_list: "8人桌全位置翻前范围矩阵、200BB+ 筹码深度开池策略、交互式范围自定与编辑、一键复制文本/矩阵、纯本地运行"
+  feature_list: "8人桌全位置翻前范围矩阵、位置增量与基准偏移对比、单手牌7位置开池边界、拖动涂抹编辑、文本范围反向导入与标准缩写复制、纯本地运行"
 
 wechat-formatter:
   id: "wechat-formatter"

@@ -28,6 +28,12 @@ tool_id: preflop-range
       --input-bg: #111419;
       --hero-glow: rgba(229, 113, 95, 0.08);
       --shadow-subtle: rgba(0, 0, 0, 0.28);
+      --diff-add-bg: rgba(56, 178, 128, 0.22);
+      --diff-add-border: rgba(74, 212, 152, 0.72);
+      --diff-add-ink: #b9f5d8;
+      --diff-rem-bg: rgba(133, 140, 150, 0.12);
+      --diff-rem-border: rgba(229, 113, 95, 0.52);
+      --diff-rem-ink: #9aa2ad;
       --radius-cell: 4px;
       --radius-control: 4px;
       --radius-card: 8px;
@@ -55,6 +61,12 @@ tool_id: preflop-range
       --input-bg: #fff;
       --hero-glow: rgba(182, 75, 59, 0.055);
       --shadow-subtle: rgba(30, 29, 27, 0.08);
+      --diff-add-bg: #dff2e8;
+      --diff-add-border: rgba(31, 122, 79, 0.65);
+      --diff-add-ink: #175c3a;
+      --diff-rem-bg: #f3ece4;
+      --diff-rem-border: rgba(182, 75, 59, 0.52);
+      --diff-rem-ink: #7d736a;
       --focus-ring: 0 0 0 3px rgba(182, 75, 59, 0.15);
     }
 
@@ -186,6 +198,12 @@ tool_id: preflop-range
       margin-top: 0;
     }
 
+    h1,
+    h2,
+    h3 {
+      text-wrap: balance;
+    }
+
     h1 {
       margin: 0;
       font-family: var(--font-brand);
@@ -284,7 +302,7 @@ tool_id: preflop-range
 
     .workspace {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 240px;
+      grid-template-columns: minmax(0, 1fr) 268px;
       min-width: 0;
     }
 
@@ -298,8 +316,17 @@ tool_id: preflop-range
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-bottom: 10px;
+    }
+
+    .matrix-topline-left {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      min-width: 0;
     }
 
     .matrix-label {
@@ -309,11 +336,45 @@ tool_id: preflop-range
       letter-spacing: 0.04em;
     }
 
-    .swipe-hint {
-      display: none;
-      margin: 0;
-      color: var(--body);
+    .diff-summary {
+      color: var(--muted);
       font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .diff-summary.has-diff {
+      color: var(--accent-deep);
+    }
+
+    .diff-controls {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .diff-btn {
+      min-height: 28px;
+      padding: 4px 10px;
+      cursor: pointer;
+      color: var(--body);
+      background: var(--surface-soft);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-control);
+      font-size: 12px;
+      font-weight: 500;
+      transition: color 140ms ease, background 140ms ease, border-color 140ms ease;
+    }
+
+    .diff-btn:hover {
+      color: var(--ink);
+      border-color: var(--accent);
+    }
+
+    .diff-btn[aria-pressed="true"] {
+      color: var(--accent-deep);
+      background: var(--accent-soft);
+      border-color: var(--open-border);
+      font-weight: 700;
     }
 
     .matrix-scroll {
@@ -329,24 +390,39 @@ tool_id: preflop-range
       grid-template-columns: repeat(13, minmax(44px, 1fr));
       grid-auto-rows: 34px;
       gap: 4px;
-      min-width: 668px;
+      min-width: 632px;
+    }
+
+    .matrix.is-editing {
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    .matrix.is-editing .hand-cell {
+      cursor: crosshair;
     }
 
     .hand-cell {
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       height: 34px;
       min-height: 0;
       padding: 0;
+      overflow: hidden;
+      white-space: nowrap;
       cursor: pointer;
       background: var(--surface);
       border: 1px solid var(--sand);
       border-radius: var(--radius-cell);
       color: var(--body);
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: clamp(11px, 1.25vw, 14px);
+      font-size: clamp(11px, 1.2vw, 13.5px);
       font-weight: 700;
       line-height: 1;
-      transition: transform 120ms ease, border-color 160ms ease, background 160ms ease;
+      transition: transform 120ms ease, border-color 160ms ease, background 160ms ease, opacity 160ms ease;
     }
 
     .hand-cell:hover {
@@ -359,6 +435,52 @@ tool_id: preflop-range
       color: var(--accent-deep);
       background: var(--accent-soft);
       border-color: var(--open-border);
+    }
+
+    .hand-cell.open.diff-carry {
+      opacity: 0.72;
+    }
+
+    .hand-cell.open.diff-added {
+      color: var(--diff-add-ink);
+      background: var(--diff-add-bg);
+      border-color: var(--diff-add-border);
+      box-shadow: inset 0 2px 0 var(--diff-add-border);
+      opacity: 1;
+    }
+
+    .hand-cell.diff-removed {
+      color: var(--diff-rem-ink);
+      background: var(--diff-rem-bg);
+      border-style: dashed;
+      border-color: var(--diff-rem-border);
+    }
+
+    .hand-cell.diff-added::after,
+    .hand-cell.diff-removed::after {
+      position: absolute;
+      top: 1px;
+      right: 3px;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .hand-cell.diff-added::after {
+      content: "+";
+      color: var(--diff-add-ink);
+    }
+
+    .hand-cell.diff-removed::after {
+      content: "−";
+      color: var(--diff-rem-ink);
+    }
+
+    .hand-cell.is-selected {
+      z-index: 3;
+      border-color: var(--ink);
+      box-shadow: 0 0 0 2px var(--ink);
     }
 
     .summary {
@@ -394,6 +516,7 @@ tool_id: preflop-range
       margin-bottom: 0;
       color: var(--body);
       font-size: 12px;
+      text-wrap: pretty;
     }
 
     .stats {
@@ -426,16 +549,25 @@ tool_id: preflop-range
     }
 
     .hand-result {
-      min-height: 72px;
-      padding: 10px;
+      min-height: 118px;
+      padding: 11px 12px;
       background: var(--surface);
       border: 1px solid var(--divider);
       border-radius: var(--radius-control);
     }
 
+    .hand-result-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
     .hand-result strong {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 0;
       font-family: var(--font-serif);
       font-size: 18px;
     }
@@ -444,10 +576,66 @@ tool_id: preflop-range
       color: var(--accent);
     }
 
+    .hand-meta-pill {
+      padding: 2px 6px;
+      color: var(--body);
+      background: var(--surface-soft);
+      border: 1px solid var(--divider);
+      border-radius: 3px;
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
     .hand-result p {
       margin-bottom: 0;
       color: var(--body);
       font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .hand-pos-strip {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 3px;
+      margin-top: 10px;
+    }
+
+    .pos-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 22px;
+      padding: 2px 1px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      border: 1px solid var(--divider);
+      border-radius: 3px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 9.5px;
+      font-weight: 600;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .pos-pill.is-open {
+      color: var(--accent-deep);
+      background: var(--accent-soft);
+      border-color: var(--open-border);
+      font-weight: 700;
+    }
+
+    .pos-pill.is-current {
+      box-shadow: 0 0 0 1.5px var(--ink);
+    }
+
+    .hand-earliest {
+      margin-top: 8px !important;
+      padding-top: 7px;
+      border-top: 1px dashed var(--divider);
+      color: var(--ink) !important;
+      font-size: 11.5px !important;
+      font-weight: 600;
     }
 
     .legend {
@@ -556,6 +744,18 @@ tool_id: preflop-range
       border-color: var(--accent);
     }
 
+    .tool-action.primary {
+      color: #fffdf9;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .tool-action.primary:hover:not(:disabled) {
+      color: #fffdf9;
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
     .tool-action:disabled {
       cursor: not-allowed;
       color: var(--muted);
@@ -574,16 +774,34 @@ tool_id: preflop-range
 
     .legend-swatch.open {
       background: var(--accent-soft);
-      border-color: var(--accent);
+      border-color: var(--open-border);
+    }
+
+    .legend-swatch.open.diff-carry {
+      opacity: 0.72;
+    }
+
+    .legend-swatch.diff-added {
+      background: var(--diff-add-bg);
+      border-color: var(--diff-add-border);
+    }
+
+    .legend-swatch.diff-removed {
+      background: var(--diff-rem-bg);
+      border-style: dashed;
+      border-color: var(--diff-rem-border);
     }
 
     .range-block {
+      padding: 14px 20px 16px;
+      border-top: 1px solid var(--divider);
+    }
+
+    .range-block-main {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 14px;
       align-items: start;
-      padding: 14px 20px 16px;
-      border-top: 1px solid var(--divider);
     }
 
     .range-block h3 {
@@ -600,10 +818,16 @@ tool_id: preflop-range
       overflow-wrap: anywhere;
     }
 
+    .range-block-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .copy-button {
       min-width: 92px;
-      min-height: 40px;
-      padding: 8px 14px;
+      min-height: 36px;
+      padding: 6px 14px;
       cursor: pointer;
       color: var(--accent);
       background: var(--surface);
@@ -617,6 +841,74 @@ tool_id: preflop-range
     .copy-button:hover {
       color: #fffdf9;
       background: var(--accent);
+    }
+
+    .import-panel {
+      margin-top: 14px;
+      padding: 14px;
+      background: var(--surface-soft);
+      border: 1px solid var(--divider);
+      border-radius: var(--radius-control);
+    }
+
+    .import-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .import-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .import-input {
+      width: 100%;
+      min-height: 54px;
+      padding: 8px 11px;
+      color: var(--ink);
+      background: var(--input-bg);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-control);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .import-input[aria-invalid="true"] {
+      border-color: var(--accent);
+    }
+
+    .import-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .import-feedback {
+      margin: 8px 0 0;
+      min-height: 18px;
+      font-size: 12px;
+      color: var(--body);
+    }
+
+    .import-feedback:empty {
+      display: none;
+    }
+
+    .import-feedback[data-tone="error"] {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .import-feedback[data-tone="success"] {
+      color: var(--diff-add-ink);
+      font-weight: 600;
     }
 
     .notes {
@@ -643,6 +935,7 @@ tool_id: preflop-range
       margin-bottom: 0;
       color: var(--body);
       font-size: 13px;
+      text-wrap: pretty;
     }
 
     .tool-related-posts {
@@ -716,6 +1009,7 @@ tool_id: preflop-range
       color: var(--body);
       font-size: 13px;
       line-height: 1.7;
+      text-wrap: pretty;
     }
 
     .tool-post-link {
@@ -848,18 +1142,15 @@ tool_id: preflop-range
         border-left: 1px solid var(--divider);
       }
 
-    }
-
-    @media (max-width: 1080px) {
-      .swipe-hint {
-        display: block;
+      .import-row {
+        grid-template-columns: 1fr;
       }
     }
 
     @media (max-width: 620px) {
       .page {
-        width: min(100% - 32px, 1180px);
-        padding-top: 14px;
+        width: calc(100% - 16px);
+        padding-top: 12px;
       }
 
       .masthead {
@@ -879,17 +1170,24 @@ tool_id: preflop-range
 
       .tool-head,
       .position-tabs,
-      .matrix-panel,
       .summary,
       .range-block {
-        padding-right: 16px;
-        padding-left: 16px;
+        padding-right: 12px;
+        padding-left: 12px;
+      }
+
+      .matrix-panel {
+        padding: 10px 6px;
+      }
+
+      .matrix-topline {
+        padding: 0 6px;
       }
 
       .tool-head {
         align-items: flex-start;
         flex-direction: column;
-        gap: 4px;
+        gap: 6px;
       }
 
       .tool-tools {
@@ -905,7 +1203,7 @@ tool_id: preflop-range
 
       .position-tabs {
         grid-template-columns: repeat(4, 1fr);
-        gap: 7px;
+        gap: 6px;
       }
 
       .position-tab {
@@ -914,14 +1212,35 @@ tool_id: preflop-range
         font-size: 12px;
       }
 
+      .matrix-scroll {
+        overflow-x: visible;
+      }
+
       .matrix {
-        min-width: 620px;
-        grid-template-columns: repeat(13, 44px);
-        grid-auto-rows: 32px;
+        min-width: 0;
+        width: 100%;
+        grid-template-columns: repeat(13, minmax(0, 1fr));
+        grid-auto-rows: auto;
+        gap: 2px;
       }
 
       .hand-cell {
-        height: 32px;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1.05;
+        min-height: 24px;
+        font-size: clamp(8.5px, 2.45vw, 11px);
+        letter-spacing: -0.04em;
+        border-radius: 3px;
+      }
+
+      .hand-cell.diff-added::after,
+      .hand-cell.diff-removed::after {
+        display: none;
+      }
+
+      .hand-cell.open.diff-added {
+        box-shadow: inset 0 2px 0 var(--diff-add-border);
       }
 
       .summary {
@@ -929,18 +1248,34 @@ tool_id: preflop-range
       }
 
       .summary-section + .summary-section {
-        padding-top: 18px;
-        padding-left: 0;
-        border-top: 1px solid var(--divider);
-        border-left: 0;
+        border-top: 0;
+        padding-top: 0;
       }
 
-      .range-block {
+      .summary-section {
+        padding-top: 14px;
+        padding-left: 0 !important;
+        border-top: 1px solid var(--divider) !important;
+        border-left: 0 !important;
+      }
+
+      .summary-hand {
+        order: -1;
+        padding-top: 0;
+        border-top: 0 !important;
+      }
+
+      .range-block-main {
         grid-template-columns: 1fr;
       }
 
-      .copy-button {
+      .range-block-btns {
         width: 100%;
+      }
+
+      .range-block-btns .tool-action,
+      .range-block-btns .copy-button {
+        flex: 1;
       }
 
       .notes {
@@ -966,6 +1301,30 @@ tool_id: preflop-range
       footer {
         flex-direction: column;
         gap: 8px;
+      }
+    }
+
+    @media (max-width: 350px) {
+      .matrix {
+        gap: 1.5px;
+      }
+
+      .hand-cell {
+        font-size: 8px;
+        letter-spacing: -0.05em;
+      }
+    }
+
+    @media (pointer: coarse) {
+      .position-tab,
+      .mode-btn,
+      .diff-btn {
+        min-height: 40px;
+      }
+
+      .tool-action,
+      .copy-button {
+        min-height: 44px;
       }
     }
 
@@ -1012,7 +1371,7 @@ tool_id: preflop-range
           <span id="tool-hint" class="sr-only" aria-live="polite">点击或悬停牌格查看开池决策；切换至编辑模式可增删手牌。</span>
         </div>
         <div class="tool-tools">
-          <div class="legend" aria-label="牌表图例">
+          <div class="legend" id="legend" aria-label="牌表图例">
             <span class="legend-item"><span class="legend-swatch open" aria-hidden="true"></span>当前范围</span>
             <span class="legend-item"><span class="legend-swatch" aria-hidden="true"></span>范围外</span>
           </div>
@@ -1029,10 +1388,16 @@ tool_id: preflop-range
       <div class="workspace" id="range-panel" role="tabpanel" aria-labelledby="tab-UTG">
         <div class="matrix-panel">
           <div class="matrix-topline">
-            <p class="matrix-label">13 × 13 起手牌表</p>
-            <p class="swipe-hint">左右滑动查看完整牌表</p>
+            <div class="matrix-topline-left">
+              <p class="matrix-label">13 × 13 起手牌表</p>
+              <span class="diff-summary" id="diff-summary" aria-live="polite"></span>
+            </div>
+            <div class="diff-controls" role="group" aria-label="范围对比视图">
+              <button class="diff-btn" id="diff-prev" type="button" aria-pressed="false">较前位增量</button>
+              <button class="diff-btn" id="diff-baseline" type="button" aria-pressed="false">对照作者基准</button>
+            </div>
           </div>
-          <div class="matrix-scroll" tabindex="0" aria-label="起手牌表，可横向滚动">
+          <div class="matrix-scroll" role="region" tabindex="0" aria-label="13×13 起手牌表">
             <div class="matrix" id="matrix" role="group" aria-label="翻前开池范围矩阵"></div>
           </div>
         </div>
@@ -1058,7 +1423,7 @@ tool_id: preflop-range
             </div>
           </div>
 
-          <div class="summary-section">
+          <div class="summary-section summary-hand">
             <p class="summary-kicker">手牌详情</p>
             <div class="hand-result" id="hand-result" aria-live="polite"></div>
           </div>
@@ -1066,18 +1431,35 @@ tool_id: preflop-range
       </div>
 
       <div class="range-block">
-        <div>
-          <h3>范围文本</h3>
-          <p class="range-text" id="range-text" tabindex="-1"></p>
+        <div class="range-block-main">
+          <div>
+            <h3>范围文本</h3>
+            <p class="range-text" id="range-text" tabindex="-1"></p>
+          </div>
+          <div class="range-block-btns">
+            <button class="tool-action secondary" id="toggle-import-btn" type="button" aria-expanded="false" aria-controls="import-panel">导入范围</button>
+            <button class="copy-button" id="copy-button" type="button" aria-live="polite">复制范围</button>
+          </div>
         </div>
-        <button class="copy-button" id="copy-button" type="button" aria-live="polite">复制范围</button>
+        <div class="import-panel" id="import-panel" hidden>
+          <label class="import-label" for="import-input">粘贴范围文本导入当前位置（支持 55+、A2s+、KK-JJ、AK 等缩写）</label>
+          <div class="import-row">
+            <textarea class="import-input" id="import-input" rows="2" aria-invalid="false" data-error="import-feedback" placeholder="例如：55+, A2s+, K9s+, QTs+, AJo+, KQo（支持逗号、空格、顿号或短横线范围）"></textarea>
+            <div class="import-actions">
+              <button class="tool-action primary" id="apply-import-btn" type="button">覆盖导入</button>
+              <button class="tool-action secondary" id="merge-import-btn" type="button">追加合并</button>
+              <button class="tool-action secondary" id="cancel-import-btn" type="button">收起</button>
+            </div>
+          </div>
+          <p class="import-feedback" id="import-feedback" role="status" aria-live="polite"></p>
+        </div>
       </div>
     </section>
 
     <section class="notes" aria-label="使用说明">
       <div class="note-card">
         <h3>如何读这张表</h3>
-        <p>对角线是口袋对子；右上区域是同花牌（s）；左下区域是不同花牌（o）。砖红浅底表示这手牌在当前开池范围内。</p>
+        <p>对角线是口袋对子；右上区域是同花牌（s）；左下区域是不同花牌（o）。砖红浅底表示当前开池范围；开启对比视图时，绿色标注新增/多松（+），虚线灰框标注收紧移除（−）。</p>
       </div>
       <div class="note-card">
         <h3>这版范围的边界</h3>
@@ -1205,14 +1587,34 @@ tool_id: preflop-range
         return false;
       }
 
+      function isValidBareNonPair(token) {
+        return token.length === 2 &&
+          RANK_INDEX[token[0]] !== undefined &&
+          RANK_INDEX[token[1]] !== undefined &&
+          RANK_INDEX[token[0]] < RANK_INDEX[token[1]];
+      }
+
+      function setsEqual(setA, setB) {
+        if (!setA || !setB || setA.size !== setB.size) return false;
+        for (const item of setA) {
+          if (!setB.has(item)) return false;
+        }
+        return true;
+      }
+
       function parseRange(rangeText) {
         const hands = [];
         const errors = [];
+        const normalizedInput = String(rangeText || "")
+          .replace(/[–—~～]/g, "-")
+          .replace(/\s*-\s*/g, "-")
+          .replace(/\s+\+/g, "+");
 
-        rangeText.split(/[,，\n;；]+/).forEach((rawToken) => {
-          let token = rawToken.trim().replace(/\s+/g, "").replace(/10/g, "T");
-          if (!token) return;
+        normalizedInput.split(/[,，、\s;；]+/).forEach((rawToken) => {
+          const originalToken = rawToken.trim();
+          if (!originalToken) return;
 
+          let token = originalToken.replace(/10/g, "T");
           const hasPlus = token.endsWith("+");
           if (hasPlus) token = token.slice(0, -1);
 
@@ -1224,28 +1626,38 @@ tool_id: preflop-range
 
           try {
             if (dashParts) {
+              if (hasPlus || dashParts.length !== 2) throw new Error("invalid range");
               const [start, end] = dashParts;
-              if (!isValidHand(start) || !isValidHand(end)) throw new Error("invalid range");
-
-              if (start.length === 2) {
-                if (end.length !== 2) throw new Error("invalid pair range");
-                const first = Math.min(RANK_INDEX[start[0]], RANK_INDEX[end[0]]);
-                const last = Math.max(RANK_INDEX[start[0]], RANK_INDEX[end[0]]);
-                for (let index = first; index <= last; index += 1) {
-                  hands.push(RANKS[index] + RANKS[index]);
+              if (isValidHand(start) && isValidHand(end)) {
+                if (start.length === 2) {
+                  if (end.length !== 2) throw new Error("invalid pair range");
+                  const first = Math.min(RANK_INDEX[start[0]], RANK_INDEX[end[0]]);
+                  const last = Math.max(RANK_INDEX[start[0]], RANK_INDEX[end[0]]);
+                  for (let index = first; index <= last; index += 1) {
+                    hands.push(RANKS[index] + RANKS[index]);
+                  }
+                } else {
+                  if (end.length !== 3 || start[0] !== end[0] || start[2] !== end[2]) {
+                    throw new Error("invalid non-pair range");
+                  }
+                  const first = Math.min(RANK_INDEX[start[1]], RANK_INDEX[end[1]]);
+                  const last = Math.max(RANK_INDEX[start[1]], RANK_INDEX[end[1]]);
+                  for (let index = first; index <= last; index += 1) {
+                    hands.push(start[0] + RANKS[index] + start[2]);
+                  }
                 }
-              } else {
-                if (end.length !== 3 || start[0] !== end[0] || start[2] !== end[2]) {
-                  throw new Error("invalid non-pair range");
-                }
+              } else if (isValidBareNonPair(start) && isValidBareNonPair(end) && start[0] === end[0]) {
                 const first = Math.min(RANK_INDEX[start[1]], RANK_INDEX[end[1]]);
                 const last = Math.max(RANK_INDEX[start[1]], RANK_INDEX[end[1]]);
-                for (let index = first; index <= last; index += 1) {
-                  hands.push(start[0] + RANKS[index] + start[2]);
-                }
+                ["s", "o"].forEach((suit) => {
+                  for (let index = first; index <= last; index += 1) {
+                    hands.push(start[0] + RANKS[index] + suit);
+                  }
+                });
+              } else {
+                throw new Error("invalid range");
               }
-            } else if (token.length === 2) {
-              if (!isValidHand(token)) throw new Error("invalid pair");
+            } else if (token.length === 2 && isValidHand(token)) {
               if (hasPlus) {
                 for (let index = RANK_INDEX[token[0]]; index >= 0; index -= 1) {
                   hands.push(RANKS[index] + RANKS[index]);
@@ -1253,6 +1665,16 @@ tool_id: preflop-range
               } else {
                 hands.push(token);
               }
+            } else if (isValidBareNonPair(token)) {
+              ["s", "o"].forEach((suit) => {
+                if (hasPlus) {
+                  for (let index = RANK_INDEX[token[1]]; index > RANK_INDEX[token[0]]; index -= 1) {
+                    hands.push(token[0] + RANKS[index] + suit);
+                  }
+                } else {
+                  hands.push(token + suit);
+                }
+              });
             } else {
               if (!isValidHand(token)) throw new Error("invalid hand");
               if (hasPlus) {
@@ -1264,7 +1686,7 @@ tool_id: preflop-range
               }
             }
           } catch (_error) {
-            errors.push(rawToken.trim());
+            errors.push(originalToken);
           }
         });
 
@@ -1272,6 +1694,68 @@ tool_id: preflop-range
           hands: [...new Set(hands)],
           errors
         };
+      }
+
+      function compressBucketRuns(indices, minTop, formatSingle, formatDash) {
+        const result = [];
+        let index = 0;
+        while (index < indices.length) {
+          const start = indices[index];
+          let end = start;
+          while (index + 1 < indices.length && indices[index + 1] === end + 1) {
+            index += 1;
+            end = indices[index];
+          }
+          if (start === end) {
+            result.push(formatSingle(end));
+          } else if (start === minTop) {
+            result.push(`${formatSingle(end)}+`);
+          } else {
+            result.push(formatDash(start, end));
+          }
+          index += 1;
+        }
+        return result;
+      }
+
+      function compressRange(openHands) {
+        if (!openHands || openHands.size === 0) return "";
+        const handSet = openHands instanceof Set ? openHands : new Set(openHands);
+        const tokens = [];
+
+        const pairIndices = [];
+        for (let i = 0; i < RANKS.length; i += 1) {
+          if (handSet.has(RANKS[i] + RANKS[i])) pairIndices.push(i);
+        }
+        tokens.push(
+          ...compressBucketRuns(
+            pairIndices,
+            0,
+            (idx) => RANKS[idx] + RANKS[idx],
+            (start, end) => `${RANKS[start]}${RANKS[start]}-${RANKS[end]}${RANKS[end]}`
+          )
+        );
+
+        ["s", "o"].forEach((suit) => {
+          for (let high = 0; high < RANKS.length - 1; high += 1) {
+            const kickerIndices = [];
+            for (let kicker = high + 1; kicker < RANKS.length; kicker += 1) {
+              if (handSet.has(RANKS[high] + RANKS[kicker] + suit)) {
+                kickerIndices.push(kicker);
+              }
+            }
+            tokens.push(
+              ...compressBucketRuns(
+                kickerIndices,
+                high + 1,
+                (idx) => RANKS[high] + RANKS[idx] + suit,
+                (start, end) => `${RANKS[high]}${RANKS[start]}${suit}-${RANKS[high]}${RANKS[end]}${suit}`
+              )
+            );
+          }
+        });
+
+        return tokens.join(", ");
       }
 
       function handName(row, column) {
@@ -1339,7 +1823,7 @@ tool_id: preflop-range
             (hand) => typeof hand === "string" && isValidHand(hand)
           );
           hands = new Set(validHands);
-          isEdited = true;
+          isEdited = !setsEqual(hands, defaultHands);
         }
 
         return [position.id, {
@@ -1352,8 +1836,18 @@ tool_id: preflop-range
       const state = {
         positionId: "UTG",
         activeHand: null,
+        pinnedHand: null,
         keyboardHand: "AA",
-        interactionMode: "view"
+        interactionMode: "view",
+        diffMode: "none"
+      };
+
+      const cellMap = new Map();
+      const dragPaint = {
+        active: false,
+        targetOpen: true,
+        suppressClick: false,
+        visited: new Set()
       };
 
       const positionTabs = document.getElementById("position-tabs");
@@ -1372,9 +1866,104 @@ tool_id: preflop-range
       const modeViewBtn = document.getElementById("mode-view");
       const modeEditBtn = document.getElementById("mode-edit");
       const toolHint = document.getElementById("tool-hint");
+      const legendEl = document.getElementById("legend");
+      const diffPrevBtn = document.getElementById("diff-prev");
+      const diffBaselineBtn = document.getElementById("diff-baseline");
+      const diffSummaryEl = document.getElementById("diff-summary");
+      const toggleImportBtn = document.getElementById("toggle-import-btn");
+      const importPanel = document.getElementById("import-panel");
+      const importInput = document.getElementById("import-input");
+      const applyImportBtn = document.getElementById("apply-import-btn");
+      const mergeImportBtn = document.getElementById("merge-import-btn");
+      const cancelImportBtn = document.getElementById("cancel-import-btn");
+      const importFeedback = document.getElementById("import-feedback");
+
+      function getHandMeta(hand) {
+        if (hand.length === 2) return { categoryLabel: "口袋对", combos: 6 };
+        if (hand.endsWith("s")) return { categoryLabel: "同花", combos: 4 };
+        return { categoryLabel: "杂色", combos: 12 };
+      }
+
+      function getHandPositions(hand) {
+        return positions.map((pos) => {
+          const posState = parsedRanges.get(pos.id);
+          return {
+            id: pos.id,
+            short: pos.short,
+            isOpen: Boolean(posState && posState.hands.has(hand)),
+            isCurrent: pos.id === state.positionId
+          };
+        });
+      }
+
+      function computeDiff(positionId = state.positionId, mode = state.diffMode) {
+        const empty = {
+          mode,
+          available: false,
+          reason: "",
+          prevShort: null,
+          added: new Set(),
+          removed: new Set(),
+          addedCombos: 0,
+          removedCombos: 0
+        };
+        const currState = parsedRanges.get(positionId);
+        if (!currState || mode === "none") return empty;
+
+        if (mode === "prev") {
+          const idx = positions.findIndex((p) => p.id === positionId);
+          if (idx <= 0) {
+            return {
+              ...empty,
+              reason: "UTG 为最前位，切换后位可查看增量"
+            };
+          }
+          const prevPos = positions[idx - 1];
+          const prevHands = parsedRanges.get(prevPos.id).hands;
+          const added = new Set([...currState.hands].filter((h) => !prevHands.has(h)));
+          const removed = new Set([...prevHands].filter((h) => !currState.hands.has(h)));
+          return {
+            mode: "prev",
+            available: true,
+            reason: "",
+            prevShort: prevPos.short,
+            added,
+            removed,
+            addedCombos: countCombos(added),
+            removedCombos: countCombos(removed)
+          };
+        }
+
+        if (mode === "baseline") {
+          const added = new Set([...currState.hands].filter((h) => !currState.defaultHands.has(h)));
+          const removed = new Set([...currState.defaultHands].filter((h) => !currState.hands.has(h)));
+          return {
+            mode: "baseline",
+            available: added.size > 0 || removed.size > 0,
+            reason: currState.isEdited ? "" : "当前与作者默认基准一致",
+            prevShort: null,
+            added,
+            removed,
+            addedCombos: countCombos(added),
+            removedCombos: countCombos(removed)
+          };
+        }
+
+        return empty;
+      }
+
+      function setDiffMode(mode) {
+        const nextMode = mode === "prev" || mode === "baseline" ? mode : "none";
+        state.diffMode = nextMode;
+        if (nextMode !== "none") {
+          window.toolAnalytics?.action("toggle_diff");
+        }
+        render();
+      }
 
       function setInteractionMode(mode) {
         state.interactionMode = mode;
+        matrix.classList?.toggle("is-editing", mode === "edit");
         if (modeViewBtn) {
           modeViewBtn.classList.toggle("active", mode === "view");
           modeViewBtn.setAttribute("aria-checked", String(mode === "view"));
@@ -1385,10 +1974,10 @@ tool_id: preflop-range
         }
         if (toolHint) {
           toolHint.textContent = mode === "edit"
-            ? "点击牌格加入或移除；清空后可自定义绘制。"
+            ? "点击或拖动涂抹牌格加入或移除；清空后可自定义绘制。"
             : "点击或悬停牌格查看开池决策；切换至编辑模式可增删手牌。";
         }
-        updateMatrix(currentRangeState().hands);
+        render();
       }
 
       if (modeViewBtn && modeEditBtn) {
@@ -1409,14 +1998,12 @@ tool_id: preflop-range
       }
 
       function formatEditedRange(openHands) {
-        return RANKS.flatMap((_rowRank, row) => RANKS.map((_columnRank, column) => handName(row, column)))
-          .filter((hand) => openHands.has(hand))
-          .join(", ");
+        return compressRange(openHands);
       }
 
       function visibleRangeText(position, rangeState) {
         if (!rangeState.isEdited) return position.range;
-        if (!rangeState.hands.size) return "（空范围｜点击牌格添加）";
+        if (!rangeState.hands.size) return "（空范围｜点击牌格或导入文本添加）";
         return formatEditedRange(rangeState.hands);
       }
 
@@ -1445,6 +2032,7 @@ tool_id: preflop-range
 
       function initializeMatrix() {
         const fragment = document.createDocumentFragment();
+        cellMap.clear();
 
         RANKS.forEach((_rowRank, row) => {
           RANKS.forEach((_columnRank, column) => {
@@ -1457,6 +2045,7 @@ tool_id: preflop-range
             button.dataset.row = String(row);
             button.dataset.column = String(column);
             button.textContent = hand;
+            cellMap.set(hand, button);
             fragment.appendChild(button);
           });
         });
@@ -1479,18 +2068,129 @@ tool_id: preflop-range
         });
       }
 
-      function updateMatrix(openHands) {
+      function syncSelectedCell() {
+        const cells = cellMap.size > 0 ? Array.from(cellMap.values()) : matrix.querySelectorAll("[data-hand]");
+        cells.forEach((button) => {
+          button.classList.toggle("is-selected", button.dataset.hand === state.pinnedHand);
+        });
+      }
+
+      function updateMatrix(openHands, diff = computeDiff()) {
         const isEditing = state.interactionMode === "edit";
-        matrix.querySelectorAll("[data-hand]").forEach((button) => {
+        matrix.classList?.toggle("is-editing", isEditing);
+        const cells = cellMap.size > 0 ? Array.from(cellMap.values()) : matrix.querySelectorAll("[data-hand]");
+
+        cells.forEach((button) => {
           const hand = button.dataset.hand;
           const isOpen = openHands.has(hand);
+          const isAdded = diff.available && diff.added.has(hand);
+          const isRemoved = diff.available && diff.removed.has(hand);
+          const isCarry = diff.available && isOpen && !isAdded;
 
           button.classList.toggle("open", isOpen);
+          button.classList.toggle("diff-added", isAdded);
+          button.classList.toggle("diff-removed", isRemoved);
+          button.classList.toggle("diff-carry", isCarry);
+          button.classList.toggle("is-selected", hand === state.pinnedHand);
+
           const stateLabel = isOpen ? "在开池范围内" : "在开池范围外";
-          const actionLabel = isEditing ? (isOpen ? "，点击移除" : "，点击加入") : "，点击查看详情";
-          button.setAttribute("aria-label", `${hand}，当前${stateLabel}${actionLabel}`);
+          let diffLabel = "";
+          if (isAdded) {
+            diffLabel = diff.mode === "baseline" ? "，较基准多松新增" : `，较 ${diff.prevShort} 新增`;
+          } else if (isRemoved) {
+            diffLabel = diff.mode === "baseline" ? "，较基准收紧移除" : `，较 ${diff.prevShort} 收紧移除`;
+          }
+          const actionLabel = isEditing ? (isOpen ? "，点击移除" : "，点击加入") : "，点击锁定详情";
+          button.setAttribute("aria-label", `${hand}，当前${stateLabel}${diffLabel}${actionLabel}`);
           button.setAttribute("aria-pressed", String(isOpen));
           button.tabIndex = hand === state.keyboardHand ? 0 : -1;
+        });
+      }
+
+      function updateDiffControls(diff) {
+        if (diffPrevBtn) {
+          diffPrevBtn.setAttribute("aria-pressed", String(state.diffMode === "prev"));
+        }
+        if (diffBaselineBtn) {
+          diffBaselineBtn.setAttribute("aria-pressed", String(state.diffMode === "baseline"));
+        }
+        if (!diffSummaryEl) return;
+
+        if (state.diffMode === "none") {
+          diffSummaryEl.textContent = "";
+          diffSummaryEl.classList?.remove("has-diff");
+          return;
+        }
+
+        if (!diff.available) {
+          diffSummaryEl.textContent = diff.reason || "";
+          diffSummaryEl.classList?.remove("has-diff");
+          return;
+        }
+
+        if (diff.added.size === 0 && diff.removed.size === 0) {
+          diffSummaryEl.textContent = state.diffMode === "prev"
+            ? `与 ${diff.prevShort} 范围完全一致`
+            : "当前与作者默认基准一致";
+          diffSummaryEl.classList?.remove("has-diff");
+          return;
+        }
+
+        if (state.diffMode === "prev") {
+          const pctDelta = ((diff.addedCombos - diff.removedCombos) / TOTAL_COMBOS * 100).toFixed(1);
+          if (diff.removed.size === 0) {
+            diffSummaryEl.textContent = `较 ${diff.prevShort} 新增 +${diff.added.size} 格（+${diff.addedCombos} 组合 / +${pctDelta}%）`;
+          } else if (diff.added.size === 0) {
+            diffSummaryEl.textContent = `较 ${diff.prevShort} 收紧 -${diff.removed.size} 格（-${diff.removedCombos} 组合）`;
+          } else {
+            diffSummaryEl.textContent = `较 ${diff.prevShort} +${diff.added.size} 格（+${diff.addedCombos}） · -${diff.removed.size} 格（-${diff.removedCombos}）`;
+          }
+        } else {
+          const parts = [];
+          if (diff.added.size > 0) parts.push(`多松 +${diff.added.size} 格（+${diff.addedCombos}）`);
+          if (diff.removed.size > 0) parts.push(`收紧 -${diff.removed.size} 格（-${diff.removedCombos}）`);
+          diffSummaryEl.textContent = `较基准 ${parts.join(" · ")}`;
+        }
+        diffSummaryEl.classList?.add("has-diff");
+      }
+
+      function updateLegend(diff) {
+        if (!legendEl) return;
+        legendEl.innerHTML = "";
+        const items = diff.mode === "prev"
+          ? [
+              { cls: "legend-swatch diff-added", text: "本位新增（+）" },
+              { cls: "legend-swatch open diff-carry", text: "沿用前位" },
+              { cls: "legend-swatch diff-removed", text: "本位收紧（−）" }
+            ]
+          : diff.mode === "baseline"
+            ? [
+                { cls: "legend-swatch diff-added", text: "比基准多松（+）" },
+                { cls: "legend-swatch open diff-carry", text: "与基准一致" },
+                { cls: "legend-swatch diff-removed", text: "比基准收紧（−）" }
+              ]
+            : [
+                { cls: "legend-swatch open", text: "当前范围" },
+                { cls: "legend-swatch", text: "范围外" }
+              ];
+
+        items.forEach((item) => {
+          const span = document.createElement("span");
+          span.className = "legend-item";
+          const swatch = document.createElement("span");
+          swatch.className = item.cls;
+          swatch.setAttribute("aria-hidden", "true");
+          span.textContent = item.text;
+          span.innerHTML = "";
+          if (typeof span.appendChild === "function") {
+            span.appendChild(swatch);
+            const labelNode = typeof document.createTextNode === "function"
+              ? document.createTextNode(item.text)
+              : null;
+            if (labelNode) span.appendChild(labelNode);
+            else span.textContent = item.text;
+          }
+          legendEl.appendChild(span);
         });
       }
 
@@ -1507,47 +2207,96 @@ tool_id: preflop-range
         restoreRangeButton.disabled = !rangeState.isEdited;
       }
 
-      function renderHandResult(openHands) {
+      function renderHandResult(openHands, diff = computeDiff()) {
         handResult.innerHTML = "";
         const rangeState = currentRangeState();
 
         if (!state.activeHand) {
           const prompt = document.createElement("strong");
-          prompt.textContent = "悬停查看手牌";
+          prompt.textContent = "点击或悬停手牌";
 
           const hint = document.createElement("p");
           hint.textContent = state.interactionMode === "edit"
-            ? "点击任意牌格可加入或移出范围；清空后可自定义绘制。"
-            : "点击或悬停任意牌格查看开池决策；切换至编辑模式可增删手牌。";
+            ? "点击或拖动牌格可加入或移除；下方可导入文本或对照作者基准。"
+            : "悬停预览，点击锁定 7 位置边界；切至编辑模式可拖动涂抹。";
 
           handResult.append(prompt, hint);
           return;
         }
 
-        const isOpen = openHands.has(state.activeHand);
+        const hand = state.activeHand;
+        const isOpen = openHands.has(hand);
         const action = isOpen ? "开池" : "弃牌";
+        const meta = getHandMeta(hand);
+
+        const head = document.createElement("div");
+        head.className = "hand-result-head";
 
         const title = document.createElement("strong");
         title.className = isOpen ? "is-open" : "";
-        title.textContent = `${state.activeHand} · ${action}`;
+        title.textContent = `${hand} · ${action}`;
+
+        const metaPill = document.createElement("span");
+        metaPill.className = "hand-meta-pill";
+        metaPill.textContent = `${meta.categoryLabel} · ${meta.combos} 组合`;
+        head.append(title, metaPill);
 
         const scope = rangeState.isEdited ? "你的自定义" : "当前作者";
-        const detail = document.createElement("p");
-        detail.textContent = isOpen
-          ? `这手牌已写入${scope}开池范围。`
-          : `这手牌未写入${scope}开池范围。`;
+        let diffSuffix = "";
+        if (diff.available && diff.added.has(hand)) {
+          diffSuffix = diff.mode === "baseline" ? "（较作者基准多放宽）" : `（较 ${diff.prevShort} 本位新增）`;
+        } else if (diff.available && diff.removed.has(hand)) {
+          diffSuffix = diff.mode === "baseline" ? "（作者基准包含此牌）" : `（较 ${diff.prevShort} 收紧移除）`;
+        }
 
-        handResult.append(title, detail);
+        const detail = document.createElement("p");
+        detail.textContent = (isOpen
+          ? `这手牌已写入${scope}开池范围。`
+          : `这手牌未写入${scope}开池范围。`) + diffSuffix;
+
+        const posList = getHandPositions(hand);
+        const strip = document.createElement("div");
+        strip.className = "hand-pos-strip";
+        strip.id = "hand-pos-strip";
+        strip.setAttribute("aria-label", "7 个位置开池状态");
+        posList.forEach((p) => {
+          const pill = document.createElement("span");
+          pill.className = `pos-pill${p.isOpen ? " is-open" : ""}${p.isCurrent ? " is-current" : ""}`;
+          pill.textContent = p.short;
+          strip.appendChild(pill);
+        });
+
+        const openPositions = posList.filter((p) => p.isOpen);
+        const earliestIdx = posList.findIndex((p) => p.isOpen);
+        const earliest = document.createElement("p");
+        earliest.className = "hand-earliest";
+        if (earliestIdx === -1) {
+          earliest.textContent = "全 7 个位置均弃牌";
+        } else {
+          const monotonic = posList.slice(earliestIdx).every((p) => p.isOpen);
+          if (monotonic) {
+            earliest.textContent = earliestIdx === 0
+              ? "最早开池位：UTG（全位置开池）"
+              : `最早开池位：${posList[earliestIdx].short}`;
+          } else {
+            earliest.textContent = `开池位：${openPositions.map((p) => p.short).join("、")}`;
+          }
+        }
+
+        handResult.append(head, detail, strip, earliest);
       }
 
       function render() {
         const position = currentPosition();
         const rangeState = currentRangeState();
         const openHands = rangeState.hands;
+        const diff = computeDiff(position.id, state.diffMode);
 
         updatePositionTabs();
-        updateMatrix(openHands);
-        renderHandResult(openHands);
+        updateDiffControls(diff);
+        updateLegend(diff);
+        updateMatrix(openHands, diff);
+        renderHandResult(openHands, diff);
         updateRangeControls(rangeState);
 
         rangePanel.setAttribute("aria-labelledby", `tab-${position.id}`);
@@ -1559,12 +2308,129 @@ tool_id: preflop-range
         rangeText.textContent = visibleRangeText(position, rangeState);
       }
 
+      function clearImportError() {
+        if (importInput) {
+          importInput.setAttribute?.("aria-invalid", "false");
+          importInput.removeAttribute?.("aria-describedby");
+        }
+        if (importFeedback && importFeedback.dataset?.tone === "error") {
+          importFeedback.textContent = "";
+          importFeedback.dataset.tone = "";
+        }
+      }
+
+      function clearImportFeedback() {
+        clearImportError();
+        if (importFeedback) {
+          importFeedback.textContent = "";
+          if (importFeedback.dataset) importFeedback.dataset.tone = "";
+        }
+      }
+
+      function setImportError(message) {
+        if (importInput) {
+          importInput.setAttribute?.("aria-invalid", "true");
+          importInput.setAttribute?.("aria-describedby", "import-feedback");
+        }
+        if (importFeedback) {
+          if (importFeedback.dataset) importFeedback.dataset.tone = "error";
+          importFeedback.textContent = message;
+        }
+      }
+
+      function toggleImportPanel(forceOpen) {
+        if (!importPanel || !toggleImportBtn) return;
+        const shouldOpen = forceOpen !== undefined ? Boolean(forceOpen) : Boolean(importPanel.hidden);
+        importPanel.hidden = !shouldOpen;
+        toggleImportBtn.setAttribute?.("aria-expanded", String(shouldOpen));
+        if (shouldOpen) {
+          clearImportError();
+          importInput?.focus?.();
+        } else {
+          clearImportFeedback();
+        }
+      }
+
+      function applyImportedRange(rawText, options = {}) {
+        const mode = options.mode === "merge" ? "merge" : "replace";
+        const trimmed = String(rawText || "").trim();
+        if (!trimmed) {
+          setImportError("请先粘贴至少一手范围文本，例如：55+, A2s+, K9s+, AJo+");
+          importInput?.focus?.();
+          return { ok: false, hands: [], errors: ["empty"] };
+        }
+
+        const parsed = parseRange(trimmed);
+        if (parsed.errors.length > 0) {
+          setImportError(`未能识别写法：${parsed.errors.join("、")}。示例格式：55+, A2s+, KK-JJ, AQo+`);
+          importInput?.focus?.();
+          return { ok: false, hands: [], errors: parsed.errors };
+        }
+
+        if (parsed.hands.length === 0) {
+          setImportError("未解析出有效起手牌，请检查格式后重试。");
+          importInput?.focus?.();
+          return { ok: false, hands: [], errors: ["empty"] };
+        }
+
+        const rangeState = currentRangeState();
+        const nextHands = mode === "merge"
+          ? new Set([...rangeState.hands, ...parsed.hands])
+          : new Set(parsed.hands);
+
+        rangeState.hands = nextHands;
+        rangeState.isEdited = !setsEqual(rangeState.hands, rangeState.defaultHands);
+        state.activeHand = state.pinnedHand;
+        saveStoredRanges();
+        window.toolAnalytics?.action("import_range");
+        clearImportError();
+        render();
+
+        const combos = countCombos(nextHands);
+        const pct = (combos / TOTAL_COMBOS * 100).toFixed(1);
+        if (importFeedback) {
+          if (importFeedback.dataset) importFeedback.dataset.tone = "success";
+          importFeedback.textContent = mode === "merge"
+            ? `已追加合并 ${parsed.hands.length} 格，当前共 ${nextHands.size} 格（${combos} 组合 / ${pct}%）。`
+            : `已导入 ${nextHands.size} 格（${combos} 组合 / ${pct}%）。`;
+        }
+
+        return { ok: true, hands: Array.from(nextHands), errors: [] };
+      }
+
+      if (diffPrevBtn) {
+        diffPrevBtn.addEventListener("click", () => {
+          setDiffMode(state.diffMode === "prev" ? "none" : "prev");
+        });
+      }
+      if (diffBaselineBtn) {
+        diffBaselineBtn.addEventListener("click", () => {
+          setDiffMode(state.diffMode === "baseline" ? "none" : "baseline");
+        });
+      }
+      if (toggleImportBtn) {
+        toggleImportBtn.addEventListener("click", () => toggleImportPanel());
+      }
+      if (cancelImportBtn) {
+        cancelImportBtn.addEventListener("click", () => toggleImportPanel(false));
+      }
+      if (applyImportBtn) {
+        applyImportBtn.addEventListener("click", () => applyImportedRange(importInput?.value || "", { mode: "replace" }));
+      }
+      if (mergeImportBtn) {
+        mergeImportBtn.addEventListener("click", () => applyImportedRange(importInput?.value || "", { mode: "merge" }));
+      }
+      if (importInput) {
+        importInput.addEventListener("input", clearImportError);
+      }
+
       positionTabs.addEventListener("click", (event) => {
         const button = event.target.closest("[data-position]");
         if (!button) return;
         state.positionId = button.dataset.position;
         window.toolAnalytics?.action('select_position');
-        state.activeHand = null;
+        state.activeHand = state.pinnedHand;
+        clearImportFeedback();
         render();
       });
 
@@ -1582,29 +2448,80 @@ tool_id: preflop-range
 
         state.positionId = positions[nextIndex].id;
         window.toolAnalytics?.action('select_position');
-        state.activeHand = null;
+        state.activeHand = state.pinnedHand;
+        clearImportFeedback();
         render();
         document.getElementById(`tab-${state.positionId}`).focus();
       });
 
-      function toggleHand(hand) {
+      function setHandOpen(hand, shouldOpen) {
         window.toolAnalytics?.action('edit_range');
         const rangeState = currentRangeState();
-        if (rangeState.hands.has(hand)) {
-          rangeState.hands.delete(hand);
-        } else {
+        if (shouldOpen) {
           rangeState.hands.add(hand);
+        } else {
+          rangeState.hands.delete(hand);
         }
-        rangeState.isEdited = true;
+        rangeState.isEdited = !setsEqual(rangeState.hands, rangeState.defaultHands);
         state.activeHand = hand;
         saveStoredRanges();
         render();
+      }
+
+      function toggleHand(hand) {
+        const rangeState = currentRangeState();
+        setHandOpen(hand, !rangeState.hands.has(hand));
       }
 
       function showHandDetail(hand) {
         state.activeHand = hand;
         renderHandResult(currentRangeState().hands);
       }
+
+      function applyPaintCell(hand, targetOpen) {
+        if (!hand || dragPaint.visited.has(hand)) return;
+        dragPaint.visited.add(hand);
+        setHandOpen(hand, targetOpen);
+      }
+
+      function endDragPaint() {
+        if (!dragPaint.active) return;
+        dragPaint.active = false;
+        dragPaint.visited.clear();
+        window.setTimeout?.(() => {
+          dragPaint.suppressClick = false;
+        }, 0);
+      }
+
+      matrix.addEventListener("pointerdown", (event) => {
+        if (state.interactionMode !== "edit") return;
+        if (event.button !== undefined && event.button !== 0) return;
+        const button = event.target?.closest?.("[data-hand]");
+        if (!button) return;
+
+        const hand = button.dataset.hand;
+        dragPaint.active = true;
+        dragPaint.targetOpen = !currentRangeState().hands.has(hand);
+        dragPaint.suppressClick = true;
+        dragPaint.visited.clear();
+        state.keyboardHand = hand;
+        applyPaintCell(hand, dragPaint.targetOpen);
+      });
+
+      matrix.addEventListener("pointermove", (event) => {
+        if (!dragPaint.active || state.interactionMode !== "edit") return;
+        const hitEl = typeof document.elementFromPoint === "function"
+          ? document.elementFromPoint(event.clientX, event.clientY)
+          : event.target;
+        const button = hitEl?.closest?.("[data-hand]");
+        if (!button || (typeof matrix.contains === "function" && !matrix.contains(button))) return;
+        applyPaintCell(button.dataset.hand, dragPaint.targetOpen);
+      });
+
+      matrix.addEventListener("pointerup", endDragPaint);
+      matrix.addEventListener("pointercancel", endDragPaint);
+      window.addEventListener?.("pointerup", endDragPaint);
+      window.addEventListener?.("pointercancel", endDragPaint);
 
       matrix.addEventListener("mouseover", (event) => {
         const button = event.target.closest("[data-hand]");
@@ -1613,18 +2530,26 @@ tool_id: preflop-range
       });
 
       matrix.addEventListener("mouseleave", () => {
-        state.activeHand = null;
+        state.activeHand = state.pinnedHand;
         renderHandResult(currentRangeState().hands);
       });
 
       matrix.addEventListener("click", (event) => {
         const button = event.target.closest("[data-hand]");
         if (!button) return;
-        state.keyboardHand = button.dataset.hand;
+        const hand = button.dataset.hand;
+        state.keyboardHand = hand;
         if (state.interactionMode === "edit") {
-          toggleHand(button.dataset.hand);
+          if (dragPaint.suppressClick) {
+            dragPaint.suppressClick = false;
+            return;
+          }
+          toggleHand(hand);
         } else {
-          showHandDetail(button.dataset.hand);
+          state.pinnedHand = state.pinnedHand === hand ? null : hand;
+          state.activeHand = state.pinnedHand;
+          renderHandResult(currentRangeState().hands);
+          syncSelectedCell();
         }
       });
 
@@ -1637,7 +2562,7 @@ tool_id: preflop-range
 
       matrix.addEventListener("focusout", (event) => {
         if (event.relatedTarget && matrix.contains(event.relatedTarget)) return;
-        state.activeHand = null;
+        state.activeHand = state.pinnedHand;
         renderHandResult(currentRangeState().hands);
       });
 
@@ -1658,8 +2583,12 @@ tool_id: preflop-range
 
         state.keyboardHand = handName(row, column);
         state.activeHand = state.keyboardHand;
-        render();
-        matrix.querySelector(`[data-hand="${state.keyboardHand}"]`).focus();
+        renderHandResult(currentRangeState().hands);
+        const target = cellMap.get(state.keyboardHand) || matrix.querySelector(`[data-hand="${state.keyboardHand}"]`);
+        if (target) {
+          updateMatrix(currentRangeState().hands);
+          target.focus();
+        }
       });
 
       clearRangeButton.addEventListener("click", () => {
@@ -1669,11 +2598,12 @@ tool_id: preflop-range
         if (!confirm(`确认清空【${pos.name}】的开池范围吗？`)) return;
         window.toolAnalytics?.action('clear_range');
         rangeState.hands.clear();
-        rangeState.isEdited = true;
-        state.activeHand = null;
+        rangeState.isEdited = !setsEqual(rangeState.hands, rangeState.defaultHands);
+        state.activeHand = state.pinnedHand;
         if (state.interactionMode !== "edit") {
           setInteractionMode("edit");
         }
+        clearImportFeedback();
         saveStoredRanges();
         render();
       });
@@ -1686,7 +2616,8 @@ tool_id: preflop-range
         window.toolAnalytics?.action('restore_range');
         rangeState.hands = new Set(rangeState.defaultHands);
         rangeState.isEdited = false;
-        state.activeHand = null;
+        state.activeHand = state.pinnedHand;
+        clearImportFeedback();
         saveStoredRanges();
         render();
       });
@@ -1758,7 +2689,13 @@ tool_id: preflop-range
           renderHandResult,
           currentRangeState,
           saveStoredRanges,
-          setInteractionMode
+          setInteractionMode,
+          parseRange,
+          compressRange,
+          setDiffMode,
+          applyImportedRange,
+          getHandPositions,
+          computeDiff
         };
       }
       render();

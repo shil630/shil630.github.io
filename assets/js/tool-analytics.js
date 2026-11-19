@@ -8,7 +8,7 @@
   var actions = {
     "investment-checklist": ["edit", "save", "copy_text", "copy_markdown", "download_markdown", "print", "load_sample"],
     "wechat-formatter": ["edit", "insert", "theme", "copy_rich", "copy_text", "download_html"],
-    "preflop-range": ["select_position", "edit_range", "clear_range", "restore_range", "copy_range"]
+    "preflop-range": ["select_position", "edit_range", "clear_range", "restore_range", "copy_range", "import_range", "toggle_diff"]
   };
   var completions = {
     "investment-checklist": ["save", "copy_text", "copy_markdown", "download_markdown"],
