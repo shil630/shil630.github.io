@@ -446,4 +446,143 @@
       }
     });
   });
+
+  /* ---------- Native <dialog> Lightbox (work showcase + article diagrams) ---------- */
+  var lightbox = document.getElementById("image-lightbox");
+  if (lightbox && typeof lightbox.showModal === "function") {
+    var lightboxImg = document.getElementById("lightbox-img");
+    var lightboxTitle = document.getElementById("lightbox-title");
+    var lightboxSub = document.getElementById("lightbox-subtitle");
+    var lightboxCloseBtn = document.getElementById("lightbox-close");
+    var supportsDisplayTransition;
+
+    function canTransitionDisplay() {
+      if (supportsDisplayTransition !== undefined) return supportsDisplayTransition;
+      if (!window.CSS || !window.CSS.supports || !window.CSS.supports("transition-behavior", "allow-discrete") || !document.body) {
+        supportsDisplayTransition = false;
+        return false;
+      }
+      var probe = document.createElement("div");
+      probe.style.cssText = "transition: display 1s allow-discrete !important; display: block;";
+      document.body.appendChild(probe);
+      window.getComputedStyle(probe).display;
+      probe.style.display = "none";
+      supportsDisplayTransition = window.getComputedStyle(probe).display === "block";
+      probe.remove();
+      return supportsDisplayTransition;
+    }
+
+    function supportsTopLayerExit() {
+      return !!(window.CSS && window.CSS.supports && window.CSS.supports("overlay", "auto") && canTransitionDisplay());
+    }
+
+    function closeLightbox() {
+      if (!lightbox.open) return;
+      if (!supportsTopLayerExit()) {
+        lightbox.setAttribute("data-closing", "");
+        var anims = lightbox.getAnimations ? lightbox.getAnimations({ subtree: true }) : [];
+        if (anims.length > 0) {
+          Promise.race([
+            Promise.allSettled(anims.map(function (a) { return a.finished; })),
+            new Promise(function (resolve) { window.setTimeout(resolve, 600); })
+          ]).then(function () {
+            if (!lightbox.hasAttribute("data-closing")) return;
+            lightbox.removeAttribute("data-closing");
+            if (lightbox.open) lightbox.close();
+          });
+          return;
+        }
+        lightbox.removeAttribute("data-closing");
+      }
+      lightbox.close();
+    }
+
+    function openLightbox(opts) {
+      if (!opts || !opts.src) return;
+      lightbox.removeAttribute("data-closing");
+      if (lightboxImg) {
+        lightboxImg.src = opts.src;
+        lightboxImg.alt = opts.alt || opts.title || "";
+      }
+      if (lightboxTitle) lightboxTitle.textContent = opts.title || "";
+      if (lightboxSub) {
+        lightboxSub.textContent = opts.subtitle || "";
+        lightboxSub.hidden = !opts.subtitle;
+      }
+      lightbox.showModal();
+    }
+
+    lightbox.addEventListener("close", function () {
+      lightbox.removeAttribute("data-closing");
+      lightbox.returnValue = "";
+    });
+
+    lightbox.addEventListener("cancel", function (e) {
+      if (!supportsTopLayerExit()) {
+        e.preventDefault();
+        closeLightbox();
+      }
+    });
+
+    if (lightboxCloseBtn) {
+      lightboxCloseBtn.addEventListener("click", function () {
+        closeLightbox();
+      });
+    }
+
+    if (!("closedBy" in HTMLDialogElement.prototype)) {
+      var pressedOutside = false;
+      var isOutsideDialog = function (e) {
+        var r = lightbox.getBoundingClientRect();
+        return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      };
+      lightbox.addEventListener("pointerdown", function (e) {
+        pressedOutside = isOutsideDialog(e);
+      });
+      lightbox.addEventListener("pointerup", function (e) {
+        if (pressedOutside && isOutsideDialog(e)) closeLightbox();
+        pressedOutside = false;
+      });
+    }
+
+    document.querySelectorAll(".media-zoom-btn[data-lightbox-src]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var lang = getLang();
+        var title = lang === "en"
+          ? (btn.getAttribute("data-lightbox-title-en") || btn.getAttribute("data-lightbox-title") || "")
+          : (btn.getAttribute("data-lightbox-title-zh") || btn.getAttribute("data-lightbox-title") || "");
+        var sub = lang === "en"
+          ? (btn.getAttribute("data-lightbox-sub-en") || "")
+          : (btn.getAttribute("data-lightbox-sub-zh") || "");
+        openLightbox({
+          src: btn.getAttribute("data-lightbox-src"),
+          alt: btn.getAttribute("data-lightbox-alt") || title,
+          title: title,
+          subtitle: sub
+        });
+      });
+    });
+
+    document.querySelectorAll(".prose img").forEach(function (img) {
+      if (img.classList.contains("about-avatar") || img.closest("a")) return;
+      img.classList.add("is-zoomable");
+      img.tabIndex = 0;
+      img.setAttribute("role", "button");
+      var handleOpen = function () {
+        openLightbox({
+          src: img.currentSrc || img.src,
+          alt: img.alt || "",
+          title: img.alt || (getLang() === "en" ? "Image preview" : "大图预览"),
+          subtitle: ""
+        });
+      };
+      img.addEventListener("click", handleOpen);
+      img.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleOpen();
+        }
+      });
+    });
+  }
 })();

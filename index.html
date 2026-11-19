@@ -136,6 +136,7 @@ image: "/assets/images/blog-home-og-1200x630.png"
     {% for tool_entry in site.data.tools %}
     {% assign tool = tool_entry[1] %}
     <a class="home-tool-card" href="{{ tool.url | relative_url }}" data-track-cta data-cta-type="tool" data-placement="home_tools">
+      {% include tool-thumb.html id=tool.id %}
       <span class="home-tool-eyebrow" data-en="{{ tool.eyebrow_en }}" data-zh="{{ tool.eyebrow_zh }}">{{ tool.eyebrow_zh }}</span>
       <h3 class="home-tool-title" data-en="{{ tool.title_en }}" data-zh="{{ tool.title_zh }}">{{ tool.title_zh }}</h3>
       <p class="home-tool-desc" data-en="{{ tool.desc_en }}" data-zh="{{ tool.desc_zh }}">{{ tool.desc_zh }}</p>

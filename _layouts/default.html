@@ -9,6 +9,24 @@
     {{ content }}
   </main>
 
+  <dialog id="image-lightbox" class="lightbox-dialog" closedby="any" aria-labelledby="lightbox-title">
+    <div class="lightbox-shell">
+      <div class="lightbox-header">
+        <div class="lightbox-meta">
+          <h2 id="lightbox-title" class="lightbox-title"></h2>
+          <p id="lightbox-subtitle" class="lightbox-subtitle" hidden></p>
+        </div>
+        <button type="button" class="lightbox-close" id="lightbox-close" autofocus>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span class="sr-only" data-en="Close preview" data-zh="关闭大图预览">关闭大图预览</span>
+        </button>
+      </div>
+      <figure class="lightbox-figure">
+        <img id="lightbox-img" src="" alt="">
+      </figure>
+    </div>
+  </dialog>
+
   {% include footer.html %}
 
   <script src="{{ '/assets/js/analytics.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>

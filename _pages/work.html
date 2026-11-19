@@ -30,7 +30,13 @@ image: "/assets/images/work/unifi-site-manager.png"
       </div>
 
       <div class="work-item-media work-media--{{ work.media | default: 'flush' }}">
-        <img src="{{ work.image | relative_url }}" alt="{{ work.alt }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async">
+        <button type="button" class="media-zoom-btn" data-lightbox-src="{{ work.image | relative_url }}" data-lightbox-alt="{{ work.alt }}" data-lightbox-title="{{ work.title }}" data-lightbox-sub-zh="{{ work.subtitle_zh }}" data-lightbox-sub-en="{{ work.subtitle_en }}">
+          <img src="{{ work.image | relative_url }}" alt="{{ work.alt }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async">
+          <span class="media-zoom-hint" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            <span data-en="Inspect" data-zh="放大检视">放大检视</span>
+          </span>
+        </button>
       </div>
 
       <div class="work-item-grid">
@@ -52,7 +58,12 @@ image: "/assets/images/work/unifi-site-manager.png"
     {% for item in site.data.works.capabilities %}
     <article class="capability-card">
       <div class="capability-media">
-        <img src="{{ item.image | relative_url }}" alt="{{ item.alt }}" loading="lazy" decoding="async">
+        <button type="button" class="media-zoom-btn" data-lightbox-src="{{ item.image | relative_url }}" data-lightbox-alt="{{ item.alt }}" data-lightbox-title-zh="{{ item.title_zh }}" data-lightbox-title-en="{{ item.title_en }}" data-lightbox-sub-zh="{{ item.eyebrow_zh }}" data-lightbox-sub-en="{{ item.eyebrow_en }}">
+          <img src="{{ item.image | relative_url }}" alt="{{ item.alt }}" loading="lazy" decoding="async">
+          <span class="media-zoom-hint" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </span>
+        </button>
       </div>
       <div class="capability-body">
         <span class="capability-eyebrow" data-en="{{ item.eyebrow_en }}" data-zh="{{ item.eyebrow_zh }}">{{ item.eyebrow_zh }}</span>
