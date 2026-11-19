@@ -3,107 +3,26 @@ layout: default
 description: "我是石亮，美国 Parsons 研究生毕业，有 10+ 年中美科技大厂经历，现任体验设计总监，也是美股投资与德州的长期实践者。持续输出「美股投资观察清单」、真实决策复盘，以及 AI 投资假设跟踪工具「持见」（thesisee.com）。"
 image: "/assets/images/blog-home-og-1200x630.png"
 ---
-<section class="hero wrap">
-  <h1 class="hero-title" data-en="Keep making better decisions under uncertainty" data-zh="在不确定中，持续做更好的决策">在不确定中，持续做更好的决策</h1>
-  {% if paginator.page == 1 %}
-  <div class="hero-intro">
-    <p class="hero-byline lang-zh">
-      <span>体验设计总监</span>
-      <span class="sep" aria-hidden="true">·</span>
-      <span>Parsons 硕士</span>
-      <span class="sep" aria-hidden="true">·</span>
-      <span>10+ 年中美科技大厂</span>
-      <span class="sep" aria-hidden="true">·</span>
-      <span>美股与德州长期实践者</span>
-    </p>
-    <p class="hero-byline lang-en" hidden>
-      <span>Experience Design Director</span>
-      <span class="sep" aria-hidden="true">·</span>
-      <span>Parsons MFA</span>
-      <span class="sep" aria-hidden="true">·</span>
-      <span>10+ yrs US &amp; China Tech</span>
-      <span class="sep" aria-hidden="true">·</span>
-      <span>US Equities &amp; Poker</span>
-    </p>
-    <p class="hero-desc lang-zh">围绕「值不值得、投入多少、何时退出」记录正EV实验，持续输出<span class="hero-nowrap">「美股投资观察清单」</span>、真实决策复盘，以及正在构建的 AI 投资假设跟踪工具<span class="hero-nowrap">「<a href="https://thesisee.com" target="_blank" rel="noopener" data-track-cta data-cta-type="external_project" data-placement="home_hero_intro">持见（thesisee.com）</a>」。</span></p>
-    <p class="hero-desc lang-en" hidden>Exploring Positive EV decisions on whether to bet, how much to size, and when to fold, alongside US equity watchlists, real decision reviews, and <span class="hero-nowrap"><a href="https://thesisee.com" target="_blank" rel="noopener" data-track-cta data-cta-type="external_project" data-placement="home_hero_intro">ThesisSee (thesisee.com)</a>,</span> an AI investment thesis tracker I'm building.</p>
-  </div>
-  <div class="hero-visual" id="hero-ev-visual" data-active-stage="plus" role="region" aria-label="正EV 决策轨迹交互示意">
-    <svg class="hero-ev-svg" viewBox="0 0 632 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="evAreaGrad" x1="0" y1="8" x2="0" y2="64" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.22" />
-          <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.0" />
-        </linearGradient>
-      </defs>
-      <!-- Corner registration crosshairs -->
-      <path d="M 6,8 H 12 M 9,5 V 11 M 620,8 H 626 M 623,5 V 11" stroke="currentColor" stroke-opacity="0.2" stroke-width="1" />
-      <!-- Zero EV baseline -->
-      <line class="hero-ev-base" x1="16" y1="62" x2="616" y2="62" stroke="currentColor" stroke-opacity="0.16" stroke-dasharray="3 4" />
-      <!-- Stochastic Monte Carlo noise paths -->
-      <g class="hero-ev-noise">
-        <path class="hero-ev-noise-cut" d="M 16,62 C 44,28 78,88 118,80 C 148,74 168,82 186,74" stroke="currentColor" stroke-opacity="0.15" stroke-width="1" stroke-dasharray="2 2" />
-        <path class="hero-ev-noise-cut" d="M 16,62 C 48,86 92,36 138,74 C 162,86 174,64 186,68 C 238,80 292,58 346,66 C 402,72 454,76 506,70" stroke="currentColor" stroke-opacity="0.15" stroke-width="1.05" stroke-dasharray="2 2" />
-        <path d="M 16,62 C 52,20 88,84 128,36 C 156,14 170,72 186,56 C 230,32 280,66 346,46 C 410,34 460,42 506,30" stroke="currentColor" stroke-opacity="0.17" stroke-width="1.1" />
-        <path d="M 16,62 C 60,78 96,26 144,52 C 166,64 176,44 186,50 C 242,60 294,28 346,36 C 406,42 456,20 506,22 C 534,23 550,15 564,14" stroke="currentColor" stroke-opacity="0.2" stroke-width="1.15" />
-        <path d="M 16,62 C 56,42 104,74 152,58 C 170,52 178,60 186,54 C 240,40 296,52 346,42 C 404,34 458,32 506,26 C 534,21 550,22 564,19" stroke="currentColor" stroke-opacity="0.2" stroke-width="1.15" />
-      </g>
-      <!-- +EV area fill & primary trajectory -->
-      <path class="hero-ev-area" d="M 16,62 C 72,62 128,58 186,52 C 240,46 292,41 346,35 C 400,29 452,23 506,18 C 534,15 550,13 564,12 L 564,62 L 16,62 Z" fill="url(#evAreaGrad)" />
-      <path class="hero-ev-line" pathLength="1" d="M 16,62 C 72,62 128,58 186,52 C 240,46 292,41 346,35 C 400,29 452,23 506,18 C 534,15 550,13 564,12" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" />
-      <!-- Origin & three decision filter gates: NOISE / EV / SIZE / EXIT / +EV -->
-      <g class="hero-ev-origin" data-ev-hit="noise" tabindex="0" role="button" aria-label="NOISE：短期随机波动">
-        <rect class="hero-ev-hit-area" x="0" y="34" width="110" height="60" rx="6" fill="transparent" />
-        <circle class="hero-ev-origin-dot" cx="16" cy="62" r="2.5" fill="currentColor" fill-opacity="0.45" />
-        <text x="16" y="88" fill="currentColor" fill-opacity="0.48" font-size="10" font-weight="600" letter-spacing="0.08em">NOISE</text>
-      </g>
-      <g class="hero-ev-step hero-ev-step-1" data-ev-hit="ev" tabindex="0" role="button" aria-label="01 · EV：值不值得">
-        <rect class="hero-ev-hit-area" x="130" y="10" width="112" height="84" rx="6" fill="transparent" />
-        <line class="hero-ev-gate" x1="186" y1="12" x2="186" y2="74" stroke="currentColor" stroke-opacity="0.12" stroke-dasharray="2 3" />
-        <circle class="hero-ev-node" cx="186" cy="52" r="3.5" fill="var(--bg)" stroke="var(--accent)" stroke-width="2" />
-        <text x="186" y="88" text-anchor="middle" fill="currentColor" fill-opacity="0.58" font-size="10" font-weight="600" letter-spacing="0.08em">01 · EV</text>
-      </g>
-      <g class="hero-ev-step hero-ev-step-2" data-ev-hit="size" tabindex="0" role="button" aria-label="02 · SIZE：投入多少">
-        <rect class="hero-ev-hit-area" x="290" y="10" width="112" height="84" rx="6" fill="transparent" />
-        <line class="hero-ev-gate" x1="346" y1="12" x2="346" y2="74" stroke="currentColor" stroke-opacity="0.12" stroke-dasharray="2 3" />
-        <circle class="hero-ev-node" cx="346" cy="35" r="3.5" fill="var(--bg)" stroke="var(--accent)" stroke-width="2" />
-        <text x="346" y="88" text-anchor="middle" fill="currentColor" fill-opacity="0.58" font-size="10" font-weight="600" letter-spacing="0.08em">02 · SIZE</text>
-      </g>
-      <g class="hero-ev-step hero-ev-step-3" data-ev-hit="exit" tabindex="0" role="button" aria-label="03 · EXIT：何时退出">
-        <rect class="hero-ev-hit-area" x="450" y="10" width="96" height="84" rx="6" fill="transparent" />
-        <line class="hero-ev-gate" x1="506" y1="12" x2="506" y2="74" stroke="currentColor" stroke-opacity="0.12" stroke-dasharray="2 3" />
-        <circle class="hero-ev-node" cx="506" cy="18" r="3.5" fill="var(--bg)" stroke="var(--accent)" stroke-width="2" />
-        <text x="506" y="88" text-anchor="middle" fill="currentColor" fill-opacity="0.58" font-size="10" font-weight="600" letter-spacing="0.08em">03 · EXIT</text>
-      </g>
-      <!-- Terminal +EV beacon & pulse -->
-      <g class="hero-ev-end" data-ev-hit="plus" tabindex="0" role="button" aria-label="+EV：长期正期望">
-        <rect class="hero-ev-hit-area" x="548" y="0" width="80" height="44" rx="6" fill="transparent" />
-        <circle class="hero-ev-pulse" cx="564" cy="12" r="4.5" stroke="var(--accent)" stroke-width="1.5" fill="none" />
-        <circle class="hero-ev-halo" cx="564" cy="12" r="7.5" fill="var(--accent)" fill-opacity="0.18" />
-        <circle class="hero-ev-beacon" cx="564" cy="12" r="3.5" fill="var(--accent)" />
-        <text x="578" y="16" text-anchor="start" fill="var(--accent)" font-size="11" font-weight="700" letter-spacing="0.06em">+EV</text>
-      </g>
-    </svg>
-    <div class="hero-ev-bar">
-      <p class="hero-ev-readout" id="hero-ev-readout" aria-live="polite">
-        <span class="hero-ev-readout-tag">+EV</span>
-        <span class="hero-ev-readout-text" data-zh="长期正期望：过滤噪音后，让时间与样本量站在自己一边" data-en="Long-run edge: filter noise and let sample size compound">长期正期望：过滤噪音后，让时间与样本量站在自己一边</span>
-      </p>
-      <div class="hero-ev-controls">
-        <button type="button" class="hero-ev-ctrl" id="hero-ev-replay">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-          <span class="sr-only" data-en="Replay draw animation" data-zh="重播绘制动画">重播绘制动画</span>
-        </button>
-        <button type="button" class="hero-ev-ctrl" id="hero-ev-pause">
-          <svg class="ev-icon-pause" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-          <svg class="ev-icon-play" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-          <span class="sr-only" id="hero-ev-pause-label" data-en="Pause pulse animation" data-zh="暂停脉搏动画">暂停脉搏动画</span>
-        </button>
-      </div>
+{% if paginator.page == 1 %}
+<section class="hero hero-fullscreen" id="hero">
+  <canvas class="hero-field" id="hero-vector-field" aria-hidden="true"></canvas>
+  <div class="hero-content wrap">
+    <h1 class="hero-title" data-en="Keep making better decisions under uncertainty" data-zh="在不确定中，持续做更好的决策">在不确定中，持续做更好的决策</h1>
+    <div class="hero-intro">
+      <p class="hero-desc lang-zh">石亮 · 体验设计总监 · 在美股与德州中记录正EV实验，并构建<span class="hero-nowrap">「<a href="https://thesisee.com" target="_blank" rel="noopener" data-track-cta data-cta-type="external_project" data-placement="home_hero_intro">持见（thesisee.com）</a>」</span></p>
+      <p class="hero-desc lang-en" hidden>Liang Shi · Experience Design Director · Exploring +EV decisions in US equities &amp; poker, building <span class="hero-nowrap"><a href="https://thesisee.com" target="_blank" rel="noopener" data-track-cta data-cta-type="external_project" data-placement="home_hero_intro">ThesisSee (thesisee.com)</a></span></p>
     </div>
   </div>
-  {% endif %}
+  <a class="hero-scroll-cue" href="#articles">
+    <span data-en="Featured essays" data-zh="精选导读">精选导读</span>
+    <span class="hero-scroll-arrow" aria-hidden="true">↓</span>
+  </a>
 </section>
+{% else %}
+<section class="hero wrap">
+  <h1 class="hero-title" data-en="Keep making better decisions under uncertainty" data-zh="在不确定中，持续做更好的决策">在不确定中，持续做更好的决策</h1>
+</section>
+{% endif %}
 
 <section class="posts wrap" id="articles">
   {% assign has_zh = false %}{% assign has_en = false %}

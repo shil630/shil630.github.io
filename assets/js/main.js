@@ -61,6 +61,8 @@
     if (schemeMeta) schemeMeta.setAttribute("content", val || "light dark");
   }
 
+  var onThemeChangeHooks = [];
+
   if (themeToggle) {
     themeToggle.addEventListener("click", function () {
       var current = getStoredScheme() || getSystemScheme();
@@ -72,101 +74,284 @@
         try { localStorage.removeItem(SCHEME_KEY); } catch (e) {}
         applySchemeMeta("light dark");
       }
+      onThemeChangeHooks.forEach(function (fn) { fn(); });
     });
   }
 
   window.addEventListener("storage", function (e) {
     if (e.key === SCHEME_KEY) {
       applySchemeMeta((e.newValue === "light" || e.newValue === "dark") ? e.newValue : "light dark");
+      onThemeChangeHooks.forEach(function (fn) { fn(); });
     }
   });
 
-  /* ---------- Hero +EV interactive trajectory diagram ---------- */
-  var heroVisual = document.getElementById("hero-ev-visual");
-  if (heroVisual) {
-    var EV_STAGES = {
-      noise: {
-        tag: "NOISE",
-        zh: "短期波动与随机噪音：单次牌局或日常涨跌本身不等于对错",
-        en: "Short-term variance: single-hand swings or daily noise reveal little alone"
-      },
-      ev: {
-        tag: "01 · EV",
-        zh: "值不值得：分辨信号与噪音，只参与长期期望值为正的牌局",
-        en: "Edge check: separate signal from noise and only play positive-EV spots"
-      },
-      size: {
-        tag: "02 · SIZE",
-        zh: "投入多少：按把握度与最大回撤硬顶，克制设定下注或仓位尺度",
-        en: "Sizing discipline: scale exposure to conviction and hard drawdown caps"
-      },
-      exit: {
-        tag: "03 · EXIT",
-        zh: "何时退出：入场前写清证伪条件，触发即弃牌离场，截断左尾风险",
-        en: "Exit rules: pre-commit falsification triggers to cut downside tail risk"
-      },
-      plus: {
-        tag: "+EV",
-        zh: "长期正期望：过滤噪音后，让时间与样本量站在自己一边",
-        en: "Long-run edge: filter noise and let sample size compound over time"
-      }
-    };
-    var readoutTag = heroVisual.querySelector(".hero-ev-readout-tag");
-    var readoutText = heroVisual.querySelector(".hero-ev-readout-text");
-    var replayBtn = document.getElementById("hero-ev-replay");
-    var pauseBtn = document.getElementById("hero-ev-pause");
-    var pauseLabel = document.getElementById("hero-ev-pause-label");
+  if (darkMedia && darkMedia.addEventListener) {
+    darkMedia.addEventListener("change", function () {
+      onThemeChangeHooks.forEach(function (fn) { fn(); });
+    });
+  }
 
-    function setEvStage(stage) {
-      var info = EV_STAGES[stage];
-      if (!info) return;
-      heroVisual.setAttribute("data-active-stage", stage);
-      if (readoutTag) readoutTag.textContent = info.tag;
-      if (readoutText) {
-        readoutText.setAttribute("data-zh", info.zh);
-        readoutText.setAttribute("data-en", info.en);
-        readoutText.textContent = getLang() === "en" ? info.en : info.zh;
-      }
+  /* ---------- Hero Option 1: Interactive Magnetic Vector Field ---------- */
+  var vectorCanvas = document.getElementById("hero-vector-field");
+  var heroSection = document.getElementById("hero");
+  if (vectorCanvas && heroSection && vectorCanvas.getContext) {
+    var ctx = vectorCanvas.getContext("2d");
+    var reducedMotionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+    var prefersReduced = reducedMotionQuery ? reducedMotionQuery.matches : false;
+    var cells = [];
+    var width = 0;
+    var height = 0;
+    var dpr = 1;
+    var radius = 260;
+    var TARGET_ANGLE = -Math.PI / 4;
+    var restX = 0;
+    var restY = 0;
+    var lensX = 0;
+    var lensY = 0;
+    var targetX = 0;
+    var targetY = 0;
+    var rafId = null;
+    var isHeroVisible = true;
+    var darkActive = false;
+    var fgRgb = [30, 29, 27];
+    var accentRgb = [182, 75, 59];
+
+    function isDarkSchemeActive() {
+      var content = schemeMeta ? schemeMeta.getAttribute("content") : "";
+      if (content === "dark") return true;
+      if (content === "light") return false;
+      return getSystemScheme() === "dark";
     }
 
-    function syncPauseLabel(paused) {
-      if (!pauseLabel) return;
-      var zh = paused ? "继续脉搏动画" : "暂停脉搏动画";
-      var en = paused ? "Play pulse animation" : "Pause pulse animation";
-      pauseLabel.setAttribute("data-zh", zh);
-      pauseLabel.setAttribute("data-en", en);
-      pauseLabel.textContent = getLang() === "en" ? en : zh;
-    }
-
-    heroVisual.querySelectorAll("[data-ev-hit]").forEach(function (hit) {
-      var stage = hit.getAttribute("data-ev-hit");
-      hit.addEventListener("pointerenter", function () { setEvStage(stage); });
-      hit.addEventListener("focus", function () { setEvStage(stage); });
-      hit.addEventListener("click", function () { setEvStage(stage); });
-      hit.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          setEvStage(stage);
+    function parseCssColor(str, fallback) {
+      var s = (str || "").trim();
+      if (s.charAt(0) === "#" && (s.length === 7 || s.length === 4)) {
+        if (s.length === 4) {
+          return [
+            parseInt(s.charAt(1) + s.charAt(1), 16),
+            parseInt(s.charAt(2) + s.charAt(2), 16),
+            parseInt(s.charAt(3) + s.charAt(3), 16)
+          ];
         }
-      });
+        return [
+          parseInt(s.slice(1, 3), 16),
+          parseInt(s.slice(3, 5), 16),
+          parseInt(s.slice(5, 7), 16)
+        ];
+      }
+      var m = s.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      return m ? [+m[1], +m[2], +m[3]] : fallback;
+    }
+
+    function syncVectorColors() {
+      darkActive = isDarkSchemeActive();
+      var cs = getComputedStyle(document.documentElement);
+      fgRgb = parseCssColor(
+        cs.getPropertyValue(darkActive ? "--fg-dark" : "--fg-light"),
+        darkActive ? [230, 232, 235] : [30, 29, 27]
+      );
+      accentRgb = parseCssColor(
+        cs.getPropertyValue(darkActive ? "--accent-dark" : "--accent-light"),
+        darkActive ? [229, 113, 95] : [182, 75, 59]
+      );
+    }
+
+    function shortestAngleDiff(from, to) {
+      var diff = (to - from) % Math.PI;
+      if (diff > Math.PI / 2) diff -= Math.PI;
+      if (diff < -Math.PI / 2) diff += Math.PI;
+      return diff;
+    }
+
+    function buildVectorGrid() {
+      var rect = heroSection.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      if (!width || !height) return;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      vectorCanvas.width = Math.round(width * dpr);
+      vectorCanvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      var step = width < 640 ? 32 : 38;
+      var cols = Math.max(4, Math.floor((width - 24) / step) + 1);
+      var rows = Math.max(4, Math.floor((height - 24) / step) + 1);
+      var offsetX = (width - (cols - 1) * step) / 2;
+      var offsetY = (height - (rows - 1) * step) / 2;
+      radius = Math.min(Math.max(width * 0.27, 175), 310);
+
+      restX = width * 0.72;
+      restY = height * 0.42;
+      lensX = targetX = restX;
+      lensY = targetY = restY;
+
+      cells = [];
+      for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+          var x = offsetX + c * step;
+          var y = offsetY + r * step;
+          var baseAngle = Math.sin(c * 1.73 + r * 0.91) * 1.25 + Math.cos(c * 0.61 - r * 1.37) * 1.1;
+          var dist = Math.hypot(x - restX, y - restY);
+          var t = dist < radius ? 0.5 * (1 + Math.cos(Math.PI * dist / radius)) : 0;
+          var influence = t * t;
+          var edgeV = Math.min(y / 56, (height - y) / 56, 1);
+          var edgeH = Math.min(x / 36, (width - x) / 36, 1);
+          var dxText = (x - width * 0.5) / (width < 640 ? 150 : 280);
+          var dyText = (y - height * 0.5) / 64;
+          var textMask = 1 - 0.68 * Math.exp(-(dxText * dxText + dyText * dyText));
+          var edgeFade = Math.max(0.15, Math.min(edgeV, edgeH)) * textMask;
+          cells.push({
+            x: x,
+            y: y,
+            baseAngle: baseAngle,
+            angle: baseAngle + shortestAngleDiff(baseAngle, TARGET_ANGLE) * influence,
+            glow: influence,
+            edgeFade: edgeFade
+          });
+        }
+      }
+    }
+
+    function renderVectorFrame(instant) {
+      if (!width || !height) return;
+      var snap = instant || prefersReduced;
+      var maxDelta = 0;
+
+      if (snap) {
+        lensX = targetX;
+        lensY = targetY;
+      } else {
+        var dxLens = targetX - lensX;
+        var dyLens = targetY - lensY;
+        lensX += dxLens * 0.12;
+        lensY += dyLens * 0.12;
+        maxDelta = Math.max(maxDelta, Math.abs(dxLens) * 0.01, Math.abs(dyLens) * 0.01);
+      }
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Soft ambient spotlight halo matching the magnetic focus zone
+      var haloRadius = radius * 1.08;
+      var grad = ctx.createRadialGradient(lensX, lensY, 0, lensX, lensY, haloRadius);
+      var haloAlpha = darkActive ? 0.14 : 0.085;
+      grad.addColorStop(0, "rgba(" + accentRgb[0] + "," + accentRgb[1] + "," + accentRgb[2] + "," + haloAlpha + ")");
+      grad.addColorStop(0.55, "rgba(" + accentRgb[0] + "," + accentRgb[1] + "," + accentRgb[2] + "," + (haloAlpha * 0.35) + ")");
+      grad.addColorStop(1, "rgba(" + accentRgb[0] + "," + accentRgb[1] + "," + accentRgb[2] + ",0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.lineCap = "round";
+      var baseAlpha = darkActive ? 0.14 : 0.15;
+      var peakAlpha = darkActive ? 0.74 : 0.64;
+
+      for (var i = 0; i < cells.length; i++) {
+        var cell = cells[i];
+        var dist = Math.hypot(cell.x - lensX, cell.y - lensY);
+        var t = dist < radius ? 0.5 * (1 + Math.cos(Math.PI * dist / radius)) : 0;
+        var influence = t * t;
+        var desiredAngle = cell.baseAngle + shortestAngleDiff(cell.baseAngle, TARGET_ANGLE) * influence;
+
+        if (snap) {
+          cell.angle = desiredAngle;
+          cell.glow = influence;
+        } else {
+          var da = shortestAngleDiff(cell.angle, desiredAngle);
+          var dg = influence - cell.glow;
+          cell.angle += da * 0.12;
+          cell.glow += dg * 0.12;
+          maxDelta = Math.max(maxDelta, Math.abs(da), Math.abs(dg));
+        }
+
+        var halfLen = (9.5 + cell.glow * 4) * 0.5;
+        var cosA = Math.cos(cell.angle);
+        var sinA = Math.sin(cell.angle);
+        var rCol = Math.round(fgRgb[0] + (accentRgb[0] - fgRgb[0]) * cell.glow);
+        var gCol = Math.round(fgRgb[1] + (accentRgb[1] - fgRgb[1]) * cell.glow);
+        var bCol = Math.round(fgRgb[2] + (accentRgb[2] - fgRgb[2]) * cell.glow);
+        var alpha = (baseAlpha + (peakAlpha - baseAlpha) * cell.glow) * cell.edgeFade;
+
+        ctx.strokeStyle = "rgba(" + rCol + "," + gCol + "," + bCol + "," + alpha.toFixed(3) + ")";
+        ctx.lineWidth = 1.1 + cell.glow * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(cell.x - cosA * halfLen, cell.y - sinA * halfLen);
+        ctx.lineTo(cell.x + cosA * halfLen, cell.y + sinA * halfLen);
+        ctx.stroke();
+      }
+
+      if (!snap && isHeroVisible && maxDelta > 0.0015) {
+        rafId = window.requestAnimationFrame(function () { renderVectorFrame(false); });
+      } else {
+        rafId = null;
+      }
+    }
+
+    function wakeVectorField() {
+      if (prefersReduced || !isHeroVisible || rafId !== null) return;
+      rafId = window.requestAnimationFrame(function () { renderVectorFrame(false); });
+    }
+
+    function refreshVectorTheme() {
+      syncVectorColors();
+      renderVectorFrame(prefersReduced);
+    }
+
+    onThemeChangeHooks.push(refreshVectorTheme);
+
+    heroSection.addEventListener("pointermove", function (e) {
+      if (prefersReduced) return;
+      var rect = heroSection.getBoundingClientRect();
+      targetX = e.clientX - rect.left;
+      targetY = e.clientY - rect.top;
+      wakeVectorField();
     });
 
-    if (replayBtn) {
-      replayBtn.addEventListener("click", function () {
-        heroVisual.classList.remove("is-paused");
-        syncPauseLabel(false);
-        heroVisual.classList.add("is-replaying");
-        void heroVisual.offsetWidth;
-        heroVisual.classList.remove("is-replaying");
+    heroSection.addEventListener("pointerdown", function (e) {
+      if (prefersReduced) return;
+      var rect = heroSection.getBoundingClientRect();
+      targetX = e.clientX - rect.left;
+      targetY = e.clientY - rect.top;
+      wakeVectorField();
+    });
+
+    heroSection.addEventListener("pointerleave", function () {
+      if (prefersReduced) return;
+      targetX = restX;
+      targetY = restY;
+      wakeVectorField();
+    });
+
+    var resizeTimer = null;
+    window.addEventListener("resize", function () {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(function () {
+        buildVectorGrid();
+        renderVectorFrame(true);
+      }, 120);
+    });
+
+    if ("IntersectionObserver" in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        isHeroVisible = entries[0] ? entries[0].isIntersecting : true;
+        if (!isHeroVisible && rafId !== null) {
+          window.cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      }, { threshold: 0.02 });
+      observer.observe(heroSection);
+    }
+
+    if (reducedMotionQuery && reducedMotionQuery.addEventListener) {
+      reducedMotionQuery.addEventListener("change", function (e) {
+        prefersReduced = e.matches;
+        targetX = restX;
+        targetY = restY;
+        renderVectorFrame(true);
       });
     }
 
-    if (pauseBtn) {
-      pauseBtn.addEventListener("click", function () {
-        var paused = heroVisual.classList.toggle("is-paused");
-        syncPauseLabel(paused);
-      });
-    }
+    syncVectorColors();
+    buildVectorGrid();
+    renderVectorFrame(true);
   }
 
   /* ---------- Post language & series filter (home + archive) ---------- */
