@@ -5,12 +5,12 @@ investment-checklist:
   title_en: "Investment Decision Checklist"
   eyebrow_zh: "投资工具"
   eyebrow_en: "Investing Tool"
-  desc_zh: "下单前写清买入理由、仓位硬顶与证伪条件（EV · SIZE · EXIT）。"
-  desc_en: "Write down your thesis, position cap, and exit triggers before placing a trade."
+  desc_zh: "下单前 90 秒风险算账与决策门禁：算清真实最大亏损与净值冲击，写下核心命题与退出底线。"
+  desc_en: "90-second pre-trade risk calculator & decision gate: quantify max dollar pain, thesis, and exit triggers."
   cta_zh: "打开检查清单"
   cta_en: "Open checklist"
   application_category: "FinanceApplication"
-  feature_list: "EV/SIZE/EXIT 三步决策记录、仓位与止损纪律、本地草稿保存、一键复制纯文本、打印排版优化、纯客户端运行保护隐私"
+  feature_list: "90秒下单前决策门禁、仓位与止损真实亏损算账、净值冲击与赔率计算、情绪温度自检、本地自动草稿保存、Markdown 导出、持见长期追踪衔接"
 
 preflop-range:
   id: "preflop-range"
