@@ -94,4 +94,12 @@ test('preflop-range correctly records import_range and toggle_diff actions', () 
   assert.deepEqual(actionNames, ['import_range', 'toggle_diff']);
 });
 
+test('wechat-formatter correctly records import_md and format_pangu actions', () => {
+  const w = boot('wechat-formatter');
+  w.toolAnalytics.action('import_md');
+  w.toolAnalytics.action('format_pangu');
+  const actionNames = events(w).filter(e => e[1] === 'tool_action').map(e => e[2].action);
+  assert.deepEqual(actionNames, ['import_md', 'format_pangu']);
+});
+
 

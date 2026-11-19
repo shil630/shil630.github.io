@@ -9,11 +9,19 @@ const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(scriptMatch, 'wechat-formatter must contain a <script> block');
 const scriptCode = scriptMatch[1];
 
-function createEnv() {
-  const store = {};
+function createEnv(initialStorage = {}) {
+  const store = { ...initialStorage };
+  const makeMock = () => ({
+    addEventListener: () => {},
+    classList: { add: () => {}, remove: () => {}, toggle: () => {} },
+    setAttribute: () => {},
+    removeAttribute: () => {},
+    dataset: {},
+    style: {}
+  });
   const mockElements = {
-    source: { value: '', addEventListener: () => {}, focus: () => {} },
-    preview: { innerHTML: '', innerText: '', style: {} },
+    source: { value: '', scrollTop: 0, scrollHeight: 0, clientHeight: 0, selectionStart: 0, selectionEnd: 0, addEventListener: () => {}, setRangeText: () => {}, focus: () => {} },
+    preview: { innerHTML: '', innerText: '', style: {}, classList: { toggle: () => {} } },
     toast: { textContent: '', classList: { add: () => {}, remove: () => {} } },
     wordCount: { textContent: '' },
     mobileWordCount: { textContent: '' },
@@ -34,36 +42,46 @@ function createEnv() {
     mobileDrawerArrow: { textContent: '' },
     sampleBtn: { addEventListener: () => {} },
     clearBtn: { addEventListener: () => {} },
-    copyBtn: { addEventListener: () => {} },
-    mobileCopyBtn: { addEventListener: () => {} },
+    importFileBtn: makeMock(),
+    mdFileInput: { ...makeMock(), files: [], value: '', click: () => {} },
+    editorWrap: makeMock(),
+    panguBtn: makeMock(),
+    syncScrollToggle: { ...makeMock(), checked: true },
+    previewWidthGroup: makeMock(),
+    tuneLinkFootnoteGroup: makeMock(),
+    copyBtn: { ...makeMock(), textContent: '复制到公众号' },
+    mobileCopyBtn: { ...makeMock(), textContent: '复制到公众号' },
     downloadBtn: { addEventListener: () => {} },
     mobileDownloadBtn: { addEventListener: () => {} }
   };
 
   const window = {
     toolAnalytics: { action: () => {}, complete: () => {} },
-    scrollTo: () => {}
+    scrollTo: () => {},
+    innerWidth: 1280
   };
   const document = {
     querySelector: (selector) => {
       const id = selector.replace(/^[#.]/, '');
-      return mockElements[id] || { addEventListener: () => {}, classList: { add: () => {}, remove: () => {}, toggle: () => {} }, setAttribute: () => {} };
+      return mockElements[id] || makeMock();
     },
     querySelectorAll: () => [],
-    createElement: () => ({ addEventListener: () => {}, classList: { toggle: () => {} }, dataset: {}, innerHTML: '' }),
+    createElement: () => ({ addEventListener: () => {}, classList: { toggle: () => {} }, dataset: {}, innerHTML: '', textContent: '' }),
     body: { classList: { remove: () => {}, add: () => {} } }
   };
   const localStorage = {
-    getItem: (k) => store[k] || null,
+    getItem: (k) => (Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null),
     setItem: (k, v) => { store[k] = String(v); },
     removeItem: (k) => { delete store[k]; }
   };
 
-  const context = { window, document, localStorage, setTimeout: () => {}, console };
+  const context = { window, document, localStorage, setTimeout: () => 1, clearTimeout: () => {}, console, confirm: () => true };
   vm.createContext(context);
   vm.runInContext(scriptCode, context);
   return {
     context,
+    mockElements,
+    store,
     eval: (expr) => vm.runInContext(expr, context)
   };
 }
@@ -153,5 +171,118 @@ test('wechat-formatter contains focus-visible, reduced motion and roving tabinde
   assert.ok(html.includes('tabindex="-1"'), 'Inactive mobile tab must have initial tabindex -1');
   assert.ok(html.includes("e.key === 'ArrowRight'"), 'Mobile tabs must handle ArrowRight keyboard navigation');
   assert.ok(html.includes("e.key === 'ArrowLeft'"), 'Mobile tabs must handle ArrowLeft keyboard navigation');
+});
+
+test('external links convert to deduplicated footnotes by default and respect linkToFootnote toggle', () => {
+  const env = createEnv();
+  const md = '参考[SEC 公告](https://www.sec.gov/8k)与[另一处](https://www.sec.gov/8k)以及[工具](/tools/preflop-range/)。';
+  const withFootnotes = env.eval(`render(${JSON.stringify(md)})`);
+  assert.ok(!withFootnotes.includes('<a href='), 'Should replace <a> tags when linkToFootnote is enabled');
+  assert.ok(withFootnotes.includes('[1]'), 'Must assign footnote number [1]');
+  assert.ok(withFootnotes.includes('[2]'), 'Must assign footnote number [2]');
+  assert.ok(!withFootnotes.includes('[3]'), 'Duplicate URL https://www.sec.gov/8k must deduplicate');
+  assert.ok(withFootnotes.includes('参考与注释'), 'Must append Reference & Footnotes section');
+  assert.ok(withFootnotes.includes('https://shiliang.me/tools/preflop-range/'), 'Relative site link must resolve to https://shiliang.me');
+
+  env.eval('TUNING.linkToFootnote = false');
+  const rawLinks = env.eval(`render(${JSON.stringify(md)})`);
+  assert.ok(rawLinks.includes('<a href="https://www.sec.gov/8k"'), 'Should render normal <a> when linkToFootnote is false');
+  assert.ok(!rawLinks.includes('参考与注释'), 'Should omit empty reference section when no footnotes rendered');
+});
+
+test('standard markdown [^id] footnotes render superscripts and bottom reference notes', () => {
+  const env = createEnv();
+  const md = '凯利公式指出最佳下注比例[^1]。\n\n[^1]: Kelly, J. L. (1956), Bell System Technical Journal.';
+  const rendered = env.eval(`render(${JSON.stringify(md)})`);
+  assert.ok(rendered.includes('>[1]</sup>'), 'Must render superscript [1]');
+  assert.ok(rendered.includes('参考与注释'), 'Must render bottom reference block');
+  assert.ok(rendered.includes('Kelly, J. L. (1956)'), 'Must include footnote definition body');
+  assert.ok(!rendered.includes('[^1]:'), 'Raw footnote definition line must not leak into body');
+});
+
+test('multiline blockquotes with blank lines and lists render as a single cohesive blockquote', () => {
+  const env = createEnv();
+  const md = '> **上头复位卡**\n>\n> - **触发事件**：亏损后冲动\n> - **复位条件**：冷静5分钟';
+  const rendered = env.eval(`render(${JSON.stringify(md)})`);
+  assert.equal((rendered.match(/<blockquote/g) || []).length, 1, 'Multi-line quote must render as ONE blockquote');
+  assert.ok(!rendered.includes('&gt;'), 'Must not leak raw > symbols');
+  assert.ok(rendered.includes('上头复位卡') && rendered.includes('触发事件') && rendered.includes('•'), 'Inner list and text must render inside blockquote');
+});
+
+test('table <br>, site-relative images and unresolved local image placeholders render cleanly', () => {
+  const env = createEnv();
+  const md = [
+    '| 类型 | 说明 |',
+    '| :--- | :--- |',
+    '| **紧凶** | 第一行<br>第二行 |',
+    '',
+    '![关系图](/assets/images/posts/preflop-range-ev/hand-role-conditions-blog.png)',
+    '*图注：牌力与位置关系图*',
+    '',
+    '![本地草图](./draft-chart.png)'
+  ].join('\n');
+  const rendered = env.eval(`render(${JSON.stringify(md)})`);
+  assert.ok(rendered.includes('第一行<br>第二行'), 'Table <br> must render as HTML line break, not escaped text');
+  assert.ok(!rendered.includes('&lt;br&gt;'), 'Must not escape <br> inside table cells');
+  assert.ok(rendered.includes('src="https://shiliang.me/assets/images/posts/preflop-range-ev/hand-role-conditions-blog.png"'), '/assets/ path must resolve to https://shiliang.me');
+  assert.ok(rendered.includes('图注：牌力与位置关系图') && rendered.includes('text-align:center'), 'Figure caption must render centered');
+  assert.ok(rendered.includes('待在公众号补图') && rendered.includes('./draft-chart.png'), 'Unresolved local path must render dashed placeholder card');
+});
+
+test('inline code protection, strikethrough, H4 and code indentation work properly', () => {
+  const env = createEnv();
+  const md = [
+    '#### 四级小标题',
+    '',
+    '行内代码 `2*3*4` 与 `==unchanged==` 以及 ~~旧看法~~。',
+    '',
+    '```js',
+    '  const x = 1;',
+    '```'
+  ].join('\n');
+  const rendered = env.eval(`render(${JSON.stringify(md)})`);
+  assert.ok(rendered.includes('<h4 '), 'Must support H4 heading');
+  assert.ok(rendered.includes('>2*3*4</code>'), 'Asterisks inside inline code must not trigger italic');
+  assert.ok(!rendered.includes('<em>3</em>'), 'Must not italicize inside inline code');
+  assert.ok(rendered.includes('<del ') && rendered.includes('旧看法</del>'), 'Must render strikethrough');
+  assert.ok(rendered.includes('&nbsp;&nbsp;const x = 1;'), 'Code block must preserve leading indentation via &nbsp;');
+});
+
+test('formatPangu inserts spacing cleanly while skipping front matter, code and URLs', () => {
+  const env = createEnv();
+  const md = [
+    '---',
+    'title: "200BB测试"',
+    '---',
+    '',
+    '在200BB以上现金桌查看[SEC8K文件](https://sec.gov/test2026)和 `Q3财报` 指标：',
+    '',
+    '```js',
+    'const x = "中文200测试";',
+    '```'
+  ].join('\n');
+  const spaced = env.eval(`formatPangu(${JSON.stringify(md)})`);
+  assert.ok(spaced.includes('title: "200BB测试"'), 'Must leave YAML front matter untouched');
+  assert.ok(spaced.includes('在 200BB 以上现金桌'), 'Must add spaces around numbers/Latin in prose');
+  assert.ok(spaced.includes('(https://sec.gov/test2026)'), 'Must keep URL untouched');
+  assert.ok(spaced.includes('`Q3财报`'), 'Must keep inline code untouched');
+  assert.ok(spaced.includes('const x = "中文200测试";'), 'Must keep fenced code block untouched');
+  assert.equal(env.eval(`formatPangu(${JSON.stringify(spaced)})`), spaced, 'formatPangu must be idempotent');
+});
+
+test('computeStats ignores YAML front matter and Markdown syntax for word count and reading time', () => {
+  const env = createEnv();
+  const md = '---\ntitle: "测试标题"\ndescription: "摘要信息"\n---\n# 标题\n\n你好 world，这是测试文本。\n\n![图](https://example.com/a.png)';
+  const stats = JSON.parse(JSON.stringify(env.eval(`computeStats(${JSON.stringify(md)})`)));
+  assert.equal(stats.words, 11, 'Must count 10 CJK chars + 1 English word and exclude YAML/URLs');
+  assert.equal(stats.minutes, 1, 'Non-empty post must estimate at least 1 minute');
+
+  const emptyStats = JSON.parse(JSON.stringify(env.eval('computeStats("")')));
+  assert.deepEqual(emptyStats, { words: 0, minutes: 0 }, 'Empty input must have 0 words and 0 minutes');
+});
+
+test('cleared empty source in localStorage stays empty on reload instead of reviving sample', () => {
+  const env = createEnv({ 'positive-ev-wechat-source': '' });
+  assert.equal(env.mockElements.source.value, '', 'Explicitly cleared empty source must remain empty');
 });
 
