@@ -86,4 +86,12 @@ test('investment-checklist correctly records load_sample action', () => {
   assert.ok(actionNames.includes('load_sample'));
 });
 
+test('preflop-range correctly records import_range and toggle_diff actions', () => {
+  const w = boot('preflop-range');
+  w.toolAnalytics.action('import_range');
+  w.toolAnalytics.action('toggle_diff');
+  const actionNames = events(w).filter(e => e[1] === 'tool_action').map(e => e[2].action);
+  assert.deepEqual(actionNames, ['import_range', 'toggle_diff']);
+});
+
 

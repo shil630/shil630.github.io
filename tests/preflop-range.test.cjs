@@ -19,6 +19,8 @@ function createMockElement(tag, id = '') {
     dataset: {},
     textContent: '',
     innerHTML: '',
+    value: '',
+    hidden: false,
     disabled: false,
     tabIndex: -1,
     classList: {
@@ -35,7 +37,10 @@ function createMockElement(tag, id = '') {
       contains: (c) => classes.has(c)
     },
     setAttribute: (k, v) => { attributes[k] = String(v); },
-    getAttribute: (k) => attributes[k] || null,
+    getAttribute: (k) => (k in attributes ? attributes[k] : null),
+    removeAttribute: (k) => { delete attributes[k]; },
+    hasAttribute: (k) => k in attributes,
+    contains: () => false,
     addEventListener: (type, fn) => {
       listeners[type] = listeners[type] || [];
       listeners[type].push(fn);
@@ -45,7 +50,8 @@ function createMockElement(tag, id = '') {
     },
     append: (...nodes) => {
       nodes.forEach(n => {
-        el.innerHTML += `<${n.tag || 'span'}>${n.textContent || ''}</${n.tag || 'span'}>`;
+        const inner = n.textContent || n.innerHTML || '';
+        el.innerHTML += `<${n.tag || 'span'}>${inner}</${n.tag || 'span'}>`;
       });
     },
     appendChild: (child) => {
@@ -63,14 +69,17 @@ function createEnv(initialStorage = {}) {
   const store = { ...initialStorage };
   const elements = {};
   const getEl = (id) => {
-    if (!elements[id]) elements[id] = createMockElement(id);
+    if (!elements[id]) elements[id] = createMockElement(id, id);
     return elements[id];
   };
 
   const requiredIds = [
     'position-tabs', 'matrix', 'range-panel', 'position-name', 'position-desc',
     'combo-count', 'range-percent', 'hand-result', 'range-text', 'copy-button',
-    'range-mode', 'clear-range', 'restore-range', 'mode-view', 'mode-edit', 'tool-hint'
+    'range-mode', 'clear-range', 'restore-range', 'mode-view', 'mode-edit', 'tool-hint',
+    'diff-prev', 'diff-baseline', 'diff-summary', 'toggle-import-btn', 'import-panel',
+    'import-input', 'apply-import-btn', 'merge-import-btn', 'cancel-import-btn',
+    'import-feedback', 'legend'
   ];
   requiredIds.forEach(id => getEl(id));
 
@@ -92,6 +101,7 @@ function createEnv(initialStorage = {}) {
       appendChild: () => {}
     }),
     createElement: (tag) => createMockElement(tag),
+    createTextNode: (text) => ({ tag: '#text', textContent: String(text) }),
     body: createMockElement('body')
   };
 
@@ -199,5 +209,125 @@ test('preflop-range tool-head repositions mode switch to left and removes duplic
   assert.ok(!html.includes('id="tool-title"'), 'tool-title id must be removed');
   assert.ok(html.includes('<div class="tool-head">\n        <div class="mode-switch"'), 'mode-switch must be placed at the start of tool-head');
   assert.ok(html.includes('id="tool-hint"'), 'tool-hint must remain for screen reader feedback');
+});
+
+test('compressRange round-trips all default positions and gap ranges accurately', () => {
+  const env = createEnv();
+  const preflop = env.eval('window.__preflop');
+
+  for (const [, posState] of preflop.parsedRanges.entries()) {
+    const compressed = preflop.compressRange(posState.defaultHands);
+    const reparsed = preflop.parseRange(compressed);
+    assert.equal(reparsed.errors.length, 0, 'Compressed range must parse cleanly without errors');
+    assert.deepEqual(
+      Array.from(new Set(Array.from(reparsed.hands))).sort(),
+      Array.from(posState.defaultHands).sort(),
+      'Compressed range must round-trip losslessly'
+    );
+  }
+
+  const gapSet = new Set(Array.from(preflop.parseRange('KK-JJ, AJs-A9s, KJo-K9o').hands));
+  const compressedGap = preflop.compressRange(gapSet);
+  assert.equal(compressedGap, 'KK-JJ, AJs-A9s, KJo-K9o', 'Gap ranges must compress using dash notation');
+  assert.equal(preflop.compressRange(new Set()), '', 'Empty set must compress to empty string');
+});
+
+test('parseRange handles extended separators, dashes, 10->T, bare non-pairs and rejects invalid tokens', () => {
+  const env = createEnv();
+  const parse = (txt) => JSON.parse(JSON.stringify(env.eval(`window.__preflop.parseRange(${JSON.stringify(txt)})`)));
+
+  const valid = parse('TT–JJ、A10s K9s~K7s AK AQ+');
+  assert.equal(valid.errors.length, 0, 'Valid extended range tokens should produce zero errors');
+  for (const expected of ['TT', 'JJ', 'ATs', 'K9s', 'K8s', 'K7s', 'AKs', 'AKo', 'AQs', 'AQo']) {
+    assert.ok(valid.hands.includes(expected), `Parsed range must include ${expected}`);
+  }
+
+  const invalid = parse('AA, XYZ, 22s, AAo, KA, 9Ts');
+  assert.deepEqual(invalid.hands, ['AA'], 'Valid token AA must still parse alongside invalid ones');
+  assert.deepEqual(invalid.errors, ['XYZ', '22s', 'AAo', 'KA', '9Ts'], 'All malformed tokens must appear in errors');
+});
+
+test('applyImportedRange handles replace, merge, and preserves existing range with accessible errors on failure', () => {
+  const env = createEnv();
+  const preflop = env.eval('window.__preflop');
+  const originalHands = Array.from(preflop.currentRangeState().hands).sort();
+
+  const badRes = env.eval('window.__preflop.applyImportedRange("55+, XYZ, 22s")');
+  assert.equal(badRes.ok, false, 'Invalid import must fail');
+  assert.deepEqual(
+    Array.from(preflop.currentRangeState().hands).sort(),
+    originalHands,
+    'Invalid import must not overwrite existing hands'
+  );
+  assert.equal(env.elements['import-input'].getAttribute('aria-invalid'), 'true', 'import-input must set aria-invalid="true"');
+  assert.equal(env.elements['import-input'].getAttribute('aria-describedby'), 'import-feedback', 'import-input must link import-feedback');
+
+  const okReplace = env.eval('window.__preflop.applyImportedRange("55+, AQo+")');
+  assert.equal(okReplace.ok, true, 'Valid import must succeed');
+  assert.equal(env.elements['import-input'].getAttribute('aria-invalid'), 'false', 'Valid import must clear aria-invalid');
+  assert.equal(env.elements['import-input'].getAttribute('aria-describedby'), null, 'Valid import must unlink aria-describedby');
+  assert.equal(env.elements['range-text'].textContent, '55+, AQo+', 'range-text must show compressed imported notation');
+
+  const okMerge = env.eval('window.__preflop.applyImportedRange("44, KQs", { mode: "merge" })');
+  assert.equal(okMerge.ok, true, 'Merge import must succeed');
+  assert.ok(preflop.currentRangeState().hands.has('44') && preflop.currentRangeState().hands.has('KQs'), 'Merged hands must be present');
+  assert.ok(preflop.currentRangeState().hands.has('AA'), 'Previously imported hands must remain after merge');
+});
+
+test('setDiffMode computes position incremental diffs and baseline offset diffs accurately', () => {
+  const env = createEnv();
+
+  // UTG edge case in prev mode
+  env.eval('window.__preflop.setDiffMode("prev")');
+  const utgDiff = env.eval('window.__preflop.computeDiff("UTG", "prev")');
+  assert.equal(utgDiff.available, false, 'UTG must report prev diff unavailable');
+  assert.ok(env.elements['diff-summary'].textContent.includes('UTG'), 'UTG diff summary must explain earliest position');
+
+  // Switch to CO -> compare vs HJ
+  env.eval('window.__preflop.state.positionId = "CO"; window.__preflop.render ? null : null;');
+  env.eval('window.__preflop.setDiffMode("prev")');
+  const coPrevDiff = env.eval('window.__preflop.computeDiff("CO", "prev")');
+  assert.equal(coPrevDiff.available, true);
+  assert.equal(coPrevDiff.prevShort, 'HJ');
+  assert.ok(coPrevDiff.added.has('K5s') && coPrevDiff.added.has('JTo'), 'CO prev diff must include newly widened hands');
+  assert.ok(env.elements['diff-summary'].textContent.includes('较 HJ 新增'), 'Summary must reflect HJ -> CO delta');
+
+  // Switch to baseline diff after modifying CO
+  env.eval('window.__preflop.toggleHand("72o"); window.__preflop.toggleHand("AA"); window.__preflop.setDiffMode("baseline");');
+  const baseDiff = env.eval('window.__preflop.computeDiff("CO", "baseline")');
+  assert.equal(baseDiff.available, true);
+  assert.ok(baseDiff.added.has('72o'), 'Added off-baseline hand 72o must appear in diff.added');
+  assert.equal(baseDiff.addedCombos, 12);
+  assert.ok(baseDiff.removed.has('AA'), 'Removed baseline hand AA must appear in diff.removed');
+  assert.equal(baseDiff.removedCombos, 6);
+  assert.ok(env.elements['diff-summary'].textContent.includes('多松 +1 格（+12）'), 'Summary must display added combos');
+  assert.ok(env.elements['diff-summary'].textContent.includes('收紧 -1 格（-6）'), 'Summary must display removed combos');
+});
+
+test('getHandPositions and renderHandResult show 7-position boundary strip and earliest opening position', () => {
+  const env = createEnv();
+  const positionsKJo = JSON.parse(JSON.stringify(env.eval('window.__preflop.getHandPositions("KJo")')));
+  assert.equal(positionsKJo.length, 7, 'Must return all 7 positions');
+  assert.deepEqual(
+    positionsKJo.map(p => [p.short, p.isOpen]),
+    [['UTG', false], ['UTG+1', false], ['MP', false], ['HJ', true], ['CO', true], ['BTN', true], ['SB', true]],
+    'KJo must open starting at HJ'
+  );
+
+  env.eval('window.__preflop.state.activeHand = "KJo"; window.__preflop.renderHandResult(window.__preflop.currentRangeState().hands);');
+  const rendered = env.elements['hand-result'].innerHTML;
+  assert.ok(rendered.includes('杂色 · 12 组合'), 'Must render hand type and combo pill');
+  assert.ok(rendered.includes('最早开池位：HJ'), 'Must compute earliest opening position HJ');
+});
+
+test('toggling a hand back to match default range resets isEdited and clears localStorage', () => {
+  const env = createEnv();
+  env.eval('window.__preflop.toggleHand("72o")');
+  assert.equal(env.eval('window.__preflop.currentRangeState().isEdited'), true);
+  assert.ok(env.store['positive-ev-preflop-ranges-v1'], 'Storage should exist after edit');
+
+  env.eval('window.__preflop.toggleHand("72o")');
+  assert.equal(env.eval('window.__preflop.currentRangeState().isEdited'), false, 'Reverting single edit must clear isEdited');
+  assert.equal(env.store['positive-ev-preflop-ranges-v1'], undefined, 'Storage must clean up automatically when default restored');
 });
 
