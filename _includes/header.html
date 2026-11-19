@@ -18,6 +18,16 @@
       <a href="{{ '/about/' | relative_url }}"{% if page.url contains 'about' %} class="active"{% endif %}>
         <span data-en="About" data-zh="关于">关于</span>
       </a>
+      <button id="theme-toggle" class="theme-toggle" type="button">
+        <span class="theme-opt theme-opt-to-light">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <span class="sr-only" data-en="Switch to light theme" data-zh="切换到纸墨浅色模式">切换到纸墨浅色模式</span>
+        </span>
+        <span class="theme-opt theme-opt-to-dark">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span class="sr-only" data-en="Switch to dark theme" data-zh="切换到深空仪器模式">切换到深空仪器模式</span>
+        </span>
+      </button>
       <button id="lang-toggle" class="lang-toggle" type="button" aria-label="切换语言 / Switch language">中 / EN</button>
     </nav>
   </div>
