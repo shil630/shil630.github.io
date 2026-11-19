@@ -74,16 +74,20 @@ test('all subdirectories under tools/ contain index.html that includes tool-head
   }
 });
 
-test('tool-head.html and all tool index.html files include correct favicon links', () => {
+test('tool-head.html and all tool index.html files include shared theme, brand mark and favicon setup', () => {
   const toolHeadContent = fs.readFileSync(toolHeadPath, 'utf8');
-  assert.ok(toolHeadContent.includes('favicon.svg'), 'tool-head.html must link favicon.svg');
-  assert.ok(toolHeadContent.includes('favicon.png'), 'tool-head.html must link favicon.png');
+  assert.ok(toolHeadContent.includes("favicon.svg' | relative_url }}?v=2"), 'tool-head.html must link favicon.svg?v=2');
+  assert.ok(toolHeadContent.includes("favicon.png' | relative_url }}?v=2"), 'tool-head.html must link favicon.png?v=2');
+  assert.ok(toolHeadContent.includes('<meta name="color-scheme" content="dark">'), 'tool-head.html must default color-scheme to dark');
+  assert.ok(toolHeadContent.includes('tool-theme.js'), 'tool-head.html must load shared tool-theme.js');
 
   const entries = fs.readdirSync(toolsDir, { withFileTypes: true });
   const toolFolders = entries.filter((e) => e.isDirectory()).map((e) => e.name);
   for (const folder of toolFolders) {
     const indexPath = path.join(toolsDir, folder, 'index.html');
     const html = fs.readFileSync(indexPath, 'utf8');
-    assert.ok(html.includes('favicon.svg'), `${folder}/index.html must contain favicon.svg link`);
+    assert.ok(html.includes('{% include tool-head.html %}'), `${folder}/index.html must include tool-head.html`);
+    assert.ok(html.includes('{% include tool-theme-toggle.html %}'), `${folder}/index.html must include tool-theme-toggle.html`);
+    assert.ok(html.includes('{% include tool-brand-mark.html'), `${folder}/index.html must include tool-brand-mark.html`);
   }
 });
