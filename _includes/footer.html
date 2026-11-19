@@ -9,5 +9,15 @@
       {% if site.social.twitter %}<a href="https://twitter.com/{{ site.social.twitter }}" target="_blank" rel="noopener">Twitter</a>{% endif %}
     </div>
     <p class="copyright">© {{ site.time | date: '%Y' }} {{ site.author }} · <span data-en="A Positive EV experiment" data-zh="一场持续进行的正EV实验">一场持续进行的正EV实验</span></p>
+    <p class="footer-colophon">
+      <span>Newsreader &amp; Inter</span>
+      <span class="footer-colophon-sep" aria-hidden="true">·</span>
+      <span>Jekyll</span>
+      <span class="footer-colophon-sep" aria-hidden="true">·</span>
+      <button type="button" class="cmd-trigger" id="cmd-trigger" aria-haspopup="dialog" aria-controls="cmd-palette">
+        <span data-en="Quick jump" data-zh="快捷导航">快捷导航</span>
+        <kbd class="cmd-kbd" id="cmd-kbd-hint">⌘K</kbd>
+      </button>
+    </p>
   </div>
 </footer>

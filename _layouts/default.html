@@ -9,6 +9,8 @@
     {{ content }}
   </main>
 
+  {% include footer.html %}
+
   <dialog id="image-lightbox" class="lightbox-dialog" closedby="any" aria-labelledby="lightbox-title">
     <div class="lightbox-shell">
       <div class="lightbox-header">
@@ -27,7 +29,58 @@
     </div>
   </dialog>
 
-  {% include footer.html %}
+  <dialog id="cmd-palette" class="cmd-dialog" closedby="any" aria-label="快捷导航与搜索">
+    <div class="cmd-shell">
+      <div class="cmd-search-bar">
+        <svg class="cmd-search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input
+          id="cmd-input"
+          class="cmd-input"
+          type="search"
+          autocomplete="off"
+          spellcheck="false"
+          role="combobox"
+          aria-expanded="true"
+          aria-controls="cmd-results"
+          aria-autocomplete="list"
+          aria-activedescendant=""
+          placeholder="搜索文章、工具、页面，或输入指令…"
+          data-placeholder-zh="搜索文章、工具、页面，或输入指令…"
+          data-placeholder-en="Search articles, tools, pages, or commands…"
+          autofocus
+        >
+        <button type="button" class="cmd-esc-btn" id="cmd-close" aria-label="关闭快捷导航">
+          <kbd>Esc</kbd>
+        </button>
+      </div>
+      <div id="cmd-results" class="cmd-results" role="listbox" aria-label="快捷导航结果"></div>
+      <p id="cmd-empty" class="cmd-empty" hidden data-en="No matching articles, tools, or commands." data-zh="没有找到匹配的文章、工具或指令。">没有找到匹配的文章、工具或指令。</p>
+      <div class="cmd-footer" aria-hidden="true">
+        <span><kbd>↑</kbd><kbd>↓</kbd> <em data-en="Navigate" data-zh="选择">选择</em></span>
+        <span><kbd>↵</kbd> <em data-en="Open" data-zh="打开">打开</em></span>
+        <span><kbd>Esc</kbd> <em data-en="Close" data-zh="关闭">关闭</em></span>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="application/json" id="cmd-index">
+  {
+    "pages": [
+      {"title_zh": "首页", "title_en": "Home", "sub_zh": "石亮正EV · 设计 × 投资 × 德州", "sub_en": "Positive EV · Design × Investing × Poker", "url": {{ '/' | relative_url | jsonify | replace: '</', '<\/' }}},
+      {"title_zh": "UX 作品集", "title_en": "Selected Work", "sub_zh": "10+ 年产品与体验设计代表项目", "sub_en": "10+ years of product & UX design case studies", "url": {{ '/work/' | relative_url | jsonify | replace: '</', '<\/' }}},
+      {"title_zh": "全部文章归档", "title_en": "Articles Archive", "sub_zh": "按时间与系列浏览全部文章", "sub_en": "Browse all articles by year and series", "url": {{ '/archive/' | relative_url | jsonify | replace: '</', '<\/' }}},
+      {"title_zh": "自建决策工具", "title_en": "Decision Tools", "sub_zh": "投资检查清单、翻前开池范围、公众号排版器", "sub_en": "Checklist, Preflop Range & WeChat Formatter", "url": {{ '/tools/' | relative_url | jsonify | replace: '</', '<\/' }}},
+      {"title_zh": "关于石亮", "title_en": "About Liang Shi", "sub_zh": "个人简介、决策框架与联系方式", "sub_en": "Bio, decision framework & contact", "url": {{ '/about/' | relative_url | jsonify | replace: '</', '<\/' }}},
+      {"title_zh": "RSS 订阅源", "title_en": "RSS Feed", "sub_zh": "feed.xml · 用阅读器订阅更新", "sub_en": "feed.xml · Subscribe via RSS reader", "url": {{ '/feed.xml' | relative_url | jsonify | replace: '</', '<\/' }}}
+    ],
+    "tools": [
+      {% for pair in site.data.tools %}{% assign t = pair[1] %}{"title_zh": {{ t.title_zh | jsonify | replace: '</', '<\/' }}, "title_en": {{ t.title_en | jsonify | replace: '</', '<\/' }}, "sub_zh": {{ t.desc_zh | jsonify | replace: '</', '<\/' }}, "sub_en": {{ t.desc_en | jsonify | replace: '</', '<\/' }}, "eyebrow_zh": {{ t.eyebrow_zh | jsonify | replace: '</', '<\/' }}, "eyebrow_en": {{ t.eyebrow_en | jsonify | replace: '</', '<\/' }}, "url": {{ t.url | relative_url | jsonify | replace: '</', '<\/' }}}{% unless forloop.last %},{% endunless %}{% endfor %}
+    ],
+    "posts": [
+      {% assign cmd_posts = site.posts | where_exp: "p", "p.draft != true" %}{% for p in cmd_posts %}{"title": {{ p.title | jsonify | replace: '</', '<\/' }}, "sub": {{ p.subtitle | default: p.description | default: "" | jsonify | replace: '</', '<\/' }}, "series": {{ p.series | default: "" | jsonify | replace: '</', '<\/' }}, "date": {{ p.date | date: "%Y-%m-%d" | jsonify | replace: '</', '<\/' }}, "tags": {{ p.tags | jsonify | replace: '</', '<\/' }}, "url": {{ p.url | relative_url | jsonify | replace: '</', '<\/' }}}{% unless forloop.last %},{% endunless %}{% endfor %}
+    ]
+  }
+  </script>
 
   <script src="{{ '/assets/js/analytics.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
   <script src="{{ '/assets/js/main.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
