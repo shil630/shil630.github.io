@@ -101,7 +101,8 @@ assert!(!home.include?('class="post-lang-badge"'), "全中文首页不应显示�
 
 featured_count = home.scan('class="featured-card"').length
 assert!(featured_count == 2, "首页精选代表作数量应为 2，实际为 #{featured_count}")
-assert!(home_doc.at_css('.hero-intro a[href="https://thesisee.com"]'), "首页简介缺少持见 thesisee.com 超链接")
+pillars_text = home_doc.at_css('.hero-intro .hero-pillars')&.text.to_s
+assert!(%w[设计 投资 德州].all? { |kw| pillars_text.include?(kw) }, "首页首屏三支柱文案不符合预期")
 assert!(home.include?("体验设计总监"), "首页简介未同步最新头衔")
 home_tools_count = home.scan('class="home-tool-card"').length
 assert!(home_tools_count == 3, "首页自建工具卡片数量应为 3，实际为 #{home_tools_count}")
