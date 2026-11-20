@@ -707,6 +707,46 @@
     }
   }
 
+  /* ---------- Prose Tables & Plain-Text Flow Diagrams (Mobile Wrapping) ---------- */
+  var proseTables = document.querySelectorAll(".prose table");
+  if (proseTables.length) {
+    var getTableRegionLabel = function () {
+      return getLang() === "en" ? "Scrollable data table" : "可横向滚动查看的表格";
+    };
+    var tableWraps = [];
+    proseTables.forEach(function (table) {
+      if (table.parentElement && table.parentElement.classList.contains("prose-table-wrap")) {
+        tableWraps.push(table.parentElement);
+        return;
+      }
+      var wrap = document.createElement("div");
+      wrap.className = "prose-table-wrap";
+      wrap.setAttribute("role", "region");
+      wrap.setAttribute("tabindex", "0");
+      wrap.setAttribute("aria-label", getTableRegionLabel());
+      if (table.parentNode) {
+        table.parentNode.insertBefore(wrap, table);
+        wrap.appendChild(table);
+        tableWraps.push(wrap);
+      }
+    });
+    if (tableWraps.length) {
+      onLangChangeHooks.push(function () {
+        var label = getTableRegionLabel();
+        tableWraps.forEach(function (wrap) {
+          wrap.setAttribute("aria-label", label);
+        });
+      });
+    }
+  }
+
+  document.querySelectorAll(".prose .language-text pre").forEach(function (pre) {
+    var text = pre.textContent || "";
+    if (!/[│├└┌┐┘┤┬┴┼]/.test(text)) {
+      pre.classList.add("prose-pre-wrap");
+    }
+  });
+
   /* ---------- Global Command Palette (⌘K / /) ---------- */
   var cmdPalette = document.getElementById("cmd-palette");
   var cmdInput = document.getElementById("cmd-input");
