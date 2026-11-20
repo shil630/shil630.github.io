@@ -19,6 +19,10 @@
       var ph = el.getAttribute(lang === "en" ? "data-placeholder-en" : "data-placeholder-zh");
       if (ph !== null) el.setAttribute("placeholder", ph);
     });
+    document.querySelectorAll("[data-aria-label-zh][data-aria-label-en]").forEach(function (el) {
+      var aria = el.getAttribute(lang === "en" ? "data-aria-label-en" : "data-aria-label-zh");
+      if (aria !== null) el.setAttribute("aria-label", aria);
+    });
     // Whole blocks: .lang-zh / .lang-en
     document.querySelectorAll(".lang-zh").forEach(function (el) {
       el.hidden = lang !== "zh";
@@ -108,6 +112,10 @@
     var targetY = 0;
     var rafId = null;
     var isHeroVisible = true;
+    var isCompact = false;
+    var hoverNoneQuery = window.matchMedia ? window.matchMedia("(hover: none)") : null;
+    var isTouchAmbient = !!(hoverNoneQuery && hoverNoneQuery.matches);
+    var ambientPauseUntil = 0;
     var darkActive = false;
     var fgRgb = [30, 29, 27];
     var accentRgb = [182, 75, 59];
@@ -162,15 +170,18 @@
       vectorCanvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      var step = width < 640 ? 32 : 38;
+      isCompact = width < 640;
+      var step = isCompact ? 28 : 38;
       var cols = Math.max(4, Math.floor((width - 24) / step) + 1);
       var rows = Math.max(4, Math.floor((height - 24) / step) + 1);
       var offsetX = (width - (cols - 1) * step) / 2;
       var offsetY = (height - (rows - 1) * step) / 2;
-      radius = Math.min(Math.max(width * 0.27, 175), 310);
+      radius = isCompact
+        ? Math.min(Math.max(width * 0.44, 155), 210)
+        : Math.min(Math.max(width * 0.27, 175), 310);
 
-      restX = width * 0.72;
-      restY = height * 0.42;
+      restX = isCompact ? width * 0.62 : width * 0.72;
+      restY = isCompact ? height * 0.34 : height * 0.42;
       lensX = targetX = restX;
       lensY = targetY = restY;
 
@@ -185,12 +196,15 @@
           var influence = t * t;
           var edgeV = Math.min(y / 56, (height - y) / 56, 1);
           var edgeH = Math.min(x / 36, (width - x) / 36, 1);
-          var dxText = (x - width * 0.5) / (width < 640 ? 150 : 280);
+          var dxText = (x - width * 0.5) / (isCompact ? 150 : 280);
           var dyText = (y - height * 0.5) / 64;
           var textMask = 1 - 0.68 * Math.exp(-(dxText * dxText + dyText * dyText));
-          var dxCue = (x - width * 0.5) / 44;
-          var dyCue = (y - (height - 46)) / 34;
-          var cueMask = 1 - 0.85 * Math.exp(-(dxCue * dxCue + dyCue * dyCue));
+          var cueMask = 1;
+          if (!isCompact) {
+            var dxCue = (x - width * 0.5) / 44;
+            var dyCue = (y - (height - 46)) / 34;
+            cueMask = 1 - 0.85 * Math.exp(-(dxCue * dxCue + dyCue * dyCue));
+          }
           var edgeFade = Math.max(0.15, Math.min(edgeV, edgeH)) * textMask * cueMask;
           cells.push({
             x: x,
@@ -204,10 +218,21 @@
       }
     }
 
-    function renderVectorFrame(instant) {
+    function getClockNow(ts) {
+      if (typeof ts === "number") return ts;
+      return window.performance && window.performance.now ? window.performance.now() : Date.now();
+    }
+
+    function renderVectorFrame(instant, now) {
       if (!width || !height) return;
       var snap = instant || prefersReduced;
       var maxDelta = 0;
+      var clock = getClockNow(now);
+
+      if (!snap && isTouchAmbient && isHeroVisible && !document.hidden && clock >= ambientPauseUntil) {
+        targetX = restX + Math.sin(clock * 0.00045) * width * 0.14;
+        targetY = restY + Math.cos(clock * 0.00032) * height * 0.10;
+      }
 
       if (snap) {
         lensX = targetX;
@@ -225,7 +250,7 @@
       // Soft ambient spotlight halo matching the magnetic focus zone
       var haloRadius = radius * 1.08;
       var grad = ctx.createRadialGradient(lensX, lensY, 0, lensX, lensY, haloRadius);
-      var haloAlpha = darkActive ? 0.14 : 0.085;
+      var haloAlpha = isCompact ? (darkActive ? 0.18 : 0.11) : (darkActive ? 0.14 : 0.085);
       grad.addColorStop(0, "rgba(" + accentRgb[0] + "," + accentRgb[1] + "," + accentRgb[2] + "," + haloAlpha + ")");
       grad.addColorStop(0.55, "rgba(" + accentRgb[0] + "," + accentRgb[1] + "," + accentRgb[2] + "," + (haloAlpha * 0.35) + ")");
       grad.addColorStop(1, "rgba(" + accentRgb[0] + "," + accentRgb[1] + "," + accentRgb[2] + ",0)");
@@ -233,7 +258,7 @@
       ctx.fillRect(0, 0, width, height);
 
       ctx.lineCap = "round";
-      var baseAlpha = darkActive ? 0.14 : 0.15;
+      var baseAlpha = isCompact ? 0.18 : (darkActive ? 0.14 : 0.15);
       var peakAlpha = darkActive ? 0.74 : 0.64;
 
       for (var i = 0; i < cells.length; i++) {
@@ -270,16 +295,17 @@
         ctx.stroke();
       }
 
-      if (!snap && isHeroVisible && maxDelta > 0.0015) {
-        rafId = window.requestAnimationFrame(function () { renderVectorFrame(false); });
+      var keepAmbient = isTouchAmbient && !snap && isHeroVisible && !document.hidden;
+      if ((!snap && isHeroVisible && maxDelta > 0.0015) || keepAmbient) {
+        rafId = window.requestAnimationFrame(function (ts) { renderVectorFrame(false, ts); });
       } else {
         rafId = null;
       }
     }
 
     function wakeVectorField() {
-      if (prefersReduced || !isHeroVisible || rafId !== null) return;
-      rafId = window.requestAnimationFrame(function () { renderVectorFrame(false); });
+      if (prefersReduced || !isHeroVisible || document.hidden || rafId !== null) return;
+      rafId = window.requestAnimationFrame(function (ts) { renderVectorFrame(false, ts); });
     }
 
     function refreshVectorTheme() {
@@ -302,6 +328,9 @@
       var rect = heroSection.getBoundingClientRect();
       targetX = e.clientX - rect.left;
       targetY = e.clientY - rect.top;
+      if (isTouchAmbient) {
+        ambientPauseUntil = getClockNow() + 2600;
+      }
       wakeVectorField();
     });
 
@@ -318,6 +347,7 @@
       resizeTimer = window.setTimeout(function () {
         buildVectorGrid();
         renderVectorFrame(true);
+        if (isTouchAmbient) wakeVectorField();
       }, 120);
     });
 
@@ -327,9 +357,27 @@
         if (!isHeroVisible && rafId !== null) {
           window.cancelAnimationFrame(rafId);
           rafId = null;
+        } else if (isHeroVisible && isTouchAmbient) {
+          wakeVectorField();
         }
       }, { threshold: 0.02 });
       observer.observe(heroSection);
+    }
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden && rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+        rafId = null;
+      } else if (!document.hidden && isHeroVisible && isTouchAmbient) {
+        wakeVectorField();
+      }
+    });
+
+    if (hoverNoneQuery && hoverNoneQuery.addEventListener) {
+      hoverNoneQuery.addEventListener("change", function (e) {
+        isTouchAmbient = e.matches;
+        if (isTouchAmbient) wakeVectorField();
+      });
     }
 
     if (reducedMotionQuery && reducedMotionQuery.addEventListener) {
@@ -338,12 +386,14 @@
         targetX = restX;
         targetY = restY;
         renderVectorFrame(true);
+        if (!prefersReduced && isTouchAmbient) wakeVectorField();
       });
     }
 
     syncVectorColors();
     buildVectorGrid();
     renderVectorFrame(true);
+    if (isTouchAmbient) wakeVectorField();
   }
 
   /* ---------- Post language & series filter (home + archive) ---------- */
@@ -747,6 +797,142 @@
     }
   });
 
+  /* ---------- Responsive Header Popover Navigation ---------- */
+  var siteHeader = document.getElementById("site-header");
+  var headerInner = siteHeader && siteHeader.querySelector ? siteHeader.querySelector(".header-inner") : null;
+  var siteMenu = document.getElementById("site-menu");
+  var menuToggle = document.getElementById("menu-toggle");
+  var supportsNativePopover = typeof HTMLElement !== "undefined" && Object.prototype.hasOwnProperty.call(HTMLElement.prototype, "popover");
+
+  function isSiteMenuOpen() {
+    if (!siteMenu) return false;
+    if (supportsNativePopover && siteMenu.matches && siteMenu.matches(":popover-open")) return true;
+    return siteMenu.classList.contains("is-popover-fallback-open");
+  }
+
+  function closeSiteMenu() {
+    if (!siteMenu) return;
+    if (supportsNativePopover && siteMenu.matches && siteMenu.matches(":popover-open") && siteMenu.hidePopover) {
+      try { siteMenu.hidePopover(); } catch (e) {}
+    }
+    siteMenu.classList.remove("is-popover-fallback-open");
+    if (menuToggle) menuToggle.setAttribute("aria-expanded", "false");
+  }
+
+  if (siteHeader && headerInner && siteMenu) {
+    var desktopNavQuery = window.matchMedia ? window.matchMedia("(min-width: 681px)") : null;
+
+    function syncHeaderNav() {
+      var isWideViewport = desktopNavQuery ? desktopNavQuery.matches : true;
+      var wasOpen = isSiteMenuOpen();
+
+      if (!isWideViewport) {
+        siteHeader.classList.add("is-collapsed");
+        siteHeader.classList.remove("is-wide");
+        if (supportsNativePopover) {
+          siteMenu.setAttribute("popover", "auto");
+        } else {
+          siteMenu.removeAttribute("popover");
+        }
+        if (menuToggle) menuToggle.setAttribute("aria-expanded", isSiteMenuOpen() ? "true" : "false");
+        return;
+      }
+
+      siteHeader.classList.add("is-measuring");
+      if (wasOpen && supportsNativePopover && siteMenu.hidePopover) {
+        try { siteMenu.hidePopover(); } catch (e) {}
+      }
+      siteHeader.classList.remove("is-collapsed");
+      siteHeader.classList.add("is-wide");
+      siteMenu.removeAttribute("popover");
+
+      var overflows = (headerInner.scrollWidth || 0) > (headerInner.clientWidth || 0) + 1;
+      if (overflows) {
+        siteHeader.classList.add("is-collapsed");
+        siteHeader.classList.remove("is-wide");
+        if (supportsNativePopover) siteMenu.setAttribute("popover", "auto");
+        if (wasOpen) {
+          if (supportsNativePopover && siteMenu.showPopover) {
+            try { siteMenu.showPopover(); } catch (e) {}
+          } else {
+            siteMenu.classList.add("is-popover-fallback-open");
+          }
+        }
+        if (menuToggle) menuToggle.setAttribute("aria-expanded", isSiteMenuOpen() ? "true" : "false");
+      } else {
+        siteMenu.classList.remove("is-popover-fallback-open");
+        if (menuToggle) menuToggle.setAttribute("aria-expanded", "false");
+      }
+
+      if (typeof window.requestAnimationFrame === "function") {
+        window.requestAnimationFrame(function () {
+          siteHeader.classList.remove("is-measuring");
+        });
+      } else {
+        siteHeader.classList.remove("is-measuring");
+      }
+    }
+
+    if (supportsNativePopover) {
+      siteMenu.addEventListener("toggle", function (e) {
+        if (menuToggle) {
+          menuToggle.setAttribute("aria-expanded", e && e.newState === "open" ? "true" : "false");
+        }
+      });
+    } else if (menuToggle) {
+      siteMenu.removeAttribute("popover");
+      menuToggle.addEventListener("click", function (e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var nextOpen = !siteMenu.classList.contains("is-popover-fallback-open");
+        siteMenu.classList.toggle("is-popover-fallback-open", nextOpen);
+        menuToggle.setAttribute("aria-expanded", nextOpen ? "true" : "false");
+      });
+      document.addEventListener("click", function (e) {
+        if (!siteMenu.classList.contains("is-popover-fallback-open")) return;
+        var t = e && e.target;
+        if (t && ((siteMenu.contains && siteMenu.contains(t)) || (menuToggle.contains && menuToggle.contains(t)))) return;
+        closeSiteMenu();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e && e.key === "Escape" && siteMenu.classList.contains("is-popover-fallback-open")) {
+          closeSiteMenu();
+          if (menuToggle.focus) menuToggle.focus();
+        }
+      });
+    }
+
+    if (siteMenu.querySelectorAll) {
+      siteMenu.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          closeSiteMenu();
+        });
+      });
+    }
+
+    syncHeaderNav();
+    onLangChangeHooks.push(syncHeaderNav);
+
+    if (typeof ResizeObserver === "function") {
+      var lastHeaderWidth = siteHeader.getBoundingClientRect ? siteHeader.getBoundingClientRect().width : 0;
+      var navResizeObserver = new ResizeObserver(function () {
+        var w = siteHeader.getBoundingClientRect ? siteHeader.getBoundingClientRect().width : 0;
+        if (siteHeader.classList.contains("is-collapsed") && w <= lastHeaderWidth && desktopNavQuery && !desktopNavQuery.matches) {
+          lastHeaderWidth = w;
+          return;
+        }
+        lastHeaderWidth = w;
+        syncHeaderNav();
+      });
+      navResizeObserver.observe(siteHeader);
+    } else {
+      window.addEventListener("resize", syncHeaderNav);
+    }
+
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+      document.fonts.ready.then(syncHeaderNav);
+    }
+  }
+
   /* ---------- Global Command Palette (⌘K / /) ---------- */
   var cmdPalette = document.getElementById("cmd-palette");
   var cmdInput = document.getElementById("cmd-input");
@@ -948,6 +1134,7 @@
     }
 
     function openCmdPalette() {
+      closeSiteMenu();
       if (lightbox && lightbox.open) {
         lightbox.close();
       }
@@ -964,6 +1151,9 @@
     if (cmdTrigger) {
       cmdTrigger.addEventListener("click", openCmdPalette);
     }
+    document.querySelectorAll("[data-cmd-open]").forEach(function (btn) {
+      btn.addEventListener("click", openCmdPalette);
+    });
 
     cmdInput.addEventListener("input", function () {
       renderCmdResults(cmdInput.value);
